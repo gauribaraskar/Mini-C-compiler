@@ -90,7 +90,14 @@ hex [0-9a-fA-F]
  ">=" {printf("Comparison Operator: %s\n",yytext );}
  "<=" {printf("Comparison Operator: %s\n",yytext );}
  "==" {printf("Comparison Operator: %s\n",yytext );}
- 
+
+ /* Strings and Characters*/
+
+\"[^\"\n]*\" {printf("String: %s\n",yytext );}
+
+ /* Punctuators */
+
+ // I shall add it later, got bored got to sleep
 
 \n {yylineno++;}
 . {printf("Illegal Character: %s\n",yytext );}
