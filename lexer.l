@@ -63,7 +63,7 @@ hex [0-9a-fA-F]
       InsertEntry(SymbolTable,yytext,"IDENTIFIER");
     }
   else
-    printf("Error %d: Identifier too long,must be between 1 to 32 characters", yylineno);
+      printf("Error %d: Identifier too long,must be between 1 to 32 characters", yylineno);
 }
 
 

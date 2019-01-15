@@ -97,16 +97,15 @@ void Display(entry** TablePointer)
 
   printf("-----------------------------------------\n");
 
-  printf("Printing Table:\n");
-  printf("(lexeme, token)\n" );
+  printf("\tPrinting Table:\n");
+  printf("\n\t(lexeme, token)\n" );
 
   for(i=0;i<SIZE;i++)
   {
-
     temp = TablePointer[i];
     while(temp != NULL)
     {
-      printf("(%s, %s)\n",temp->lexeme,temp->token);
+      printf("\t(%5s, %s)\n",temp->lexeme,temp->token);
       temp = temp->next;
     }
 

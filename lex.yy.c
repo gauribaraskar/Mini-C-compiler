@@ -1006,7 +1006,7 @@ YY_RULE_SETUP
       InsertEntry(SymbolTable,yytext,"IDENTIFIER");
     }
   else
-    printf("Error %d: Identifier too long,must be between 1 to 32 characters", yylineno);
+      printf("Error %d: Identifier too long,must be between 1 to 32 characters", yylineno);
 }
 	YY_BREAK
 case 22:
