@@ -4,14 +4,11 @@
 
 #define SIZE 100
 
-enum Identifier{
-  ID = 1
-};
 
 struct table_entry{
 
     char *lexeme;
-    int token;
+    char  *token;
     struct table_entry *next;
 };
 
@@ -61,7 +58,7 @@ int Search(entry** TablePointer, char *lexeme)
   return 0;
 }
 
-void InsertEntry(entry** TablePointer, char *lexeme,int Token )
+void InsertEntry(entry** TablePointer, char *lexeme,char *Token )
 {
   if(Search(TablePointer,lexeme) == 1)
     return;
@@ -75,7 +72,7 @@ void InsertEntry(entry** TablePointer, char *lexeme,int Token )
     entry *tempPoint = NULL;
     tempPoint = malloc(sizeof(entry));
     tempPoint->lexeme = strdup(lexeme);
-    tempPoint->token = Token;
+    tempPoint->token = strdup(Token);
     tempPoint->next = NULL;
 
     if (head == NULL)
@@ -109,25 +106,11 @@ void Display(entry** TablePointer)
     temp = TablePointer[i];
     while(temp != NULL)
     {
-      printf("(%s, %d)\n",temp->lexeme,temp->token);
+      printf("(%s, %s)\n",temp->lexeme,temp->token);
       temp = temp->next;
     }
 
   }
 
   printf("-----------------------------------------\n");
-}
-
-
-int main()
-{
-  entry **table;
-  table = CreateTable();
-
-  InsertEntry(table,"ayush",ID);
-  InsertEntry(table,"Kumar",ID);
-  InsertEntry(table,"SING",ID);
-
-  Display(table);
-  return 0;
 }
