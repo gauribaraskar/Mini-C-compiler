@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define SIZE 100
 
 enum Identifier{
-  id = 1;
+  ID = 1
 };
 
 struct table_entry{
@@ -28,7 +29,7 @@ int hash(char *lexeme)
 
 entry** CreateTable()
 {
-  entry *TablePointer = NULL;
+  entry **TablePointer = NULL;
 
   TablePointer = malloc(sizeof(entry*)*SIZE);
 
@@ -37,7 +38,7 @@ entry** CreateTable()
 
   int i;
   for(i=0;i<SIZE;i++)
-    TablePointer[i] == NULL;
+    TablePointer[i] = NULL;
 
   return TablePointer;
 }
@@ -55,14 +56,14 @@ int Search(entry** TablePointer, char *lexeme)
     else
       head = head->next;
   }
-
   if(head == NULL)
     return 0;
+  return 0;
 }
 
 void InsertEntry(entry** TablePointer, char *lexeme,int Token )
 {
-  if(search(TablePointer,lexeme) == 1)
+  if(Search(TablePointer,lexeme) == 1)
     return;
   else
   {
@@ -71,19 +72,62 @@ void InsertEntry(entry** TablePointer, char *lexeme,int Token )
 
     head = TablePointer[temp];
 
-    while(head->next != NULL)
-      head = head->next;
-
     entry *tempPoint = NULL;
     tempPoint = malloc(sizeof(entry));
     tempPoint->lexeme = strdup(lexeme);
     tempPoint->token = Token;
+    tempPoint->next = NULL;
 
-    head->next = tempPoint;
+    if (head == NULL)
+    {
+      TablePointer[temp] = tempPoint;
+    }
+    else
+    {
+      tempPoint->next = TablePointer[temp];
+      TablePointer[temp] = tempPoint;
+    }
+
   }
 }
 
 void Display(entry** TablePointer)
 {
-  printf("*");
+  int i =0;
+  entry *temp = NULL;
+
+  printf("\n\n");
+
+  printf("-----------------------------------------\n");
+
+  printf("Printing Table:\n");
+  printf("(lexeme, token)\n" );
+
+  for(i=0;i<SIZE;i++)
+  {
+
+    temp = TablePointer[i];
+    while(temp != NULL)
+    {
+      printf("(%s, %d)\n",temp->lexeme,temp->token);
+      temp = temp->next;
+    }
+
+  }
+
+  printf("-----------------------------------------\n");
+}
+
+
+int main()
+{
+  entry **table;
+  table = CreateTable();
+
+  InsertEntry(table,"ayush",ID);
+  InsertEntry(table,"Kumar",ID);
+  InsertEntry(table,"SING",ID);
+
+  Display(table);
+  return 0;
 }
