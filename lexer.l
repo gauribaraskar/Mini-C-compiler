@@ -154,10 +154,10 @@ hex [0-9a-fA-F]
 
 int main(int argc, char *argv[])
 {
+	
   FILE *fh;
   if (argc == 2 && (fh = fopen(argv[1], "r")))
         yyin = fh;
-  yyin = fopen("test-case-errors.c", "r");
   yylex();
   printf("Lexical analysis finished\n");
   return 0;
