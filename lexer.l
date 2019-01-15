@@ -1,6 +1,11 @@
 %{
     #include<stdio.h>
     #include<stdlib.h>
+
+    #include "tables.h"
+
+    entry **SymbolTable = NULL;
+    entry **ConstantTable = NULL;
 %}
 
 
@@ -46,15 +51,18 @@ hex [0-9a-fA-F]
 
  /* Constants */
 
-[+/-]?[0][x|X]{hex}+                {printf("\t%-50s : Hexadecimal Constant\n", yytext);}
-[+/-]?{digit}+                      {printf("\t%-50s : Integer Constant\n", yytext);}
-[+/-]?({digit}+)["."]({digit}+)     {printf("\t%-50s : Decimal Constant\n", yytext);}
+[+/-]?[0][x|X]{hex}+                {printf("\t%-50s : Hexadecimal Constant\n", yytext); InsertEntry(ConstantTable,yytext,"HEX_CONSTANT");}
+[+/-]?{digit}+                      {printf("\t%-50s : Integer Constant\n", yytext); InsertEntry(ConstantTable,yytext,"INT_CONSTANT");}
+[+/-]?({digit}+)["."]({digit}+)     {printf("\t%-50s : Decimal Constant\n", yytext); InsertEntry(ConstantTable,yytext,"DEC_CONSTANT");}
 
 
 {identifier} {
   if(strlen(yytext) <= 32)
-    printf("\t%-50s : Identifier\n", yytext); 
-  else 
+    {
+      printf("\t%-50s : Identifier\n", yytext);
+      InsertEntry(SymbolTable,yytext,"IDENTIFIER");
+    }
+  else
     printf("Error %d: Identifier too long,must be between 1 to 32 characters", yylineno);
 }
 
@@ -123,6 +131,7 @@ hex [0-9a-fA-F]
   if(yytext[yyleng-2]=='\\') {
     yyless(yyleng-1);
     yymore();
+    InsertEntry(ConstantTable,yytext,"STRING");
     printf("\t%-50s : String\n", yytext);
   }
   else
@@ -154,11 +163,17 @@ hex [0-9a-fA-F]
 
 int main(int argc, char *argv[])
 {
-	
+  SymbolTable = CreateTable();
+  ConstantTable = CreateTable();
   FILE *fh;
   if (argc == 2 && (fh = fopen(argv[1], "r")))
         yyin = fh;
   yylex();
+
+  Display(SymbolTable);
+  printf("\n\n");
+  Display(ConstantTable);
+
   printf("Lexical analysis finished\n");
   return 0;
 }
