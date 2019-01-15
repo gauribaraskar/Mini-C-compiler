@@ -19,55 +19,109 @@ hex [0-9a-fA-F]
 %x COMMENT
 %x SLCOMMENT
 
-
 %%
 
  /* Keywords */
 
-"int" 					{printf("Keyword: %s",yytext);}
-"short" 				{printf("Keyword: %s",yytext);}
-"long" 					{printf("Keyword: %s",yytext);}
-"char" 					{printf("Keyword: %s",yytext);}
-"signed" 				{printf("Keyword: %s",yytext);}
-"unsigned" 			{printf("Keyword: %s",yytext);}
-"void" 					{printf("Keyword: %s",yytext);}
-"if" 					  {printf("Keyword: %s",yytext);}
-"else" 					{printf("Keyword: %s",yytext);}
-"for" 					{printf("Keyword: %s",yytext);}
-"do" 					  {printf("Keyword: %s",yytext);}
-"while" 				{printf("Keyword: %s",yytext);}
-"goto" 					{printf("Keyword: %s",yytext);}
-"break" 				{printf("Keyword: %s",yytext);}
-"continue" 			{printf("Keyword: %s",yytext);}
+"int"           {printf("\t%-50s : Keyword\n", yytext);}
+"short"         {printf("\t%-50s : Keyword\n", yytext);}
+"long"          {printf("\t%-50s : Keyword\n", yytext);}
+"char"          {printf("\t%-50s : Keyword\n", yytext);}
+"signed"        {printf("\t%-50s : Keyword\n", yytext);}
+"unsigned"      {printf("\t%-50s : Keyword\n", yytext);}
+"void"          {printf("\t%-50s : Keyword\n", yytext);}
+"if"            {printf("\t%-50s : Keyword\n", yytext);}
+"else"          {printf("\t%-50s : Keyword\n", yytext);}
+"for"           {printf("\t%-50s : Keyword\n", yytext);}
+"do"            {printf("\t%-50s : Keyword\n", yytext);}
+"while"         {printf("\t%-50s : Keyword\n", yytext);}
+"goto"          {printf("\t%-50s : Keyword\n", yytext);}
+"break"         {printf("\t%-50s : Keyword\n", yytext);}
+"continue"      {printf("\t%-50s : Keyword\n", yytext);}
+"main"      {printf("\t%-50s : Keyword\n", yytext);}
+
 
  /* Constants */
+
 [+/-]?[0][x|X]{hex}+              {printf("This is a hexadecimal Constan: %s\n",yytext);}
 [+/-]?{digit}+                    {printf("This is an Integer Constant: %s\n",yytext);}
 [+/-]?({digit}+)["."]({digit}+)   {printf("This is a Decimal Constnat: %s\n",yytext);}
 
-{identifier} 		{if(strlen(yytext) <= 32)printf("Identifier: %s\n",yytext); else printf("Identifier too long must be either 1 to 32 characters %d here\n",strlen(yytext));}
-{whitespace} 		;
+
+[+/-]?[0][x|X]{hex}+              {printf("\t%-50s : Hexadecimal Constant\n", yytext);}
+[+/-]?{digit}+                    {printf("\t%-50s : Integer Constant\n", yytext);}
+[+/-]?({digit}+)["."]({digit}+)   {printf("\t%-50s : Decimal Constant\n", yytext);}
+
+{identifier}    {if(strlen(yytext) <= 32)printf("\t%-50s : Identifier\n", yytext); else printf("Error %d: Identifier too long,must be between 1 to 32 characters", yylineno);}
+{digit}+({letter}|_)+ {printf("Error %d: Illegal identifier format\n", yylineno);}
+{whitespace}    ;
 
  /* Preprocessor Directives */
 
-^"#include" 				            {BEGIN PREPROCESSOR;}
-<PREPROCESSOR>"<"[^<>\n]*">" 		{printf("Preprocessor directive: %s\n",yytext);BEGIN INITIAL;}
-<PREPROCESSOR>\"[^<>\n]*\" 		  {printf("Preprocessor directive: %s\n",yytext);}
-<PREPROCESSOR>{whitespace} 		  ;
-<PREPROCESSOR>"\n" 			        {printf("This header format isn't allowed");yylineno++; BEGIN INITIAL;}
-<PREPROCESSOR>. 			          {printf("This header format isn't allowed\n Line Number: %d",yylineno); BEGIN INITIAL;}
+^"#include"                     {BEGIN PREPROCESSOR;}
+<PREPROCESSOR>{whitespace}      ;
+<PREPROCESSOR>"<"[^<>\n]*">"    {printf("\t%-50s : Preprocessor directive\n", yytext); BEGIN INITIAL;}
+<PREPROCESSOR>\"[^<>\n]*\"      {printf("\t%-50s : Preprocessor directive\n", yytext); BEGIN INITIAL;}
+<PREPROCESSOR>"\n"              {printf("Error %d: Header format not allowed\n", yylineno); yylineno++; BEGIN INITIAL;}
+<PREPROCESSOR>.                 {printf("Error %d: Header format not allowed\n", yylineno); BEGIN INITIAL;}
 
  /* Macropreprocessor Directives */
 
-^"#define" 				                                {BEGIN MACROPREPROCESSOR;}
-<MACROPREPROCESSOR>{whitespace} 	                ;
-<MACROPREPROCESSOR>({letter})({letter}|{digit})*  {printf("MACROPREPROCESSOR DIRECTIVE %s\n",yytext); BEGIN INITIAL;}
-<MACROPREPROCESSOR>\n 			                      {yylineno++; BEGIN INITIAL;}
-<MACROPREPROCESSOR>. 			                        {printf("Invalid Definition %d\n",yylineno); BEGIN INITIAL;}
+^"#define"                                        {BEGIN MACROPREPROCESSOR;}
+<MACROPREPROCESSOR>{whitespace}                   ;
+<MACROPREPROCESSOR>({letter})({letter}|{digit})*  {printf("\t%-50s : Macropreprocessor directive\n", yytext); BEGIN INITIAL;}
+<MACROPREPROCESSOR>\n                             {yylineno++; BEGIN INITIAL;}
+<MACROPREPROCESSOR>.                              {printf("Error %d: Invalid definition\n", yylineno); BEGIN INITIAL;}
 
+ /* Comments */
 
-"/*"                              	  { BEGIN COMMENT;}
+"/*"                                  {BEGIN COMMENT;}
 <COMMENT>.|{whitespace}               ;
+
+<COMMENT>\n                           {yylineno++;}
+<COMMENT>"*/"                         {BEGIN INITIAL;}
+<COMMENT>"/*"                         {printf("Error %d: Nested comments are invalid\n", yylineno);yyterminate();BEGIN INITIAL;}
+<COMMENT><<EOF>>                      {printf("Error %d: Unterminated comments are invalid\n", yylineno); yyterminate();}
+"//"                                  {BEGIN SLCOMMENT;}
+<SLCOMMENT>.                          ;
+<SLCOMMENT>\n                         {yylineno++; BEGIN INITIAL;}
+
+ /* Operators */
+
+"+"   {printf("\t%-50s : Arithmetic Operator\n", yytext);}
+"-"   {printf("\t%-50s : Arithmetic Operator\n", yytext);}
+"*"   {printf("\t%-50s : Arithmetic Operator\n", yytext);}
+"/"   {printf("\t%-50s : Arithmetic Operator\n", yytext);}
+"="   {printf("\t%-50s : Assignment Operator\n", yytext);}
+"--"  {printf("\t%-50s : Decrement Operator\n", yytext);}
+"++"  {printf("\t%-50s : Increment Operator\n", yytext);}
+
+">"  {printf("\t%-50s : Comparison Operator\n", yytext);}
+"<"  {printf("\t%-50s : Comparison Operator\n", yytext);}
+">=" {printf("\t%-50s : Comparison Operator\n", yytext);}
+"<=" {printf("\t%-50s : Comparison Operator\n", yytext);}
+"==" {printf("\t%-50s : Comparison Operator\n", yytext);}
+
+"||" {printf("\t%-50s : Boolean Operator\n", yytext);}
+"&&" {printf("\t%-50s : Boolean Operator\n", yytext);}
+"!"  {printf("\t%-50s : Boolean Operator\n", yytext);}
+
+ /* Strings and Characters */
+
+\"[^\"\n]*$  {printf("Error %d: Illegally terminated string\n", yylineno); yyterminate();}
+
+\"[^\"\n]*\" {
+  if(yytext[yyleng-2]=='\\') {
+    yyless(yyleng-1);
+    yymore();
+    printf("\t%-50s : String\n", yytext);
+  }
+  else
+    printf("\t%-50s : String\n", yytext);
+}
+
+\'[^\'\n]\' {printf("\t%-50s : Character\n", yytext);}
+
 <COMMENT>\n                          	{yylineno++;}
 <COMMENT>"*/"                        	{BEGIN INITIAL;}
 <COMMENT>"/*"                        	{printf("Nested comments are not valid.\n");}
@@ -121,6 +175,7 @@ hex [0-9a-fA-F]
 
 
 
+
  /* Punctuators */
 "[" {printf("Square Bracket: %s\n",yytext);}
 "]" {printf("Square Bracket: %s\n",yytext);}
@@ -132,19 +187,28 @@ hex [0-9a-fA-F]
 ";" {printf("Delimeter: %s\n",yytext);}
 
 
-\n {yylineno++;}
-. {printf("Illegal Character: %s\n",yytext );}
+"[" {printf("\t%-50s : Open Square Bracket\n", yytext);}
+"]" {printf("\t%-50s : Closed Square Bracket\n", yytext);}
+"{" {printf("\t%-50s : Open Curly Bracket\n", yytext);}
+"}" {printf("\t%-50s : Closed Curly Bracket\n", yytext);}
+"(" {printf("\t%-50s : Open Curve Bracket\n", yytext);}
+")" {printf("\t%-50s : Closed Curve Bracket\n", yytext);}
+"," {printf("\t%-50s : Comma\n", yytext);}
+";" {printf("\t%-50s : Delimiter\n", yytext);}
+
+
+.   {printf("Error %d: Illegal character\n", yylineno);}
+"\n" {yylineno++;}
 
 %%
-
 
 int yywrap(){return 1;};
 
 int main()
 {
   extern FILE *yyin;
-  yyin = fopen("2.c","r");
+  yyin = fopen("test-case-strings.c","r");
   yylex();
-  printf("Lexical analysis Finished\n");
+  printf("Lexical analysis finished\n");
   return 0;
 }
