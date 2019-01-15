@@ -17,6 +17,7 @@ hex [0-9a-fA-F]
 %x PREPROCESSOR
 %x MACROPREPROCESSOR
 %x COMMENT
+%x SLCOMMENT
 
 
 %%
@@ -42,7 +43,7 @@ hex [0-9a-fA-F]
  /* Constants */
 [+/-]?[0][x|X]{hex}+              {printf("This is a hexadecimal Constan: %s\n",yytext);}
 [+/-]?{digit}+                    {printf("This is an Integer Constant: %s\n",yytext);}
-[+/-]?({digit}+)["."]({digit}*)   {printf("This is a Decimal Constnat: %s\n",yytext);}
+[+/-]?({digit}+)["."]({digit}+)   {printf("This is a Decimal Constnat: %s\n",yytext);}
 
 {identifier} 		{if(strlen(yytext) <= 32)printf("Identifier: %s\n",yytext); else printf("Identifier too long must be either 1 to 32 characters %d here\n",strlen(yytext));}
 {whitespace} 		;
@@ -67,11 +68,14 @@ hex [0-9a-fA-F]
 
 "/*"                              	  { BEGIN COMMENT;}
 <COMMENT>.|{whitespace}               ;
-<COMMENT>\n                          	{printf("\nComment: %s",yytext);yylineno++;}
+<COMMENT>\n                          	{yylineno++;}
 <COMMENT>"*/"                        	{BEGIN INITIAL;}
 <COMMENT>"/*"                        	{printf("Nested comments are not valid.\n");}
 <COMMENT><<EOF>>                     	{printf(" Unterminated comment\n"); yyterminate();}
-"//".*        				                {printf("\nComment: %s\n",yytext);}
+"//"        				                  {BEGIN SLCOMMENT;}
+<SLCOMMENT>.                            ;
+<SLCOMMENT>\n                           {yylineno++; BEGIN INITIAL;}
+
 
  /* Operators */
 
@@ -85,19 +89,48 @@ hex [0-9a-fA-F]
 
  /* Comparison and boolean operators   */
 
- ">" {printf("Comparison Operator: %s\n",yytext );}
- "<" {printf("Comparison Operator: %s\n",yytext );}
- ">=" {printf("Comparison Operator: %s\n",yytext );}
- "<=" {printf("Comparison Operator: %s\n",yytext );}
- "==" {printf("Comparison Operator: %s\n",yytext );}
+">" {printf("Comparison Operator: %s\n",yytext );}
+"<" {printf("Comparison Operator: %s\n",yytext );}
+">=" {printf("Comparison Operator: %s\n",yytext );}
+"<=" {printf("Comparison Operator: %s\n",yytext );}
+"==" {printf("Comparison Operator: %s\n",yytext );}
+"!=" {printf("Comparison Operator: %s\n",yytext );}
+
+"||" {printf("Boolean Operator: %s\n",yytext );}
+"&&" {printf("Boolean Operator: %s\n",yytext );}
+"!"  {printf("Boolean Operator: %s\n",yytext );}
 
  /* Strings and Characters*/
 
-\"[^\"\n]*\" {printf("String: %s\n",yytext );}
+
+\"[^\"\n]*$  {printf("Line: %d Illegaly terminated string: %s\n",yylineno,yytext );}
+
+\"[^\"\n]*\"     {
+
+  if(yytext[yyleng-2]=='\\') /* check if it was an escaped quote */
+  {
+    yyless(yyleng-1);       /* push the quote back if it was escaped */
+    yymore();
+    printf("String: %s\n",yytext );
+  }
+  else
+  {
+    printf("String: %s\n",yytext );
+  }
+ }
+
+
 
  /* Punctuators */
+"[" {printf("Square Bracket: %s\n",yytext);}
+"]" {printf("Square Bracket: %s\n",yytext);}
+"{" {printf("Curly Bracket: %s\n",yytext);}
+"}" {printf("Curly Bracket: %s\n",yytext);}
+")" {printf("Curve Bracket: %s\n",yytext);}
+"(" {printf("Curve Bracket: %s\n",yytext);}
+"," {printf("Comma: %s\n",yytext);}
+";" {printf("Delimeter: %s\n",yytext);}
 
- // I shall add it later, got bored got to sleep
 
 \n {yylineno++;}
 . {printf("Illegal Character: %s\n",yytext );}
