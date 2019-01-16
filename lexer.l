@@ -170,8 +170,10 @@ int main(int argc, char *argv[])
         yyin = fh;
   yylex();
 
+  printf("\nPrinting Symbol Table\n" );
   Display(SymbolTable);
   printf("\n\n");
+  printf("Printing Constant Table\n" );
   Display(ConstantTable);
 
   printf("Lexical analysis finished\n");

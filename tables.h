@@ -97,7 +97,6 @@ void Display(entry** TablePointer)
 
   printf("-----------------------------------------\n");
 
-  printf("\tPrinting Table:\n");
   printf("\n\t(lexeme, token)\n" );
 
   for(i=0;i<SIZE;i++)
