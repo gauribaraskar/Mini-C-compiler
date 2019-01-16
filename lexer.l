@@ -30,23 +30,23 @@ hex [0-9a-fA-F]
 
  /* Keywords */
 
-"int"                               {printf("\t%-50s : Keyword\n", yytext);}
-"short"                             {printf("\t%-50s : Keyword\n", yytext);}
-"long"                              {printf("\t%-50s : Keyword\n", yytext);}
-"char"                              {printf("\t%-50s : Keyword\n", yytext);}
-"signed"                            {printf("\t%-50s : Keyword\n", yytext);}
-"unsigned"                          {printf("\t%-50s : Keyword\n", yytext);}
-"void"                              {printf("\t%-50s : Keyword\n", yytext);}
-"if"                                {printf("\t%-50s : Keyword\n", yytext);}
-"else"                              {printf("\t%-50s : Keyword\n", yytext);}
-"for"                               {printf("\t%-50s : Keyword\n", yytext);}
-"do"                                {printf("\t%-50s : Keyword\n", yytext);}
-"while"                             {printf("\t%-50s : Keyword\n", yytext);}
-"goto"                              {printf("\t%-50s : Keyword\n", yytext);}
-"break"                             {printf("\t%-50s : Keyword\n", yytext);}
-"continue"                          {printf("\t%-50s : Keyword\n", yytext);}
-"main"                              {printf("\t%-50s : Keyword\n", yytext);}
-"return"                            {printf("\t%-50s : Keyword\n", yytext);}
+"int"                               {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"short"                             {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"long"                              {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"char"                              {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"signed"                            {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"unsigned"                          {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"void"                              {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"if"                                {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"else"                              {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"for"                               {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"do"                                {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"while"                             {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"goto"                              {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"break"                             {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"continue"                          {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"main"                              {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
+"return"                            {printf("\t%-50s : Keyword\n", yytext);InsertEntry(SymbolTable,yytext,"KEYWORD");}
 
 
  /* Constants */
@@ -78,7 +78,7 @@ hex [0-9a-fA-F]
 <PREPROCESSOR>"<"[^<>\n]*">"        {printf("\t%-50s : Preprocessor directive\n", yytext); BEGIN INITIAL;}
 <PREPROCESSOR>\"[^<>\n]*\"          {printf("\t%-50s : Preprocessor directive\n", yytext); BEGIN INITIAL;}
 <PREPROCESSOR>"\n"                  {printf("Error %d: Header format not allowed\n", yylineno); yylineno++; BEGIN INITIAL;}
-<PREPROCESSOR>.                     {printf("Error %d: Header format not allowed\n", yylineno); BEGIN INITIAL;}
+<PREPROCESSOR>.                     {printf("Error %d: Header format not allowed\n", yylineno);}
 
 
  /* Macropreprocessor Directives */
