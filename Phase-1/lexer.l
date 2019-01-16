@@ -56,8 +56,8 @@ hex [0-9a-fA-F]
 
 [+/-]?[0][x|X]{hex}+                {printf("\t%-50s : Hexadecimal Constant\n", yytext); InsertEntry(ConstantTable,yytext,"HEX_CONSTANT");}
 [+/-]?{digit}+                      {printf("\t%-50s : Integer Constant\n", yytext); InsertEntry(ConstantTable,yytext,"INT_CONSTANT");}
-[+/-]?({digit}+)["."]({digit}+)     {printf("\t%-50s : Decimal Constant\n", yytext); InsertEntry(ConstantTable,yytext,"DEC_CONSTANT");}
-
+[+/-]?({digit}*)["."]({digit}+)     {printf("\t%-50s : Decimal Constant\n", yytext); InsertEntry(ConstantTable,yytext,"DEC_CONSTANT");}
+[+/-]?({digit}+)["."]({digit}*)     {printf("\t%-50s : Decimal Constant\n", yytext); InsertEntry(ConstantTable,yytext,"DEC_CONSTANT");}
 
 {identifier} {
   if(strlen(yytext) <= 32)
