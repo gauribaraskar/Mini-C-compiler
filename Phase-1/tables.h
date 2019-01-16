@@ -1,3 +1,14 @@
+/*
+  This File implements all functions required to implement Symbol Table and
+  Constant Table.
+  The functions here are used to Add entries to a hash table.
+
+  Authors:
+  Sanjana Krishnam
+  Ayush Kumar
+  Gauri Baraskar
+
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
