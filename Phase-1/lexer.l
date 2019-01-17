@@ -159,7 +159,7 @@ hex [0-9a-fA-F]
 ")"                                 {printf("\t%-50s : Closed Round Bracket\n", yytext);}
 ","                                 {printf("\t%-50s : Comma\n", yytext);}
 ";"                                 {printf("\t%-50s : Delimiter\n", yytext);}
-
+"&"                                 {printf("\t%-50s : Ampersand\n",yytext);}
 
 "\n"                                {yylineno++;}
 .                                   {printf("Error %d: Illegal character\n", yylineno);ErrFlag=1;}
