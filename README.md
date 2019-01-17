@@ -7,7 +7,7 @@ An implementation of a mini C compiler using lex and yacc
 3. Gauri Baraskar (16CO209)
 
 ### Phases:
-1. **`DONE`**  Scanner/Lexical analyse
+1. **`DONE`**  Scanner/Lexical analyser
 2. **`In Progress`** Parser                       
 3. **`In Progress`** Semantic Checker             
 4. **`In Progress`** Intermediate Code Generator  
