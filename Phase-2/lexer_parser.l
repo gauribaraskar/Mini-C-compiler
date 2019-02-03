@@ -122,7 +122,7 @@ hex [0-9a-fA-F]
 
 "||"                                {printf("\t%-50s : Boolean Operator\n", yytext); return LG_OR;}
 "&&"                                {printf("\t%-50s : Boolean Operator\n", yytext); return LG_AND;}
-"!"                                 {printf("\t%-50s : Boolean Operator\n", yytext);} return NOT;}
+"!"                                 {printf("\t%-50s : Boolean Operator\n", yytext); return NOT;}
 "!="                                {printf("\t%-50s : Boolean Operator\n", yytext);} NOT_EQ;}
 
 
@@ -176,4 +176,4 @@ hex [0-9a-fA-F]
   return 0;
 }
 
-int yywrap(){return 1;}*/
+int yywrap(){return 1;}
