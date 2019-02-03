@@ -4,7 +4,6 @@
     #include<stdlib.h>
 
     int ErrFlag = 0;
-    
 
     #include "y.tab.h"
 %}
@@ -139,7 +138,7 @@ hex [0-9a-fA-F]
   }
   else
   {
-    
+
     printf("\t%-50s : String\n", yytext);
     return STRING;
   }
@@ -152,8 +151,6 @@ hex [0-9a-fA-F]
 
 
 "\n"                                {yylineno++;}
-.                                   {printf("Error %d: Illegal character\n", yylineno);ErrFlag=1;}
+.                                   {return yytext[0];}
 
 %%
-
-

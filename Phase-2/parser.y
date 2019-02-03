@@ -47,6 +47,7 @@
 
 /* Identifier */
 %token <tbEntry> IDENTIFIER
+%start program
 
 %left ','
 %right '='
@@ -59,22 +60,23 @@
 %right NOT
 
 %%
-    program : declarationList declaration 
+    program : declarationList declaration
             | declaration;
 
-    declarationList : declarationList declaration 
+    declarationList : declarationList declaration
                     | declaration;
 
     declaration : varDeclaration;
 
-    varDeclaration : typeSpecifier IDENTIFIER 
-                   | typeSpecifier IDENTIFIER '=' const_type;
+    varDeclaration : typeSpecifier IDENTIFIER ';'
+                   | typeSpecifier IDENTIFIER ASSIGN const_type ';'
+									 ;
 
-    const_type : DEC_CONSTANT 
-               | INT_CONSTANT 
+    const_type : DEC_CONSTANT
+               | INT_CONSTANT
                | HEX_CONSTANT ;
 
-    typeSpecifier : INT 
+    typeSpecifier : INT
                   | LONG INT
                   | CHAR ;
 
@@ -84,7 +86,7 @@
 
 #include "lex.yy.c"
 int main(int argc , char *argv[]){
-    
+
     SymbolTable = CreateTable();
     ConstantTable = CreateTable();
 
