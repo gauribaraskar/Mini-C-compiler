@@ -70,7 +70,7 @@
 
     varDeclaration : typeSpecifier IDENTIFIER ';'
                    | typeSpecifier IDENTIFIER ASSIGN const_type ';'
-									 ;
+									;
 
     const_type : DEC_CONSTANT
                | INT_CONSTANT
