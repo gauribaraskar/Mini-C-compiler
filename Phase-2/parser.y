@@ -60,17 +60,20 @@
 %right NOT
 
 %%
-    program : declarationList declaration
-            | declaration;
+    program : declarationList;
 
-    declarationList : declarationList declaration
-                    | declaration;
+    declarationList : declarationList declaration | declaration;
 
     declaration : varDeclaration;
 
-    varDeclaration : typeSpecifier IDENTIFIER ';'
-                   | typeSpecifier IDENTIFIER ASSIGN const_type ';'
-									;
+    varDeclaration : typeSpecifier varDeclList ';' ;
+
+    varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
+
+    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression ;
+
+    varDecId : IDENTIFIER;
+									 
 
     const_type : DEC_CONSTANT
                | INT_CONSTANT
@@ -79,6 +82,32 @@
     typeSpecifier : INT
                   | LONG INT
                   | CHAR ;
+
+expression : IDENTIFIER ASSIGN expression | IDENTIFIER INCREMENT | IDENTIFIER DECREMENT | simpleExpression;
+
+simpleExpression : simpleExpression LG_OR andExpression | andExpression;
+
+andExpression : andExpression LG_AND unaryRelExpression | unaryRelExpression;
+
+unaryRelExpression : NOT unaryRelExpression | relExpression ;
+
+relExpression : sumExpression relop sumExpression | sumExpression ;
+
+relop : '<' | '>' | LESS_EQ | GR_EQ | NOT_EQ | EQUAL ;
+
+sumExpression : sumExpression sumop term | term ;
+
+term : term mulop factor | factor ;
+
+mulop : MULTIPLY | DIVIDE | '%' ;
+
+sumop : ADD | SUBTRACT ;
+
+factor : immutable | mutable ;
+
+mutable : IDENTIFIER ;
+
+immutable : '(' expression ')' | const_type ;
 
 
 
