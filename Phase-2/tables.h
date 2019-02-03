@@ -19,7 +19,8 @@
 struct table_entry{
 
     char *lexeme;
-    char  *token;
+    double value;
+    int data_type;
     struct table_entry *next;
 };
 
@@ -69,7 +70,7 @@ int Search(entry** TablePointer, char *lexeme)
   return 0;
 }
 
-void InsertEntry(entry** TablePointer, char *lexeme,char *Token )
+void InsertEntry(entry** TablePointer, char *lexeme,double value,int DataType )
 {
   if(Search(TablePointer,lexeme) == 1)
     return;
@@ -83,7 +84,8 @@ void InsertEntry(entry** TablePointer, char *lexeme,char *Token )
     entry *tempPoint = NULL;
     tempPoint = malloc(sizeof(entry));
     tempPoint->lexeme = strdup(lexeme);
-    tempPoint->token = strdup(Token);
+    tempPoint->value = value;
+    tempPoint->data_type = DataType;
     tempPoint->next = NULL;
 
     if (head == NULL)
@@ -115,7 +117,7 @@ void Display(entry** TablePointer)
     temp = TablePointer[i];
     while(temp != NULL)
     {
-      printf("\t(%5s, %s)\n",temp->lexeme,temp->token);
+      printf("\t(%5s, %f, %d)\n",temp->lexeme,temp->value,temp->data_type);
       temp = temp->next;
     }
 

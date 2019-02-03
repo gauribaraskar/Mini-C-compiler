@@ -7,6 +7,7 @@
     entry **SymbolTable = NULL;
     entry **ConstantTable = NULL;
     int yyerror(char *msg);
+    int yylex(void);
 %}
 
 
@@ -17,6 +18,9 @@
 	double dval;
 }
 
+/* Random Tokens I declared to silence errors */
+%token MAIN ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN
+
 /* Keywords */
 %token VOID IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN
 
@@ -24,7 +28,7 @@
 %token INT SHORT LONG CHAR SIGNED UNSIGNED
 
 /* Logical Operators */
-%token LG_OR LG_AND NOT
+%token LG_OR LG_AND NOT LESS_EQ GR_EQ
 
 /* Relational Operators */
 %token EQUAL
@@ -49,7 +53,7 @@
 %left LG_OR
 %left LG_AND
 %left EQUAL NOT_EQ
-%left '<' '>' '<=' '>='
+%left '<' '>' LESS_EQ GR_EQ
 %left '+' '-'
 %left '*' '/' '%'
 %right NOT
@@ -61,8 +65,7 @@
     declarationList : declarationList declaration 
                     | declaration;
 
-    declaration : varDeclaration 
-                | funDeclaration;
+    declaration : varDeclaration;
 
     varDeclaration : typeSpecifier IDENTIFIER 
                    | typeSpecifier IDENTIFIER '=' const_type;
@@ -97,7 +100,7 @@ int main(int argc , char *argv[]){
             printf("\nParsing failed\n");
     }
     printf("\n\tSymbol table");
-    display(SymbolTable);
+    Display(SymbolTable);
     fclose(yyin);
     return 0;
 }
@@ -105,4 +108,5 @@ int main(int argc , char *argv[]){
 int yyerror(char *msg)
 {
     printf("Line no: %d Error message: %s Token: %s\n", yylineno, msg, yytext);
+    return 0;
 }

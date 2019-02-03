@@ -4,6 +4,9 @@
     #include<stdlib.h>
 
     int ErrFlag = 0;
+    
+
+    #include "y.tab.h"
 %}
 
 
@@ -123,7 +126,7 @@ hex [0-9a-fA-F]
 "||"                                {printf("\t%-50s : Boolean Operator\n", yytext); return LG_OR;}
 "&&"                                {printf("\t%-50s : Boolean Operator\n", yytext); return LG_AND;}
 "!"                                 {printf("\t%-50s : Boolean Operator\n", yytext); return NOT;}
-"!="                                {printf("\t%-50s : Boolean Operator\n", yytext);} NOT_EQ;}
+"!="                                {printf("\t%-50s : Boolean Operator\n", yytext); NOT_EQ;}
 
 
  /* Strings and Characters */
@@ -154,26 +157,3 @@ hex [0-9a-fA-F]
 %%
 
 
-/*int main(int argc, char *argv[])
-{
-  /*SymbolTable = CreateTable();
-  ConstantTable = CreateTable();*/
-  FILE *fh;
-  if (argc == 2 && (fh = fopen(argv[1], "r")))
-        yyin = fh;
-  yylex();
-
-  if (ErrFlag == 0)
-  {
-    printf("\nPrinting Symbol Table\n" );
-    Display(SymbolTable);
-    printf("\n\n");
-    printf("Printing Constant Table\n" );
-    Display(ConstantTable);
-  }
-
-  printf("Lexical analysis finished\n");
-  return 0;
-}
-
-int yywrap(){return 1;}
