@@ -1,7 +1,6 @@
 // Pointers , strings , chracters, comma declaration , array declaration
-
 %{
-	#include<stdio.h>
+    #include<stdio.h>
 	#include<stdlib.h>
 	#include "tables.h"
     entry **SymbolTable = NULL;
@@ -9,7 +8,6 @@
     int yyerror(char *msg);
     int yylex(void);
 %}
-
 
 %union{
 	int ival;
@@ -19,7 +17,7 @@
 }
 
 /* Random Tokens I declared to silence errors */
-%token MAIN ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN
+%token MAIN ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN MOD
 
 /* Keywords */
 %token VOID IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN
@@ -28,12 +26,10 @@
 %token INT SHORT LONG CHAR SIGNED UNSIGNED
 
 /* Logical Operators */
-%token LG_OR LG_AND NOT LESS_EQ GR_EQ
+%token LG_OR LG_AND NOT LESS_EQ GREATER_EQ
 
 /* Relational Operators */
 %token EQUAL
-
-
 
 /* Assignment Operators */
 %token DECREMENT INCREMENT NOT_EQ
@@ -47,16 +43,16 @@
 
 /* Identifier */
 %token <tbEntry> IDENTIFIER
-%start program
+%start statement
 
 %left ','
-%right '='
+%right ASSIGN
 %left LG_OR
 %left LG_AND
 %left EQUAL NOT_EQ
-%left '<' '>' LESS_EQ GR_EQ
-%left '+' '-'
-%left '*' '/' '%'
+%left LESSER_THAN GREATER_THAN LESS_EQ GREATER_EQ
+%left ADD SUBTRACT
+%left MULTIPLY DIVIDE MOD
 %right NOT
 
 %%
@@ -66,7 +62,7 @@
 
     declaration : varDeclaration;
 
-    varDeclaration : typeSpecifier varDeclList ';' ;
+    varDeclaration : typeSpecifier varDeclList ';' 
 
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
 
@@ -93,21 +89,35 @@ unaryRelExpression : NOT unaryRelExpression | relExpression ;
 
 relExpression : sumExpression relop sumExpression | sumExpression ;
 
-relop : '<' | '>' | LESS_EQ | GR_EQ | NOT_EQ | EQUAL ;
+relop : GREATER_THAN | LESSER_THAN | LESS_EQ | GREATER_EQ | NOT_EQ | EQUAL ;
 
 sumExpression : sumExpression sumop term | term ;
 
 term : term mulop factor | factor ;
 
-mulop : MULTIPLY | DIVIDE | '%' ;
+mulop : MULTIPLY | DIVIDE | MOD ;
 
 sumop : ADD | SUBTRACT ;
 
-factor : immutable | mutable ;
+factor : IDENTIFIER |'(' expression ')'|const_type ;
 
-mutable : IDENTIFIER ;
+statement : expressionStmt | compoundStmt | selectionStmt | iterationStmt | returnStmt | breakStmt ; 
 
-immutable : '(' expression ')' | const_type ;
+expressionStmt : expression ';' | ';' ;
+
+compoundStmt : '{' statementList '}' ;
+
+statementList : statementList statement 
+                | 
+                ;
+
+selectionStmt : IF '(' simpleExpression ')' statement | IF '(' simpleExpression ')' statement ELSE statement ;
+
+iterationStmt : WHILE '(' simpleExpression ')' statement | DO statement WHILE '(' expression ')' | FOR '(' expression ';' expression ';' expression ')' statement
+
+returnStmt : RETURN ';' | RETURN expression ;
+
+breakStmt : BREAK ';' ;
 
 
 

@@ -111,13 +111,14 @@ hex [0-9a-fA-F]
 "-"                                 {return SUBTRACT;}
 "*"                                 {return MULTIPLY;}
 "/"                                 {return DIVIDE;}
+"%"                                 {return MOD;}
 "="                                 {return ASSIGN;}
 "--"                                {return DECREMENT;}
 "++"                                {return INCREMENT;}
 
 ">"                                 {return GREATER_THAN;}
 "<"                                 {return LESSER_THAN;}
-">="                                {return GR_EQ;}
+">="                                {return GREATER_EQ;}
 "<="                                {return LESS_EQ;}
 "=="                                {return EQUAL;}
 
