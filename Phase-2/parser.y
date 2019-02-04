@@ -87,7 +87,7 @@
 
     varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression ;
 
-    varDecId : IDENTIFIER;
+    varDecId : IDENTIFIER | IDENTIFIER '[' INT_CONSTANT ']';
 
 
     const_type : DEC_CONSTANT
@@ -103,6 +103,7 @@
 
     funcCall : IDENTIFIER '(' params ')' statement;
 
+params : paramList | ;
 
 paramList :paramList ',' paramTypeList | paramTypeList ;
 
