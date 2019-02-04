@@ -107,7 +107,11 @@ params : paramList | ;
 
 paramList :paramList ',' paramTypeList | paramTypeList ;
 
-paramTypeList : typeSpecifier IDENTIFIER;
+paramTypeList : typeSpecifier paramIdList;
+
+paramIdList : paramIdList ',' paramId | paramId ;
+
+paramId : IDENTIFIER | IDENTIFIER '[' ']';
 
 expression : IDENTIFIER ASSIGN expression
           | INCREMENT IDENTIFIER
