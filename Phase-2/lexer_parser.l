@@ -59,7 +59,7 @@ hex [0-9a-fA-F]
 {identifier} {
   if(strlen(yytext) <= 32)
     {
-      
+
       return IDENTIFIER;
     }
   else
@@ -116,6 +116,12 @@ hex [0-9a-fA-F]
 "="                                 {return ASSIGN;}
 "--"                                {return DECREMENT;}
 "++"                                {return INCREMENT;}
+
+"+="                                 {return ADD_ASSIGN;}
+"-="                                 {return SUB_ASSIGN;}
+"*="                                  {return MUL_ASSIGN;}
+"/="                                  {return DIV_ASSIGN;}
+"%="                                  {return MOD_ASSIGN;}
 
 ">"                                 {return GREATER_THAN;}
 "<"                                 {return LESSER_THAN;}

@@ -19,7 +19,7 @@
 
 
 /* Random Tokens I declared to silence errors */
-%token MAIN ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN MOD
+%token MAIN ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN MOD ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
 
 /* Keywords */
 %token VOID IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN
@@ -69,17 +69,16 @@
 %right NOT
 
 
+
 %nonassoc IFX
 %nonassoc ELSE
-
-%glr-parser
 %%
     /* Program is made up of declarations */
     program : declarationList;
 
     declarationList : declarationList declaration | declaration;
 
-    declaration : varDeclaration | funcDeclaration;
+    declaration : varDeclaration | funDeclaration;
 
     varDeclaration : typeSpecifier varDeclList ';'
 
@@ -99,71 +98,80 @@
                   | LONG INT
                   | CHAR ;
 
-    funcDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt ;
+  funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt ;
 
-    funcCall : IDENTIFIER '(' params ')' statement;
+  funCall : IDENTIFIER '(' params ')' statement;
 
-params : paramList | ;
+  params : paramList | ;
 
-paramList :paramList ',' paramTypeList | paramTypeList ;
+  paramList :paramList ',' paramTypeList | paramTypeList ;
 
-paramTypeList : typeSpecifier paramIdList;
+  paramTypeList : typeSpecifier paramIdList;
 
-paramIdList : paramIdList ',' paramId | paramId ;
+  paramIdList : paramIdList ',' paramId | paramId ;
 
-paramId : IDENTIFIER | IDENTIFIER '[' ']';
+  paramId : IDENTIFIER | IDENTIFIER '[' ']';
 
-expression : IDENTIFIER ASSIGN expression
-          | INCREMENT IDENTIFIER
-          | DECREMENT IDENTIFIER
-          | simpleExpression;
+  statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | funCall ;
 
-simpleExpression : simpleExpression LG_OR andExpression | andExpression ;
+  compoundStmt : '{' localDeclarations statementList '}' ;
 
-andExpression : andExpression LG_AND unaryRelExpression  | unaryRelExpression ;
+  localDeclarations : localDeclarations varDeclaration |  ;
 
-unaryRelExpression : NOT unaryRelExpression | relExpression ;
+  statementList : statementList statement
+                  |
+                  ;
+  expressionStmt : expression ';' | ';' ;
 
-relExpression : sumExpression GREATER_THAN sumExpression
-              | sumExpression LESSER_THAN sumExpression
-              | sumExpression LESS_EQ sumExpression
-              | sumExpression GREATER_EQ sumExpression
-              | sumExpression NOT_EQ sumExpression
-              | sumExpression EQUAL sumExpression
-              | sumExpression ;
+  selectionStmt : IF '(' simpleExpression ')' statement %prec IFX | IF '(' simpleExpression ')' statement ELSE statement ;
 
-sumExpression : sumExpression ADD term
-              | sumExpression SUBTRACT term
-              | term ;
+  iterationStmt : WHILE '(' simpleExpression ')' statement | DO statement WHILE '(' expression ')' | FOR '(' expression ';' expression ';' expression ')' statement
 
- term : term MULTIPLY factor
-     | term DIVIDE factor
-     | term MOD factor
-     | '(' expression ')'
-     | const_type
-     | factor ;
+  jumpStmt : GOTO IDENTIFIER ';' | CONTINUE ';' ;
 
-factor : IDENTIFIER;
+  returnStmt : RETURN ';' | RETURN expression ;
 
-statement : declarationList | expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | returnStmt | breakStmt | funcCall ;
-
-expressionStmt : expression ';' | ';' ;
-
-compoundStmt : '{' statementList '}' ;
-
-statementList : statementList statement
-                |
-                ;
-
-selectionStmt : IF '(' simpleExpression ')' statement %prec IFX | IF '(' simpleExpression ')' statement ELSE statement ;
-
-iterationStmt : WHILE '(' simpleExpression ')' statement | DO statement WHILE '(' expression ')' | FOR '(' expression ';' expression ';' expression ')' statement
-
-returnStmt : RETURN ';' | RETURN expression ;
-
-breakStmt : BREAK ';' ;
+  breakStmt : BREAK ';' ;
 
 
+  expression : IDENTIFIER ASSIGN expression
+             | IDENTIFIER ADD_ASSIGN expression
+             | IDENTIFIER SUB_ASSIGN expression
+             | IDENTIFIER MUL_ASSIGN expression
+             | IDENTIFIER DIV_ASSIGN expression
+             | IDENTIFIER MOD_ASSIGN expression
+             | INCREMENT IDENTIFIER
+             | DECREMENT IDENTIFIER
+             | simpleExpression
+             ;
+  simpleExpression : simpleExpression LG_OR andExpression | andExpression ;
+
+  andExpression : andExpression LG_AND unaryRelExpression  | unaryRelExpression ;
+
+  unaryRelExpression : NOT unaryRelExpression | relExpression ;
+
+  relExpression : sumExpression GREATER_THAN sumExpression
+                | sumExpression LESSER_THAN sumExpression
+                | sumExpression LESS_EQ sumExpression
+                | sumExpression GREATER_EQ sumExpression
+                | sumExpression NOT_EQ sumExpression
+                | sumExpression EQUAL sumExpression
+                | sumExpression ;
+
+   sumExpression : sumExpression ADD term
+                 | sumExpression SUBTRACT term
+                 | term ;
+
+    term : term MULTIPLY unaryExpression
+       | term DIVIDE unaryExpression
+       | term MOD unaryExpression
+       | unaryExpression
+       ;
+  unaryExpression : unaryOp unaryExpression | factor ;
+
+  unaryOp : '-'| '*' |  '?' ;
+
+  factor : IDENTIFIER | '(' expression ')' | const_type;
 
 
 %%
