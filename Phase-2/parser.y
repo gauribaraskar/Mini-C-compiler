@@ -80,11 +80,11 @@
 
     declaration : varDeclaration | funDeclaration;
 
-    varDeclaration : typeSpecifier varDeclList ';'
+    varDeclaration : typeSpecifier varDeclList ';' ;
 
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
 
-    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression ;
+    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression | varDecId ASSIGN ternaryExpression;
 
     varDecId : IDENTIFIER | IDENTIFIER '[' INT_CONSTANT ']';
 
@@ -94,9 +94,14 @@
                | HEX_CONSTANT
                ;
 
-    typeSpecifier : INT
+// Had to use multiply here cause it was crying otherwise
+
+    typeSpecifier : typeSpecifier pointer
+                  | INT
                   | LONG INT
                   | CHAR ;
+
+  pointer : MULTIPLY pointer | MULTIPLY;    
 
   funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt ;
 
@@ -143,7 +148,11 @@
              | INCREMENT IDENTIFIER
              | DECREMENT IDENTIFIER
              | simpleExpression
+             | ternaryExpression
              ;
+
+  ternaryExpression : simpleExpression '?' simpleExpression ':' simpleExpression;
+ 
   simpleExpression : simpleExpression LG_OR andExpression | andExpression ;
 
   andExpression : andExpression LG_AND unaryRelExpression  | unaryRelExpression ;
