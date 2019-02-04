@@ -66,7 +66,8 @@
 %left MULTIPLY DIVIDE MOD
 %right NOT
 
-
+%nonassoc IFX
+%nonassoc ELSE
 %%
     /* Program is made up of declarations */
     program : declarationList;
@@ -125,12 +126,12 @@ relExpression : sumExpression GREATER_THAN sumExpression
 sumExpression : sumExpression ADD term
               | sumExpression SUBTRACT term
               | term ;
-//
-// term : term MULTIPLY factor {$$ = ($1 * $3);}
-//      | term DIVIDE factor {$$ = ($1 / $3);}
-//      | term MOD factor {$$ = ($1 % $3);}
-     term : '(' expression ')'
-     | const_type 
+
+ term : term MULTIPLY factor
+     | term DIVIDE factor
+     | term MOD factor
+     | '(' expression ')'
+     | const_type
      | factor ;
 
 factor : IDENTIFIER;
@@ -145,7 +146,7 @@ statementList : statementList statement
                 |
                 ;
 
-selectionStmt : IF '(' simpleExpression ')' statement | IF '(' simpleExpression ')' statement ELSE statement ;
+selectionStmt : IF '(' simpleExpression ')' statement %prec IFX | IF '(' simpleExpression ')' statement ELSE statement ;
 
 iterationStmt : WHILE '(' simpleExpression ')' statement | DO statement WHILE '(' expression ')' | FOR '(' expression ';' expression ';' expression ')' statement
 
