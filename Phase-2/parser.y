@@ -81,11 +81,11 @@
 
     declaration : varDeclaration | funDeclaration;
 
-    varDeclaration : typeSpecifier varDeclList ';'
+    varDeclaration : typeSpecifier varDeclList ';' ;
 
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
 
-    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression
+    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression ;
 
     varDecId : IDENTIFIER {$1->data_type = curr_data_type;} | IDENTIFIER '[' INT_CONSTANT ']';
 
@@ -99,6 +99,8 @@
                   | LONG INT
                   | CHAR {curr_data_type = 2;}
                   ;
+
+  pointer : MULTIPLY pointer | MULTIPLY;
 
   funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt ;
 
@@ -145,6 +147,7 @@
              | INCREMENT IDENTIFIER
              | DECREMENT IDENTIFIER
              | simpleExpression
+             | ternaryExpression
              ;
   simpleExpression : simpleExpression LG_OR andExpression  | andExpression ;
 
