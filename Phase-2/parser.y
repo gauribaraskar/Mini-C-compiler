@@ -43,8 +43,19 @@
 
 /* Identifier */
 %token <tbEntry> IDENTIFIER
-%start statement
 
+// %type <dval> expression;
+// %type <dval> simpleExpression;
+// %type <dval> andExpression;
+// %type <dval> unaryRelExpression;
+// %type <dval> relExpression;
+// %type <dval> sumExpression;
+// %type <dval> term;
+// %type <dval> const_type;
+
+%start program
+
+/* Precedence of Operators */
 %left ','
 %right ASSIGN
 %left LG_OR
@@ -55,60 +66,83 @@
 %left MULTIPLY DIVIDE MOD
 %right NOT
 
+
 %%
+    /* Program is made up of declarations */
     program : declarationList;
 
     declarationList : declarationList declaration | declaration;
 
-    declaration : varDeclaration;
+    declaration : varDeclaration | funcDeclaration;
 
-    varDeclaration : typeSpecifier varDeclList ';' 
+    varDeclaration : typeSpecifier varDeclList ';'
 
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
 
     varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression ;
 
     varDecId : IDENTIFIER;
-									 
+
 
     const_type : DEC_CONSTANT
                | INT_CONSTANT
-               | HEX_CONSTANT ;
+               | HEX_CONSTANT
+               ;
 
     typeSpecifier : INT
                   | LONG INT
                   | CHAR ;
 
-expression : IDENTIFIER ASSIGN expression | IDENTIFIER INCREMENT | IDENTIFIER DECREMENT | simpleExpression;
+funcDeclaration : typeSpecifier IDENTIFIER '(' params ')' statement | IDENTIFIER '(' params ')' statement;
 
-simpleExpression : simpleExpression LG_OR andExpression | andExpression;
+params : paramList | ;
 
-andExpression : andExpression LG_AND unaryRelExpression | unaryRelExpression;
+paramList :paramList ',' paramTypeList | paramTypeList ;
+
+paramTypeList : typeSpecifier IDENTIFIER;
+
+expression : IDENTIFIER ASSIGN expression
+          | IDENTIFIER INCREMENT
+          | IDENTIFIER DECREMENT
+          | INCREMENT IDENTIFIER
+          | DECREMENT IDENTIFIER
+          | simpleExpression;
+
+simpleExpression : simpleExpression LG_OR andExpression | andExpression ;
+
+andExpression : andExpression LG_AND unaryRelExpression  | unaryRelExpression ;
 
 unaryRelExpression : NOT unaryRelExpression | relExpression ;
 
-relExpression : sumExpression relop sumExpression | sumExpression ;
+relExpression : sumExpression GREATER_THAN sumExpression
+              | sumExpression LESSER_THAN sumExpression
+              | sumExpression LESS_EQ sumExpression
+              | sumExpression GREATER_EQ sumExpression
+              | sumExpression NOT_EQ sumExpression
+              | sumExpression EQUAL sumExpression
+              | sumExpression ;
 
-relop : GREATER_THAN | LESSER_THAN | LESS_EQ | GREATER_EQ | NOT_EQ | EQUAL ;
+sumExpression : sumExpression ADD term
+              | sumExpression SUBTRACT term
+              | term ;
+//
+// term : term MULTIPLY factor {$$ = ($1 * $3);}
+//      | term DIVIDE factor {$$ = ($1 / $3);}
+//      | term MOD factor {$$ = ($1 % $3);}
+     term : '(' expression ')'
+     | const_type 
+     | factor ;
 
-sumExpression : sumExpression sumop term | term ;
+factor : IDENTIFIER;
 
-term : term mulop factor | factor ;
-
-mulop : MULTIPLY | DIVIDE | MOD ;
-
-sumop : ADD | SUBTRACT ;
-
-factor : IDENTIFIER |'(' expression ')'|const_type ;
-
-statement : expressionStmt | compoundStmt | selectionStmt | iterationStmt | returnStmt | breakStmt ; 
+statement : declarationList | expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | returnStmt | breakStmt ;
 
 expressionStmt : expression ';' | ';' ;
 
 compoundStmt : '{' statementList '}' ;
 
-statementList : statementList statement 
-                | 
+statementList : statementList statement
+                |
                 ;
 
 selectionStmt : IF '(' simpleExpression ')' statement | IF '(' simpleExpression ')' statement ELSE statement ;
@@ -118,6 +152,7 @@ iterationStmt : WHILE '(' simpleExpression ')' statement | DO statement WHILE '(
 returnStmt : RETURN ';' | RETURN expression ;
 
 breakStmt : BREAK ';' ;
+
 
 
 

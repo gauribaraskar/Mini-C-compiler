@@ -99,6 +99,7 @@ void InsertEntry(entry** TablePointer, char *lexeme,double value,int DataType )
     }
 
   }
+
 }
 
 void Display(entry** TablePointer)

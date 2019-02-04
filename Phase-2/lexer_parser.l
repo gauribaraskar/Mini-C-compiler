@@ -51,14 +51,15 @@ hex [0-9a-fA-F]
 
  /* Constants */
 
-[+/-]?[0][x|X]{hex}+                {return HEX_CONSTANT;}
-[+/-]?{digit}+                      {return INT_CONSTANT;}
-[+/-]?({digit}*)["."]({digit}+)     {return DEC_CONSTANT;}
-[+/-]?({digit}+)["."]({digit}*)     {return DEC_CONSTANT;}
+[+/-]?[0][x|X]{hex}+                {yylval.dval = (int)strtol(yytext, NULL, 16);return HEX_CONSTANT;}
+[+/-]?{digit}+                      {yylval.ival = atoi(yytext);return INT_CONSTANT;}
+[+/-]?({digit}*)["."]({digit}+)     {yylval.dval = atoi(yytext);return DEC_CONSTANT;}
+[+/-]?({digit}+)["."]({digit}*)     {yylval.dval = atoi(yytext);return DEC_CONSTANT;}
 
 {identifier} {
   if(strlen(yytext) <= 32)
     {
+      
       return IDENTIFIER;
     }
   else
