@@ -1,8 +1,8 @@
 // Pointers , strings , chracters, comma declaration , array declaration
 %{
     #include<stdio.h>
-	#include<stdlib.h>
-	#include "tables.h"
+	  #include<stdlib.h>
+	  #include "tables.h"
     entry **SymbolTable = NULL;
     entry **ConstantTable = NULL;
     int yyerror(char *msg);
@@ -15,6 +15,8 @@
 	entry *tbEntry;
 	double dval;
 }
+
+
 
 /* Random Tokens I declared to silence errors */
 %token MAIN ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN MOD
@@ -66,8 +68,11 @@
 %left MULTIPLY DIVIDE MOD
 %right NOT
 
+
 %nonassoc IFX
 %nonassoc ELSE
+
+%glr-parser
 %%
     /* Program is made up of declarations */
     program : declarationList;
@@ -94,7 +99,9 @@
                   | LONG INT
                   | CHAR ;
 
-funcDeclaration : typeSpecifier IDENTIFIER '(' params ')' statement | IDENTIFIER '(' params ')' statement;
+funcDeclaration : typeSpecifier IDENTIFIER '(' params ')' statement 
+
+funcCall : IDENTIFIER '(' params ')' statement;
 
 params : paramList | ;
 
@@ -103,8 +110,6 @@ paramList :paramList ',' paramTypeList | paramTypeList ;
 paramTypeList : typeSpecifier IDENTIFIER;
 
 expression : IDENTIFIER ASSIGN expression
-          | IDENTIFIER INCREMENT
-          | IDENTIFIER DECREMENT
           | INCREMENT IDENTIFIER
           | DECREMENT IDENTIFIER
           | simpleExpression;
@@ -136,7 +141,7 @@ sumExpression : sumExpression ADD term
 
 factor : IDENTIFIER;
 
-statement : declarationList | expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | returnStmt | breakStmt ;
+statement : declarationList | expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | returnStmt | breakStmt | funcCall ;
 
 expressionStmt : expression ';' | ';' ;
 
