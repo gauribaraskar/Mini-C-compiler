@@ -6,6 +6,7 @@
     entry **SymbolTable = NULL;
     entry **ConstantTable = NULL;
     int yyerror(char *msg);
+    int curr_data_type;
     int yylex(void);
 %}
 
@@ -38,7 +39,7 @@
 
 /* Constants */
 %token <dval> HEX_CONSTANT DEC_CONSTANT
-%token <ival> INT_CONSTANT
+%token <dval> INT_CONSTANT
 
 /* String */
 %token <str> STRING
@@ -53,7 +54,7 @@
 // %type <dval> relExpression;
 // %type <dval> sumExpression;
 // %type <dval> term;
-// %type <dval> const_type;
+%type <dval> const_type;
 
 %start program
 
@@ -84,9 +85,9 @@
 
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
 
-    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression ;
+    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression
 
-    varDecId : IDENTIFIER | IDENTIFIER '[' INT_CONSTANT ']';
+    varDecId : IDENTIFIER {$1->data_type = curr_data_type;} | IDENTIFIER '[' INT_CONSTANT ']';
 
 
     const_type : DEC_CONSTANT
@@ -94,9 +95,10 @@
                | HEX_CONSTANT
                ;
 
-    typeSpecifier : INT
+    typeSpecifier : INT {curr_data_type = 1;}
                   | LONG INT
-                  | CHAR ;
+                  | CHAR {curr_data_type = 2;}
+                  ;
 
   funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt ;
 
@@ -144,11 +146,11 @@
              | DECREMENT IDENTIFIER
              | simpleExpression
              ;
-  simpleExpression : simpleExpression LG_OR andExpression | andExpression ;
+  simpleExpression : simpleExpression LG_OR andExpression  | andExpression ;
 
-  andExpression : andExpression LG_AND unaryRelExpression  | unaryRelExpression ;
+  andExpression : andExpression LG_AND unaryRelExpression | unaryRelExpression ;
 
-  unaryRelExpression : NOT unaryRelExpression | relExpression ;
+  unaryRelExpression : NOT unaryRelExpression  | relExpression  ;
 
   relExpression : sumExpression GREATER_THAN sumExpression
                 | sumExpression LESSER_THAN sumExpression
@@ -156,11 +158,13 @@
                 | sumExpression GREATER_EQ sumExpression
                 | sumExpression NOT_EQ sumExpression
                 | sumExpression EQUAL sumExpression
-                | sumExpression ;
+                | sumExpression
+                ;
 
    sumExpression : sumExpression ADD term
                  | sumExpression SUBTRACT term
-                 | term ;
+                 | term
+                 ;
 
     term : term MULTIPLY unaryExpression
        | term DIVIDE unaryExpression
@@ -195,6 +199,8 @@ int main(int argc , char *argv[]){
     }
     printf("\n\tSymbol table");
     Display(SymbolTable);
+    printf("\n\tConstant table");
+    Display(ConstantTable);
     fclose(yyin);
     return 0;
 }

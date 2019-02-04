@@ -2,7 +2,7 @@
 %{
     #include<stdio.h>
     #include<stdlib.h>
-
+    #include<limits.h>
     int ErrFlag = 0;
 
     #include "y.tab.h"
@@ -51,15 +51,15 @@ hex [0-9a-fA-F]
 
  /* Constants */
 
-[+/-]?[0][x|X]{hex}+                {yylval.dval = (int)strtol(yytext, NULL, 16);return HEX_CONSTANT;}
-[+/-]?{digit}+                      {yylval.ival = atoi(yytext);return INT_CONSTANT;}
-[+/-]?({digit}*)["."]({digit}+)     {yylval.dval = atoi(yytext);return DEC_CONSTANT;}
-[+/-]?({digit}+)["."]({digit}*)     {yylval.dval = atoi(yytext);return DEC_CONSTANT;}
+[+/-]?[0][x|X]{hex}+                {yylval.dval = (int)strtol(yytext, NULL, 16); InsertEntry(ConstantTable, yytext , yylval.dval,1);return HEX_CONSTANT;}
+[+/-]?{digit}+                      {yylval.dval = (int) atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,1);return INT_CONSTANT;}
+[+/-]?({digit}*)["."]({digit}+)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,2);return DEC_CONSTANT;}
+[+/-]?({digit}+)["."]({digit}*)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,2);return DEC_CONSTANT;}
 
 {identifier} {
   if(strlen(yytext) <= 32)
     {
-
+     yylval.tbEntry = InsertEntry(SymbolTable, yytext, INT_MAX , 1);
       return IDENTIFIER;
     }
   else

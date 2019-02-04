@@ -70,13 +70,14 @@ int Search(entry** TablePointer, char *lexeme)
   return 0;
 }
 
-void InsertEntry(entry** TablePointer, char *lexeme,double value,int DataType )
+entry* InsertEntry(entry** TablePointer, char *lexeme,double value,int DataType )
 {
+    int temp = hash(lexeme);
   if(Search(TablePointer,lexeme) == 1)
-    return;
+    return TablePointer[temp];
   else
   {
-    int temp = hash(lexeme);
+
     entry *head = NULL;
 
     head = TablePointer[temp];
@@ -99,6 +100,7 @@ void InsertEntry(entry** TablePointer, char *lexeme,double value,int DataType )
     }
 
   }
+  return TablePointer[temp];
 
 }
 
@@ -111,7 +113,7 @@ void Display(entry** TablePointer)
 
   printf("-----------------------------------------\n");
 
-  printf("\n\t(lexeme, token)\n" );
+  printf("\n\t(lexeme, token, Data type)\n" );
 
   for(i=0;i<SIZE;i++)
   {
