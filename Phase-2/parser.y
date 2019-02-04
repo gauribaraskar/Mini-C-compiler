@@ -99,11 +99,10 @@
                   | LONG INT
                   | CHAR ;
 
-funcDeclaration : typeSpecifier IDENTIFIER '(' params ')' statement 
+    funcDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt ;
 
-funcCall : IDENTIFIER '(' params ')' statement;
+    funcCall : IDENTIFIER '(' params ')' statement;
 
-params : paramList | ;
 
 paramList :paramList ',' paramTypeList | paramTypeList ;
 
