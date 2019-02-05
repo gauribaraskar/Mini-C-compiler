@@ -161,8 +161,8 @@
                 | sumExpression
                 ;
 
-   sumExpression : sumExpression '+' term
-                 | sumExpression '-' term
+   sumExpression : sumExpression ADD term
+                 | sumExpression SUBTRACT term
                  | term
                  ;
 
