@@ -81,7 +81,9 @@
 
     declaration : varDeclaration | funDeclaration | strucUniDecl;
 
-    strucUniDecl : STRUCT_UNI '{' varDeclaration '}' IDENTIFIER ';';
+    strucUniDecl : STRUCT_UNI '{' declarationRecur '}' IDENTIFIER ';';
+
+    declarationRecur : declarationRecur declaration | declaration ;
 
     varDeclaration : typeSpecifier varDeclList ';' ;
 
@@ -139,7 +141,7 @@
 
   selectionStmt : IF '(' simpleExpression ')' statement %prec IFX | IF '(' simpleExpression ')' statement ELSE statement | SWITCH '(' simpleExpression ')' statement;
 
-  iterationStmt : WHILE '(' simpleExpression ')' statement | DO statement WHILE '(' expression ')' | FOR '(' optExpression ';' optExpression ';' optExpression ')' statement;
+  iterationStmt : WHILE '(' simpleExpression ')' statement | DO statement WHILE '(' expression ')' ';' | FOR '(' optExpression ';' optExpression ';' optExpression ')' statement;
 
   optExpression : expression | ;
 

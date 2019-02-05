@@ -87,7 +87,7 @@ hex [0-9a-fA-F]
 <PREPROCESSOR>"<"[^<>\n]*">"        {BEGIN INITIAL;}
 <PREPROCESSOR>\"[^<>\n]*\"          {BEGIN INITIAL;}
 <PREPROCESSOR>"\n"                  { yylineno++; BEGIN INITIAL;ErrFlag=1;}
-<PREPROCESSOR>.                     {ErrFlag=1;}
+<PREPROCESSOR>.                     {yyerror("Improper Header");}
 
 
  /* Macropreprocessor Directives */
@@ -105,8 +105,8 @@ hex [0-9a-fA-F]
 <COMMENT>.|{whitespace}             ;
 <COMMENT>\n                         {yylineno++;}
 <COMMENT>"*/"                       {BEGIN INITIAL;}
-<COMMENT>"/*"                       {ErrFlag=1;yyterminate();}
-<COMMENT><<EOF>>                    {ErrFlag=1; yyterminate();}
+<COMMENT>"/*"                       {yyerror("Improper Comment");yyterminate();}
+<COMMENT><<EOF>>                    {yyerror("Improper Comment");yyterminate();}
 "//"                                {BEGIN SLCOMMENT;}
 <SLCOMMENT>.                        ;
 <SLCOMMENT>\n                       {yylineno++; BEGIN INITIAL;}
