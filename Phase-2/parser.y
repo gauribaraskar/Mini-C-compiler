@@ -197,6 +197,14 @@
 
 %%
 
+void disp()
+{
+    printf("\n\tSymbol table");
+    Display(SymbolTable);
+    printf("\n\tConstant table");
+    Display(ConstantTable);
+}
+
 #include "lex.yy.c"
 int main(int argc , char *argv[]){
 
@@ -209,15 +217,13 @@ int main(int argc , char *argv[]){
     if(!yyparse())
     {
         printf("\nParsing complete\n");
+        disp();
     }
     else
     {
             printf("\nParsing failed\n");
     }
-    printf("\n\tSymbol table");
-    Display(SymbolTable);
-    printf("\n\tConstant table");
-    Display(ConstantTable);
+    
     fclose(yyin);
     return 0;
 }
