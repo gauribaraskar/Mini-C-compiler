@@ -6,7 +6,7 @@
     entry **SymbolTable = NULL;
     entry **ConstantTable = NULL;
     int yyerror(char *msg);
-    int curr_data_type;
+    char* curr_data_type;
     int yylex(void);
 %}
 
@@ -95,9 +95,10 @@
                | HEX_CONSTANT
                ;
 
-    typeSpecifier : INT {curr_data_type = 1;}
+    typeSpecifier : typeSpecifier pointer
+                  | INT {curr_data_type = strdup("INT");}
                   | LONG INT
-                  | CHAR {curr_data_type = 2;}
+                  | CHAR {curr_data_type = strdup("CHAR");}
                   ;
 
   pointer : MULTIPLY pointer | MULTIPLY;
@@ -147,7 +148,6 @@
              | INCREMENT IDENTIFIER
              | DECREMENT IDENTIFIER
              | simpleExpression
-             | ternaryExpression
              ;
   simpleExpression : simpleExpression LG_OR andExpression  | andExpression ;
 
