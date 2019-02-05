@@ -102,7 +102,9 @@
 
   pointer : MULTIPLY pointer | MULTIPLY;
 
-  funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt | typeSpecifier MAIN '(' params ')' compoundStmt ;
+  funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt | typeSpecifier MAIN '(' params ')' compoundStmt | noDefDeclare ;
+
+  noDefDeclare : typeSpecifier IDENTIFIER '(' params ')' ';';
 
   funCall : IDENTIFIER '(' params ')' statement;
 
@@ -127,7 +129,7 @@
 
   selectionStmt : IF '(' simpleExpression ')' statement %prec IFX | IF '(' simpleExpression ')' statement ELSE statement ;
 
-  iterationStmt : WHILE '(' simpleExpression ')' statement | DO statement WHILE '(' expression ')' | FOR '(' expression ';' expression ';' expression ')' statement
+  iterationStmt : WHILE '(' simpleExpression ')' statement | DO statement WHILE '(' expression ')' | FOR '(' expression ';' expression ';' expression ')' statement;
 
   jumpStmt : GOTO IDENTIFIER ';' | CONTINUE ';' ;
 
@@ -158,6 +160,8 @@
                 | sumExpression GREATER_EQ sumExpression
                 | sumExpression NOT_EQ sumExpression
                 | sumExpression EQUAL sumExpression
+                | sumExpression '|' sumExpression
+                | sumExpression '&' sumExpression
                 | sumExpression
                 ;
 
@@ -171,9 +175,9 @@
        | term MOD unaryExpression
        | unaryExpression
        ;
-  unaryExpression : unaryOp %prec UMINUS unaryExpression | factor ;
+  unaryExpression : unaryOp %prec UMINUS unaryExpression| factor ;
 
-  unaryOp : UMINUS | '*' |  '?' | UPLUS ;
+  unaryOp : UMINUS | '*' |  '?' | UPLUS | '!' | '~' | '^' ;
 
   factor : IDENTIFIER | '(' expression ')' | const_type;
 

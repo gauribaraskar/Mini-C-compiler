@@ -132,7 +132,7 @@ hex [0-9a-fA-F]
 "||"                                {return LG_OR;}
 "&&"                                {return LG_AND;}
 "!"                                 {return NOT;}
-"!="                                {NOT_EQ;}
+"!="                                {return NOT_EQ;}
 
 
  /* Strings and Characters */
