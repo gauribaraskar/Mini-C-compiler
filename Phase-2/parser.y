@@ -1,3 +1,4 @@
+// comment 
 %{
     #include<stdio.h>
 	  #include<stdlib.h>
@@ -19,10 +20,10 @@
 
 
 /* Random Tokens I declared to silence errors */
-%token MAIN VOID ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN MOD ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
+%token MAIN ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN MOD ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
 
 /* Keywords */
-%token IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN
+%token VOID IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN
 
 /* Data types */
 %token INT SHORT LONG CHAR SIGNED UNSIGNED
@@ -84,9 +85,13 @@
 
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
 
-    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression | varDecId ASSIGN STRING ;
+    varDeclInitialize : varDecId | varDecId ASSIGN STRING | varDecId ASSIGN assignmentExpression ;
+
+    assignmentExpression : conditionalStmt | unaryExpression assignmentOperator assignmentExpression;
 
     varDecId : IDENTIFIER {$1->data_type = curr_data_type;} | IDENTIFIER '[' INT_CONSTANT ']';
+
+    assignmentOperator : ASSIGN | ADD_ASSIGN | SUB_ASSIGN |MUL_ASSIGN|DIV_ASSIGN|MOD_ASSIGN;
 
 
     const_type : DEC_CONSTANT
@@ -100,13 +105,11 @@
                   | CHAR {curr_data_type = strdup("CHAR");}
                   ;
 
-    
-
   pointer : MULTIPLY pointer | MULTIPLY;
 
-  funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt | typeSpecifier MAIN '(' params ')' compoundStmt | noDefDeclare | VOID IDENTIFIER '(' params ')' compoundStmt | VOID MAIN '(' params ')' compoundStmt ;
+  funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt | typeSpecifier MAIN '(' params ')' compoundStmt | noDefDeclare ;
 
-  noDefDeclare : typeSpecifier IDENTIFIER '(' params ')' ';' | VOID IDENTIFIER '(' params ')' ';';
+  noDefDeclare : typeSpecifier IDENTIFIER '(' params ')' ';';
 
   funCall : IDENTIFIER '(' params ')' statement;
 
@@ -141,13 +144,10 @@
 
   breakStmt : BREAK ';' ;
 
+    conditionalStmt : simpleExpression '?' expression ':' conditionalStmt  | simpleExpression;
 
-  expression : IDENTIFIER ASSIGN expression
-             | IDENTIFIER ADD_ASSIGN expression
-             | IDENTIFIER SUB_ASSIGN expression
-             | IDENTIFIER MUL_ASSIGN expression
-             | IDENTIFIER DIV_ASSIGN expression
-             | IDENTIFIER MOD_ASSIGN expression
+
+  expression : IDENTIFIER assignmentOperator expression
              | INCREMENT IDENTIFIER
              | DECREMENT IDENTIFIER
              | simpleExpression
@@ -181,7 +181,7 @@
        ;
   unaryExpression : unaryOp %prec UMINUS unaryExpression| factor ;
 
-  unaryOp : UMINUS | '*' |  '?' | UPLUS | '!' | '~' | '^' ;
+  unaryOp : UMINUS | '*'| UPLUS | '!' | '~' | '^' ;
 
   factor : IDENTIFIER | '(' expression ')' | const_type;
 

@@ -24,284 +24,297 @@ Grammar
     8            | varDeclInitialize
 
     9 varDeclInitialize: varDecId
-   10                  | varDecId ASSIGN simpleExpression
-   11                  | varDecId ASSIGN STRING
+   10                  | varDecId ASSIGN STRING
+   11                  | varDecId ASSIGN assignmentExpression
 
-   12 varDecId: IDENTIFIER
-   13         | IDENTIFIER '[' INT_CONSTANT ']'
+   12 assignmentExpression: conditionalStmt
+   13                     | unaryExpression assignmentOperator assignmentExpression
 
-   14 const_type: DEC_CONSTANT
-   15           | INT_CONSTANT
-   16           | HEX_CONSTANT
+   14 varDecId: IDENTIFIER
+   15         | IDENTIFIER '[' INT_CONSTANT ']'
 
-   17 typeSpecifier: typeSpecifier pointer
-   18              | INT
-   19              | LONG INT
-   20              | CHAR
+   16 assignmentOperator: ASSIGN
+   17                   | ADD_ASSIGN
+   18                   | SUB_ASSIGN
+   19                   | MUL_ASSIGN
+   20                   | DIV_ASSIGN
+   21                   | MOD_ASSIGN
 
-   21 pointer: MULTIPLY pointer
-   22        | MULTIPLY
+   22 const_type: DEC_CONSTANT
+   23           | INT_CONSTANT
+   24           | HEX_CONSTANT
 
-   23 funDeclaration: typeSpecifier IDENTIFIER '(' params ')' compoundStmt
-   24               | typeSpecifier MAIN '(' params ')' compoundStmt
-   25               | noDefDeclare
+   25 typeSpecifier: typeSpecifier pointer
+   26              | INT
+   27              | LONG INT
+   28              | CHAR
 
-   26 noDefDeclare: typeSpecifier IDENTIFIER '(' params ')' ';'
+   29 pointer: MULTIPLY pointer
+   30        | MULTIPLY
 
-   27 funCall: IDENTIFIER '(' params ')' statement
+   31 funDeclaration: typeSpecifier IDENTIFIER '(' params ')' compoundStmt
+   32               | typeSpecifier MAIN '(' params ')' compoundStmt
+   33               | noDefDeclare
 
-   28 params: paramList
-   29       | %empty
+   34 noDefDeclare: typeSpecifier IDENTIFIER '(' params ')' ';'
 
-   30 paramList: paramList ',' paramTypeList
-   31          | paramTypeList
+   35 funCall: IDENTIFIER '(' params ')' statement
 
-   32 paramTypeList: typeSpecifier paramId
+   36 params: paramList
+   37       | %empty
 
-   33 paramId: IDENTIFIER
-   34        | IDENTIFIER '[' ']'
+   38 paramList: paramList ',' paramTypeList
+   39          | paramTypeList
 
-   35 statement: expressionStmt
-   36          | compoundStmt
-   37          | selectionStmt
-   38          | iterationStmt
-   39          | jumpStmt
-   40          | returnStmt
-   41          | breakStmt
-   42          | funCall
+   40 paramTypeList: typeSpecifier paramId
 
-   43 compoundStmt: '{' localDeclarations statementList '}'
+   41 paramId: IDENTIFIER
+   42        | IDENTIFIER '[' ']'
 
-   44 localDeclarations: localDeclarations varDeclaration
-   45                  | %empty
+   43 statement: expressionStmt
+   44          | compoundStmt
+   45          | selectionStmt
+   46          | iterationStmt
+   47          | jumpStmt
+   48          | returnStmt
+   49          | breakStmt
+   50          | funCall
 
-   46 statementList: statementList statement
-   47              | %empty
+   51 compoundStmt: '{' localDeclarations statementList '}'
 
-   48 expressionStmt: expression ';'
-   49               | ';'
+   52 localDeclarations: localDeclarations varDeclaration
+   53                  | %empty
 
-   50 selectionStmt: IF '(' simpleExpression ')' statement
-   51              | IF '(' simpleExpression ')' statement ELSE statement
+   54 statementList: statementList statement
+   55              | %empty
 
-   52 iterationStmt: WHILE '(' simpleExpression ')' statement
-   53              | DO statement WHILE '(' expression ')'
-   54              | FOR '(' optExpression ';' optExpression ';' optExpression ')' statement
+   56 expressionStmt: expression ';'
+   57               | ';'
 
-   55 optExpression: expression
-   56              | %empty
+   58 selectionStmt: IF '(' simpleExpression ')' statement
+   59              | IF '(' simpleExpression ')' statement ELSE statement
 
-   57 jumpStmt: GOTO IDENTIFIER ';'
-   58         | CONTINUE ';'
+   60 iterationStmt: WHILE '(' simpleExpression ')' statement
+   61              | DO statement WHILE '(' expression ')'
+   62              | FOR '(' optExpression ';' optExpression ';' optExpression ')' statement
 
-   59 returnStmt: RETURN ';'
-   60           | RETURN expression
+   63 optExpression: expression
+   64              | %empty
 
-   61 breakStmt: BREAK ';'
+   65 jumpStmt: GOTO IDENTIFIER ';'
+   66         | CONTINUE ';'
 
-   62 expression: IDENTIFIER ASSIGN expression
-   63           | IDENTIFIER ADD_ASSIGN expression
-   64           | IDENTIFIER SUB_ASSIGN expression
-   65           | IDENTIFIER MUL_ASSIGN expression
-   66           | IDENTIFIER DIV_ASSIGN expression
-   67           | IDENTIFIER MOD_ASSIGN expression
-   68           | INCREMENT IDENTIFIER
-   69           | DECREMENT IDENTIFIER
-   70           | simpleExpression
+   67 returnStmt: RETURN ';'
+   68           | RETURN expression
 
-   71 simpleExpression: simpleExpression LG_OR andExpression
-   72                 | andExpression
+   69 breakStmt: BREAK ';'
 
-   73 andExpression: andExpression LG_AND unaryRelExpression
-   74              | unaryRelExpression
+   70 conditionalStmt: simpleExpression '?' expression ':' conditionalStmt
+   71                | simpleExpression
 
-   75 unaryRelExpression: NOT unaryRelExpression
-   76                   | relExpression
+   72 expression: IDENTIFIER assignmentOperator expression
+   73           | INCREMENT IDENTIFIER
+   74           | DECREMENT IDENTIFIER
+   75           | simpleExpression
 
-   77 relExpression: sumExpression GREATER_THAN sumExpression
-   78              | sumExpression LESSER_THAN sumExpression
-   79              | sumExpression LESS_EQ sumExpression
-   80              | sumExpression GREATER_EQ sumExpression
-   81              | sumExpression NOT_EQ sumExpression
-   82              | sumExpression EQUAL sumExpression
-   83              | sumExpression '|' sumExpression
-   84              | sumExpression '&' sumExpression
-   85              | sumExpression
+   76 simpleExpression: simpleExpression LG_OR andExpression
+   77                 | andExpression
 
-   86 sumExpression: sumExpression ADD term
-   87              | sumExpression SUBTRACT term
-   88              | term
+   78 andExpression: andExpression LG_AND unaryRelExpression
+   79              | unaryRelExpression
 
-   89 term: term MULTIPLY unaryExpression
-   90     | term DIVIDE unaryExpression
-   91     | term MOD unaryExpression
-   92     | unaryExpression
+   80 unaryRelExpression: NOT unaryRelExpression
+   81                   | relExpression
 
-   93 unaryExpression: unaryOp unaryExpression
-   94                | factor
+   82 relExpression: sumExpression GREATER_THAN sumExpression
+   83              | sumExpression LESSER_THAN sumExpression
+   84              | sumExpression LESS_EQ sumExpression
+   85              | sumExpression GREATER_EQ sumExpression
+   86              | sumExpression NOT_EQ sumExpression
+   87              | sumExpression EQUAL sumExpression
+   88              | sumExpression '|' sumExpression
+   89              | sumExpression '&' sumExpression
+   90              | sumExpression
 
-   95 unaryOp: UMINUS
-   96        | '*'
-   97        | '?'
-   98        | UPLUS
-   99        | '!'
-  100        | '~'
-  101        | '^'
+   91 sumExpression: sumExpression ADD term
+   92              | sumExpression SUBTRACT term
+   93              | term
 
-  102 factor: IDENTIFIER
-  103       | '(' expression ')'
-  104       | const_type
+   94 term: term MULTIPLY unaryExpression
+   95     | term DIVIDE unaryExpression
+   96     | term MOD unaryExpression
+   97     | unaryExpression
+
+   98 unaryExpression: unaryOp unaryExpression
+   99                | factor
+
+  100 unaryOp: UMINUS
+  101        | '*'
+  102        | UPLUS
+  103        | '!'
+  104        | '~'
+  105        | '^'
+
+  106 factor: IDENTIFIER
+  107       | '(' expression ')'
+  108       | const_type
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'!' (33) 99
-'&' (38) 84
-'(' (40) 23 24 26 27 50 51 52 53 54 103
-')' (41) 23 24 26 27 50 51 52 53 54 103
-'*' (42) 96
-',' (44) 7 30
-';' (59) 6 26 48 49 54 57 58 59 61
-'?' (63) 97
-'[' (91) 13 34
-']' (93) 13 34
-'^' (94) 101
-'{' (123) 43
-'|' (124) 83
-'}' (125) 43
-'~' (126) 100
+'!' (33) 103
+'&' (38) 89
+'(' (40) 31 32 34 35 58 59 60 61 62 107
+')' (41) 31 32 34 35 58 59 60 61 62 107
+'*' (42) 101
+',' (44) 7 38
+':' (58) 70
+';' (59) 6 34 56 57 62 65 66 67 69
+'?' (63) 70
+'[' (91) 15 42
+']' (93) 15 42
+'^' (94) 105
+'{' (123) 51
+'|' (124) 88
+'}' (125) 51
+'~' (126) 104
 error (256)
-MAIN (258) 24
-ADD (259) 86
-SUBTRACT (260) 87
-MULTIPLY (261) 21 22 89
-DIVIDE (262) 90
-ASSIGN (263) 10 11 62
-GREATER_THAN (264) 77
-LESSER_THAN (265) 78
-MOD (266) 91
-ADD_ASSIGN (267) 63
-SUB_ASSIGN (268) 64
-MUL_ASSIGN (269) 65
-DIV_ASSIGN (270) 66
-MOD_ASSIGN (271) 67
+MAIN (258) 32
+ADD (259) 91
+SUBTRACT (260) 92
+MULTIPLY (261) 29 30 94
+DIVIDE (262) 95
+ASSIGN (263) 10 11 16
+GREATER_THAN (264) 82
+LESSER_THAN (265) 83
+MOD (266) 96
+ADD_ASSIGN (267) 17
+SUB_ASSIGN (268) 18
+MUL_ASSIGN (269) 19
+DIV_ASSIGN (270) 20
+MOD_ASSIGN (271) 21
 VOID (272)
-IF (273) 50 51
-ELSE (274) 51
-FOR (275) 54
-DO (276) 53
-WHILE (277) 52 53
-GOTO (278) 57
-BREAK (279) 61
-CONTINUE (280) 58
-RETURN (281) 59 60
-INT (282) 18 19
+IF (273) 58 59
+ELSE (274) 59
+FOR (275) 62
+DO (276) 61
+WHILE (277) 60 61
+GOTO (278) 65
+BREAK (279) 69
+CONTINUE (280) 66
+RETURN (281) 67 68
+INT (282) 26 27
 SHORT (283)
-LONG (284) 19
-CHAR (285) 20
+LONG (284) 27
+CHAR (285) 28
 SIGNED (286)
 UNSIGNED (287)
-LG_OR (288) 71
-LG_AND (289) 73
-NOT (290) 75
-LESS_EQ (291) 79
-GREATER_EQ (292) 80
-EQUAL (293) 82
-DECREMENT (294) 69
-INCREMENT (295) 68
-NOT_EQ (296) 81
-HEX_CONSTANT (297) 16
-DEC_CONSTANT (298) 14
-INT_CONSTANT (299) 13 15
-STRING (300) 11
-IDENTIFIER (301) 12 13 23 26 27 33 34 57 62 63 64 65 66 67 68 69 102
-UMINUS (302) 95
-UPLUS (303) 98
+LG_OR (288) 76
+LG_AND (289) 78
+NOT (290) 80
+LESS_EQ (291) 84
+GREATER_EQ (292) 85
+EQUAL (293) 87
+DECREMENT (294) 74
+INCREMENT (295) 73
+NOT_EQ (296) 86
+HEX_CONSTANT (297) 24
+DEC_CONSTANT (298) 22
+INT_CONSTANT (299) 15 23
+STRING (300) 10
+IDENTIFIER (301) 14 15 31 34 35 41 42 65 72 73 74 106
+UMINUS (302) 100
+UPLUS (303) 102
 IFX (304)
 
 
 Nonterminals, with rules where they appear
 
-$accept (65)
+$accept (66)
     on left: 0
-program (66)
+program (67)
     on left: 1, on right: 0
-declarationList (67)
+declarationList (68)
     on left: 2 3, on right: 1 2
-declaration (68)
+declaration (69)
     on left: 4 5, on right: 2 3
-varDeclaration (69)
-    on left: 6, on right: 4 44
-varDeclList (70)
+varDeclaration (70)
+    on left: 6, on right: 4 52
+varDeclList (71)
     on left: 7 8, on right: 6 7
-varDeclInitialize (71)
+varDeclInitialize (72)
     on left: 9 10 11, on right: 7 8
-varDecId (72)
-    on left: 12 13, on right: 9 10 11
-const_type (73)
-    on left: 14 15 16, on right: 104
-typeSpecifier (74)
-    on left: 17 18 19 20, on right: 6 17 23 24 26 32
-pointer (75)
-    on left: 21 22, on right: 17 21
-funDeclaration (76)
-    on left: 23 24 25, on right: 5
-noDefDeclare (77)
-    on left: 26, on right: 25
-funCall (78)
-    on left: 27, on right: 42
-params (79)
-    on left: 28 29, on right: 23 24 26 27
-paramList (80)
-    on left: 30 31, on right: 28 30
-paramTypeList (81)
-    on left: 32, on right: 30 31
-paramId (82)
-    on left: 33 34, on right: 32
-statement (83)
-    on left: 35 36 37 38 39 40 41 42, on right: 27 46 50 51 52 53 54
-compoundStmt (84)
-    on left: 43, on right: 23 24 36
-localDeclarations (85)
-    on left: 44 45, on right: 43 44
-statementList (86)
-    on left: 46 47, on right: 43 46
-expressionStmt (87)
-    on left: 48 49, on right: 35
-selectionStmt (88)
-    on left: 50 51, on right: 37
-iterationStmt (89)
-    on left: 52 53 54, on right: 38
-optExpression (90)
-    on left: 55 56, on right: 54
-jumpStmt (91)
-    on left: 57 58, on right: 39
-returnStmt (92)
-    on left: 59 60, on right: 40
-breakStmt (93)
-    on left: 61, on right: 41
-expression (94)
-    on left: 62 63 64 65 66 67 68 69 70, on right: 48 53 55 60 62 63
-    64 65 66 67 103
-simpleExpression (95)
-    on left: 71 72, on right: 10 50 51 52 70 71
-andExpression (96)
-    on left: 73 74, on right: 71 72 73
-unaryRelExpression (97)
-    on left: 75 76, on right: 73 74 75
-relExpression (98)
-    on left: 77 78 79 80 81 82 83 84 85, on right: 76
-sumExpression (99)
-    on left: 86 87 88, on right: 77 78 79 80 81 82 83 84 85 86 87
-term (100)
-    on left: 89 90 91 92, on right: 86 87 88 89 90 91
-unaryExpression (101)
-    on left: 93 94, on right: 89 90 91 92 93
-unaryOp (102)
-    on left: 95 96 97 98 99 100 101, on right: 93
-factor (103)
-    on left: 102 103 104, on right: 94
+assignmentExpression (73)
+    on left: 12 13, on right: 11 13
+varDecId (74)
+    on left: 14 15, on right: 9 10 11
+assignmentOperator (75)
+    on left: 16 17 18 19 20 21, on right: 13 72
+const_type (76)
+    on left: 22 23 24, on right: 108
+typeSpecifier (77)
+    on left: 25 26 27 28, on right: 6 25 31 32 34 40
+pointer (78)
+    on left: 29 30, on right: 25 29
+funDeclaration (79)
+    on left: 31 32 33, on right: 5
+noDefDeclare (80)
+    on left: 34, on right: 33
+funCall (81)
+    on left: 35, on right: 50
+params (82)
+    on left: 36 37, on right: 31 32 34 35
+paramList (83)
+    on left: 38 39, on right: 36 38
+paramTypeList (84)
+    on left: 40, on right: 38 39
+paramId (85)
+    on left: 41 42, on right: 40
+statement (86)
+    on left: 43 44 45 46 47 48 49 50, on right: 35 54 58 59 60 61 62
+compoundStmt (87)
+    on left: 51, on right: 31 32 44
+localDeclarations (88)
+    on left: 52 53, on right: 51 52
+statementList (89)
+    on left: 54 55, on right: 51 54
+expressionStmt (90)
+    on left: 56 57, on right: 43
+selectionStmt (91)
+    on left: 58 59, on right: 45
+iterationStmt (92)
+    on left: 60 61 62, on right: 46
+optExpression (93)
+    on left: 63 64, on right: 62
+jumpStmt (94)
+    on left: 65 66, on right: 47
+returnStmt (95)
+    on left: 67 68, on right: 48
+breakStmt (96)
+    on left: 69, on right: 49
+conditionalStmt (97)
+    on left: 70 71, on right: 12 70
+expression (98)
+    on left: 72 73 74 75, on right: 56 61 63 68 70 72 107
+simpleExpression (99)
+    on left: 76 77, on right: 58 59 60 70 71 75 76
+andExpression (100)
+    on left: 78 79, on right: 76 77 78
+unaryRelExpression (101)
+    on left: 80 81, on right: 78 79 80
+relExpression (102)
+    on left: 82 83 84 85 86 87 88 89 90, on right: 81
+sumExpression (103)
+    on left: 91 92 93, on right: 82 83 84 85 86 87 88 89 90 91 92
+term (104)
+    on left: 94 95 96 97, on right: 91 92 93 94 95 96
+unaryExpression (105)
+    on left: 98 99, on right: 13 94 95 96 97 98
+unaryOp (106)
+    on left: 100 101 102 103 104 105, on right: 98
+factor (107)
+    on left: 106 107 108, on right: 99
 
 
 State 0
@@ -323,23 +336,23 @@ State 0
 
 State 1
 
-   18 typeSpecifier: INT .
+   26 typeSpecifier: INT .
 
-    $default  reduce using rule 18 (typeSpecifier)
+    $default  reduce using rule 26 (typeSpecifier)
 
 
 State 2
 
-   19 typeSpecifier: LONG . INT
+   27 typeSpecifier: LONG . INT
 
     INT  shift, and go to state 11
 
 
 State 3
 
-   20 typeSpecifier: CHAR .
+   28 typeSpecifier: CHAR .
 
-    $default  reduce using rule 20 (typeSpecifier)
+    $default  reduce using rule 28 (typeSpecifier)
 
 
 State 4
@@ -384,10 +397,10 @@ State 7
 State 8
 
     6 varDeclaration: typeSpecifier . varDeclList ';'
-   17 typeSpecifier: typeSpecifier . pointer
-   23 funDeclaration: typeSpecifier . IDENTIFIER '(' params ')' compoundStmt
-   24               | typeSpecifier . MAIN '(' params ')' compoundStmt
-   26 noDefDeclare: typeSpecifier . IDENTIFIER '(' params ')' ';'
+   25 typeSpecifier: typeSpecifier . pointer
+   31 funDeclaration: typeSpecifier . IDENTIFIER '(' params ')' compoundStmt
+   32               | typeSpecifier . MAIN '(' params ')' compoundStmt
+   34 noDefDeclare: typeSpecifier . IDENTIFIER '(' params ')' ';'
 
     MAIN        shift, and go to state 14
     MULTIPLY    shift, and go to state 15
@@ -408,16 +421,16 @@ State 9
 
 State 10
 
-   25 funDeclaration: noDefDeclare .
+   33 funDeclaration: noDefDeclare .
 
-    $default  reduce using rule 25 (funDeclaration)
+    $default  reduce using rule 33 (funDeclaration)
 
 
 State 11
 
-   19 typeSpecifier: LONG INT .
+   27 typeSpecifier: LONG INT .
 
-    $default  reduce using rule 19 (typeSpecifier)
+    $default  reduce using rule 27 (typeSpecifier)
 
 
 State 12
@@ -436,32 +449,32 @@ State 13
 
 State 14
 
-   24 funDeclaration: typeSpecifier MAIN . '(' params ')' compoundStmt
+   32 funDeclaration: typeSpecifier MAIN . '(' params ')' compoundStmt
 
     '('  shift, and go to state 21
 
 
 State 15
 
-   21 pointer: MULTIPLY . pointer
-   22        | MULTIPLY .
+   29 pointer: MULTIPLY . pointer
+   30        | MULTIPLY .
 
-    $default  reduce using rule 22 (pointer)
+    $default  reduce using rule 30 (pointer)
 
     pointer  go to state 22
 
 
 State 16
 
-   12 varDecId: IDENTIFIER .
-   13         | IDENTIFIER . '[' INT_CONSTANT ']'
-   23 funDeclaration: typeSpecifier IDENTIFIER . '(' params ')' compoundStmt
-   26 noDefDeclare: typeSpecifier IDENTIFIER . '(' params ')' ';'
+   14 varDecId: IDENTIFIER .
+   15         | IDENTIFIER . '[' INT_CONSTANT ']'
+   31 funDeclaration: typeSpecifier IDENTIFIER . '(' params ')' compoundStmt
+   34 noDefDeclare: typeSpecifier IDENTIFIER . '(' params ')' ';'
 
     '['  shift, and go to state 23
     '('  shift, and go to state 24
 
-    $default  reduce using rule 12 (varDecId)
+    $default  reduce using rule 14 (varDecId)
 
 
 State 17
@@ -483,8 +496,8 @@ State 18
 State 19
 
     9 varDeclInitialize: varDecId .
-   10                  | varDecId . ASSIGN simpleExpression
-   11                  | varDecId . ASSIGN STRING
+   10                  | varDecId . ASSIGN STRING
+   11                  | varDecId . ASSIGN assignmentExpression
 
     ASSIGN  shift, and go to state 27
 
@@ -493,20 +506,20 @@ State 19
 
 State 20
 
-   17 typeSpecifier: typeSpecifier pointer .
+   25 typeSpecifier: typeSpecifier pointer .
 
-    $default  reduce using rule 17 (typeSpecifier)
+    $default  reduce using rule 25 (typeSpecifier)
 
 
 State 21
 
-   24 funDeclaration: typeSpecifier MAIN '(' . params ')' compoundStmt
+   32 funDeclaration: typeSpecifier MAIN '(' . params ')' compoundStmt
 
     INT   shift, and go to state 1
     LONG  shift, and go to state 2
     CHAR  shift, and go to state 3
 
-    $default  reduce using rule 29 (params)
+    $default  reduce using rule 37 (params)
 
     typeSpecifier  go to state 28
     params         go to state 29
@@ -516,28 +529,28 @@ State 21
 
 State 22
 
-   21 pointer: MULTIPLY pointer .
+   29 pointer: MULTIPLY pointer .
 
-    $default  reduce using rule 21 (pointer)
+    $default  reduce using rule 29 (pointer)
 
 
 State 23
 
-   13 varDecId: IDENTIFIER '[' . INT_CONSTANT ']'
+   15 varDecId: IDENTIFIER '[' . INT_CONSTANT ']'
 
     INT_CONSTANT  shift, and go to state 32
 
 
 State 24
 
-   23 funDeclaration: typeSpecifier IDENTIFIER '(' . params ')' compoundStmt
-   26 noDefDeclare: typeSpecifier IDENTIFIER '(' . params ')' ';'
+   31 funDeclaration: typeSpecifier IDENTIFIER '(' . params ')' compoundStmt
+   34 noDefDeclare: typeSpecifier IDENTIFIER '(' . params ')' ';'
 
     INT   shift, and go to state 1
     LONG  shift, and go to state 2
     CHAR  shift, and go to state 3
 
-    $default  reduce using rule 29 (params)
+    $default  reduce using rule 37 (params)
 
     typeSpecifier  go to state 28
     params         go to state 33
@@ -564,8 +577,8 @@ State 26
 
 State 27
 
-   10 varDeclInitialize: varDecId ASSIGN . simpleExpression
-   11                  | varDecId ASSIGN . STRING
+   10 varDeclInitialize: varDecId ASSIGN . STRING
+   11                  | varDecId ASSIGN . assignmentExpression
 
     NOT           shift, and go to state 36
     HEX_CONSTANT  shift, and go to state 37
@@ -577,82 +590,83 @@ State 27
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
-    const_type          go to state 50
-    simpleExpression    go to state 51
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    assignmentExpression  go to state 49
+    const_type            go to state 50
+    conditionalStmt       go to state 51
+    simpleExpression      go to state 52
+    andExpression         go to state 53
+    unaryRelExpression    go to state 54
+    relExpression         go to state 55
+    sumExpression         go to state 56
+    term                  go to state 57
+    unaryExpression       go to state 58
+    unaryOp               go to state 59
+    factor                go to state 60
 
 
 State 28
 
-   17 typeSpecifier: typeSpecifier . pointer
-   32 paramTypeList: typeSpecifier . paramId
+   25 typeSpecifier: typeSpecifier . pointer
+   40 paramTypeList: typeSpecifier . paramId
 
     MULTIPLY    shift, and go to state 15
-    IDENTIFIER  shift, and go to state 60
+    IDENTIFIER  shift, and go to state 61
 
     pointer  go to state 20
-    paramId  go to state 61
+    paramId  go to state 62
 
 
 State 29
 
-   24 funDeclaration: typeSpecifier MAIN '(' params . ')' compoundStmt
+   32 funDeclaration: typeSpecifier MAIN '(' params . ')' compoundStmt
 
-    ')'  shift, and go to state 62
+    ')'  shift, and go to state 63
 
 
 State 30
 
-   28 params: paramList .
-   30 paramList: paramList . ',' paramTypeList
+   36 params: paramList .
+   38 paramList: paramList . ',' paramTypeList
 
-    ','  shift, and go to state 63
+    ','  shift, and go to state 64
 
-    $default  reduce using rule 28 (params)
+    $default  reduce using rule 36 (params)
 
 
 State 31
 
-   31 paramList: paramTypeList .
+   39 paramList: paramTypeList .
 
-    $default  reduce using rule 31 (paramList)
+    $default  reduce using rule 39 (paramList)
 
 
 State 32
 
-   13 varDecId: IDENTIFIER '[' INT_CONSTANT . ']'
+   15 varDecId: IDENTIFIER '[' INT_CONSTANT . ']'
 
-    ']'  shift, and go to state 64
+    ']'  shift, and go to state 65
 
 
 State 33
 
-   23 funDeclaration: typeSpecifier IDENTIFIER '(' params . ')' compoundStmt
-   26 noDefDeclare: typeSpecifier IDENTIFIER '(' params . ')' ';'
+   31 funDeclaration: typeSpecifier IDENTIFIER '(' params . ')' compoundStmt
+   34 noDefDeclare: typeSpecifier IDENTIFIER '(' params . ')' ';'
 
-    ')'  shift, and go to state 65
+    ')'  shift, and go to state 66
 
 
 State 34
 
-   12 varDecId: IDENTIFIER .
-   13         | IDENTIFIER . '[' INT_CONSTANT ']'
+   14 varDecId: IDENTIFIER .
+   15         | IDENTIFIER . '[' INT_CONSTANT ']'
 
     '['  shift, and go to state 23
 
-    $default  reduce using rule 12 (varDecId)
+    $default  reduce using rule 14 (varDecId)
 
 
 State 35
@@ -664,7 +678,7 @@ State 35
 
 State 36
 
-   75 unaryRelExpression: NOT . unaryRelExpression
+   80 unaryRelExpression: NOT . unaryRelExpression
 
     NOT           shift, and go to state 36
     HEX_CONSTANT  shift, and go to state 37
@@ -675,231 +689,248 @@ State 36
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type          go to state 50
-    unaryRelExpression  go to state 66
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    unaryRelExpression  go to state 67
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 37
 
-   16 const_type: HEX_CONSTANT .
+   24 const_type: HEX_CONSTANT .
 
-    $default  reduce using rule 16 (const_type)
+    $default  reduce using rule 24 (const_type)
 
 
 State 38
 
-   14 const_type: DEC_CONSTANT .
+   22 const_type: DEC_CONSTANT .
 
-    $default  reduce using rule 14 (const_type)
+    $default  reduce using rule 22 (const_type)
 
 
 State 39
 
-   15 const_type: INT_CONSTANT .
+   23 const_type: INT_CONSTANT .
 
-    $default  reduce using rule 15 (const_type)
+    $default  reduce using rule 23 (const_type)
 
 
 State 40
 
-   11 varDeclInitialize: varDecId ASSIGN STRING .
-
-    $default  reduce using rule 11 (varDeclInitialize)
-
-
-State 41
-
-  102 factor: IDENTIFIER .
-
-    $default  reduce using rule 102 (factor)
-
-
-State 42
-
-   95 unaryOp: UMINUS .
-
-    $default  reduce using rule 95 (unaryOp)
-
-
-State 43
-
-   98 unaryOp: UPLUS .
-
-    $default  reduce using rule 98 (unaryOp)
-
-
-State 44
-
-  103 factor: '(' . expression ')'
-
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 69
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    const_type          go to state 50
-    expression          go to state 70
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
-
-
-State 45
-
-   96 unaryOp: '*' .
-
-    $default  reduce using rule 96 (unaryOp)
-
-
-State 46
-
-   97 unaryOp: '?' .
-
-    $default  reduce using rule 97 (unaryOp)
-
-
-State 47
-
-   99 unaryOp: '!' .
-
-    $default  reduce using rule 99 (unaryOp)
-
-
-State 48
-
-  100 unaryOp: '~' .
-
-    $default  reduce using rule 100 (unaryOp)
-
-
-State 49
-
-  101 unaryOp: '^' .
-
-    $default  reduce using rule 101 (unaryOp)
-
-
-State 50
-
-  104 factor: const_type .
-
-    $default  reduce using rule 104 (factor)
-
-
-State 51
-
-   10 varDeclInitialize: varDecId ASSIGN simpleExpression .
-   71 simpleExpression: simpleExpression . LG_OR andExpression
-
-    LG_OR  shift, and go to state 72
+   10 varDeclInitialize: varDecId ASSIGN STRING .
 
     $default  reduce using rule 10 (varDeclInitialize)
 
 
+State 41
+
+  106 factor: IDENTIFIER .
+
+    $default  reduce using rule 106 (factor)
+
+
+State 42
+
+  100 unaryOp: UMINUS .
+
+    $default  reduce using rule 100 (unaryOp)
+
+
+State 43
+
+  102 unaryOp: UPLUS .
+
+    $default  reduce using rule 102 (unaryOp)
+
+
+State 44
+
+  107 factor: '(' . expression ')'
+
+    NOT           shift, and go to state 36
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 71
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    '('           shift, and go to state 44
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    const_type          go to state 50
+    expression          go to state 72
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
+
+
+State 45
+
+  101 unaryOp: '*' .
+
+    $default  reduce using rule 101 (unaryOp)
+
+
+State 46
+
+  103 unaryOp: '!' .
+
+    $default  reduce using rule 103 (unaryOp)
+
+
+State 47
+
+  104 unaryOp: '~' .
+
+    $default  reduce using rule 104 (unaryOp)
+
+
+State 48
+
+  105 unaryOp: '^' .
+
+    $default  reduce using rule 105 (unaryOp)
+
+
+State 49
+
+   11 varDeclInitialize: varDecId ASSIGN assignmentExpression .
+
+    $default  reduce using rule 11 (varDeclInitialize)
+
+
+State 50
+
+  108 factor: const_type .
+
+    $default  reduce using rule 108 (factor)
+
+
+State 51
+
+   12 assignmentExpression: conditionalStmt .
+
+    $default  reduce using rule 12 (assignmentExpression)
+
+
 State 52
 
-   72 simpleExpression: andExpression .
-   73 andExpression: andExpression . LG_AND unaryRelExpression
+   70 conditionalStmt: simpleExpression . '?' expression ':' conditionalStmt
+   71                | simpleExpression .
+   76 simpleExpression: simpleExpression . LG_OR andExpression
 
-    LG_AND  shift, and go to state 73
+    LG_OR  shift, and go to state 74
+    '?'    shift, and go to state 75
 
-    $default  reduce using rule 72 (simpleExpression)
+    $default  reduce using rule 71 (conditionalStmt)
 
 
 State 53
 
-   74 andExpression: unaryRelExpression .
+   77 simpleExpression: andExpression .
+   78 andExpression: andExpression . LG_AND unaryRelExpression
 
-    $default  reduce using rule 74 (andExpression)
+    LG_AND  shift, and go to state 76
+
+    $default  reduce using rule 77 (simpleExpression)
 
 
 State 54
 
-   76 unaryRelExpression: relExpression .
+   79 andExpression: unaryRelExpression .
 
-    $default  reduce using rule 76 (unaryRelExpression)
+    $default  reduce using rule 79 (andExpression)
 
 
 State 55
 
-   77 relExpression: sumExpression . GREATER_THAN sumExpression
-   78              | sumExpression . LESSER_THAN sumExpression
-   79              | sumExpression . LESS_EQ sumExpression
-   80              | sumExpression . GREATER_EQ sumExpression
-   81              | sumExpression . NOT_EQ sumExpression
-   82              | sumExpression . EQUAL sumExpression
-   83              | sumExpression . '|' sumExpression
-   84              | sumExpression . '&' sumExpression
-   85              | sumExpression .
-   86 sumExpression: sumExpression . ADD term
-   87              | sumExpression . SUBTRACT term
+   81 unaryRelExpression: relExpression .
 
-    ADD           shift, and go to state 74
-    SUBTRACT      shift, and go to state 75
-    GREATER_THAN  shift, and go to state 76
-    LESSER_THAN   shift, and go to state 77
-    LESS_EQ       shift, and go to state 78
-    GREATER_EQ    shift, and go to state 79
-    EQUAL         shift, and go to state 80
-    NOT_EQ        shift, and go to state 81
-    '|'           shift, and go to state 82
-    '&'           shift, and go to state 83
-
-    $default  reduce using rule 85 (relExpression)
+    $default  reduce using rule 81 (unaryRelExpression)
 
 
 State 56
 
-   88 sumExpression: term .
-   89 term: term . MULTIPLY unaryExpression
-   90     | term . DIVIDE unaryExpression
-   91     | term . MOD unaryExpression
+   82 relExpression: sumExpression . GREATER_THAN sumExpression
+   83              | sumExpression . LESSER_THAN sumExpression
+   84              | sumExpression . LESS_EQ sumExpression
+   85              | sumExpression . GREATER_EQ sumExpression
+   86              | sumExpression . NOT_EQ sumExpression
+   87              | sumExpression . EQUAL sumExpression
+   88              | sumExpression . '|' sumExpression
+   89              | sumExpression . '&' sumExpression
+   90              | sumExpression .
+   91 sumExpression: sumExpression . ADD term
+   92              | sumExpression . SUBTRACT term
 
-    MULTIPLY  shift, and go to state 84
-    DIVIDE    shift, and go to state 85
-    MOD       shift, and go to state 86
+    ADD           shift, and go to state 77
+    SUBTRACT      shift, and go to state 78
+    GREATER_THAN  shift, and go to state 79
+    LESSER_THAN   shift, and go to state 80
+    LESS_EQ       shift, and go to state 81
+    GREATER_EQ    shift, and go to state 82
+    EQUAL         shift, and go to state 83
+    NOT_EQ        shift, and go to state 84
+    '|'           shift, and go to state 85
+    '&'           shift, and go to state 86
 
-    $default  reduce using rule 88 (sumExpression)
+    $default  reduce using rule 90 (relExpression)
 
 
 State 57
 
-   92 term: unaryExpression .
+   93 sumExpression: term .
+   94 term: term . MULTIPLY unaryExpression
+   95     | term . DIVIDE unaryExpression
+   96     | term . MOD unaryExpression
 
-    $default  reduce using rule 92 (term)
+    MULTIPLY  shift, and go to state 87
+    DIVIDE    shift, and go to state 88
+    MOD       shift, and go to state 89
+
+    $default  reduce using rule 93 (sumExpression)
 
 
 State 58
 
-   93 unaryExpression: unaryOp . unaryExpression
+   13 assignmentExpression: unaryExpression . assignmentOperator assignmentExpression
+   97 term: unaryExpression .
+
+    ASSIGN      shift, and go to state 90
+    ADD_ASSIGN  shift, and go to state 91
+    SUB_ASSIGN  shift, and go to state 92
+    MUL_ASSIGN  shift, and go to state 93
+    DIV_ASSIGN  shift, and go to state 94
+    MOD_ASSIGN  shift, and go to state 95
+
+    $default  reduce using rule 97 (term)
+
+    assignmentOperator  go to state 96
+
+
+State 59
+
+   98 unaryExpression: unaryOp . unaryExpression
 
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
@@ -909,199 +940,146 @@ State 58
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type       go to state 50
-    unaryExpression  go to state 87
-    unaryOp          go to state 58
-    factor           go to state 59
-
-
-State 59
-
-   94 unaryExpression: factor .
-
-    $default  reduce using rule 94 (unaryExpression)
+    unaryExpression  go to state 97
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 60
 
-   33 paramId: IDENTIFIER .
-   34        | IDENTIFIER . '[' ']'
+   99 unaryExpression: factor .
 
-    '['  shift, and go to state 88
-
-    $default  reduce using rule 33 (paramId)
+    $default  reduce using rule 99 (unaryExpression)
 
 
 State 61
 
-   32 paramTypeList: typeSpecifier paramId .
+   41 paramId: IDENTIFIER .
+   42        | IDENTIFIER . '[' ']'
 
-    $default  reduce using rule 32 (paramTypeList)
+    '['  shift, and go to state 98
+
+    $default  reduce using rule 41 (paramId)
 
 
 State 62
 
-   24 funDeclaration: typeSpecifier MAIN '(' params ')' . compoundStmt
+   40 paramTypeList: typeSpecifier paramId .
 
-    '{'  shift, and go to state 89
-
-    compoundStmt  go to state 90
+    $default  reduce using rule 40 (paramTypeList)
 
 
 State 63
 
-   30 paramList: paramList ',' . paramTypeList
+   32 funDeclaration: typeSpecifier MAIN '(' params ')' . compoundStmt
+
+    '{'  shift, and go to state 99
+
+    compoundStmt  go to state 100
+
+
+State 64
+
+   38 paramList: paramList ',' . paramTypeList
 
     INT   shift, and go to state 1
     LONG  shift, and go to state 2
     CHAR  shift, and go to state 3
 
     typeSpecifier  go to state 28
-    paramTypeList  go to state 91
-
-
-State 64
-
-   13 varDecId: IDENTIFIER '[' INT_CONSTANT ']' .
-
-    $default  reduce using rule 13 (varDecId)
+    paramTypeList  go to state 101
 
 
 State 65
 
-   23 funDeclaration: typeSpecifier IDENTIFIER '(' params ')' . compoundStmt
-   26 noDefDeclare: typeSpecifier IDENTIFIER '(' params ')' . ';'
+   15 varDecId: IDENTIFIER '[' INT_CONSTANT ']' .
 
-    ';'  shift, and go to state 92
-    '{'  shift, and go to state 89
-
-    compoundStmt  go to state 93
+    $default  reduce using rule 15 (varDecId)
 
 
 State 66
 
-   75 unaryRelExpression: NOT unaryRelExpression .
+   31 funDeclaration: typeSpecifier IDENTIFIER '(' params ')' . compoundStmt
+   34 noDefDeclare: typeSpecifier IDENTIFIER '(' params ')' . ';'
 
-    $default  reduce using rule 75 (unaryRelExpression)
+    ';'  shift, and go to state 102
+    '{'  shift, and go to state 99
+
+    compoundStmt  go to state 103
 
 
 State 67
 
-   69 expression: DECREMENT . IDENTIFIER
+   80 unaryRelExpression: NOT unaryRelExpression .
 
-    IDENTIFIER  shift, and go to state 94
+    $default  reduce using rule 80 (unaryRelExpression)
 
 
 State 68
 
-   68 expression: INCREMENT . IDENTIFIER
+   97 term: unaryExpression .
 
-    IDENTIFIER  shift, and go to state 95
+    $default  reduce using rule 97 (term)
 
 
 State 69
 
-   62 expression: IDENTIFIER . ASSIGN expression
-   63           | IDENTIFIER . ADD_ASSIGN expression
-   64           | IDENTIFIER . SUB_ASSIGN expression
-   65           | IDENTIFIER . MUL_ASSIGN expression
-   66           | IDENTIFIER . DIV_ASSIGN expression
-   67           | IDENTIFIER . MOD_ASSIGN expression
-  102 factor: IDENTIFIER .
+   74 expression: DECREMENT . IDENTIFIER
 
-    ASSIGN      shift, and go to state 96
-    ADD_ASSIGN  shift, and go to state 97
-    SUB_ASSIGN  shift, and go to state 98
-    MUL_ASSIGN  shift, and go to state 99
-    DIV_ASSIGN  shift, and go to state 100
-    MOD_ASSIGN  shift, and go to state 101
-
-    $default  reduce using rule 102 (factor)
+    IDENTIFIER  shift, and go to state 104
 
 
 State 70
 
-  103 factor: '(' expression . ')'
+   73 expression: INCREMENT . IDENTIFIER
 
-    ')'  shift, and go to state 102
+    IDENTIFIER  shift, and go to state 105
 
 
 State 71
 
-   70 expression: simpleExpression .
-   71 simpleExpression: simpleExpression . LG_OR andExpression
+   72 expression: IDENTIFIER . assignmentOperator expression
+  106 factor: IDENTIFIER .
 
-    LG_OR  shift, and go to state 72
+    ASSIGN      shift, and go to state 90
+    ADD_ASSIGN  shift, and go to state 91
+    SUB_ASSIGN  shift, and go to state 92
+    MUL_ASSIGN  shift, and go to state 93
+    DIV_ASSIGN  shift, and go to state 94
+    MOD_ASSIGN  shift, and go to state 95
 
-    $default  reduce using rule 70 (expression)
+    $default  reduce using rule 106 (factor)
+
+    assignmentOperator  go to state 106
 
 
 State 72
 
-   71 simpleExpression: simpleExpression LG_OR . andExpression
+  107 factor: '(' expression . ')'
 
-    NOT           shift, and go to state 36
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 41
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    const_type          go to state 50
-    andExpression       go to state 103
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    ')'  shift, and go to state 107
 
 
 State 73
 
-   73 andExpression: andExpression LG_AND . unaryRelExpression
+   75 expression: simpleExpression .
+   76 simpleExpression: simpleExpression . LG_OR andExpression
 
-    NOT           shift, and go to state 36
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 41
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    LG_OR  shift, and go to state 74
 
-    const_type          go to state 50
-    unaryRelExpression  go to state 104
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    $default  reduce using rule 75 (expression)
 
 
 State 74
 
-   86 sumExpression: sumExpression ADD . term
+   76 simpleExpression: simpleExpression LG_OR . andExpression
 
+    NOT           shift, and go to state 36
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
     INT_CONSTANT  shift, and go to state 39
@@ -1110,46 +1088,58 @@ State 74
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
-    const_type       go to state 50
-    term             go to state 105
-    unaryExpression  go to state 57
-    unaryOp          go to state 58
-    factor           go to state 59
+    const_type          go to state 50
+    andExpression       go to state 108
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 75
 
-   87 sumExpression: sumExpression SUBTRACT . term
+   70 conditionalStmt: simpleExpression '?' . expression ':' conditionalStmt
 
+    NOT           shift, and go to state 36
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
     INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 41
+    IDENTIFIER    shift, and go to state 71
     UMINUS        shift, and go to state 42
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
-    const_type       go to state 50
-    term             go to state 106
-    unaryExpression  go to state 57
-    unaryOp          go to state 58
-    factor           go to state 59
+    const_type          go to state 50
+    expression          go to state 109
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 76
 
-   77 relExpression: sumExpression GREATER_THAN . sumExpression
+   78 andExpression: andExpression LG_AND . unaryRelExpression
 
+    NOT           shift, and go to state 36
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
     INT_CONSTANT  shift, and go to state 39
@@ -1158,22 +1148,23 @@ State 76
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
-    const_type       go to state 50
-    sumExpression    go to state 107
-    term             go to state 56
-    unaryExpression  go to state 57
-    unaryOp          go to state 58
-    factor           go to state 59
+    const_type          go to state 50
+    unaryRelExpression  go to state 110
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 77
 
-   78 relExpression: sumExpression LESSER_THAN . sumExpression
+   91 sumExpression: sumExpression ADD . term
 
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
@@ -1183,22 +1174,20 @@ State 77
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type       go to state 50
-    sumExpression    go to state 108
-    term             go to state 56
-    unaryExpression  go to state 57
-    unaryOp          go to state 58
-    factor           go to state 59
+    term             go to state 111
+    unaryExpression  go to state 68
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 78
 
-   79 relExpression: sumExpression LESS_EQ . sumExpression
+   92 sumExpression: sumExpression SUBTRACT . term
 
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
@@ -1208,22 +1197,20 @@ State 78
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type       go to state 50
-    sumExpression    go to state 109
-    term             go to state 56
-    unaryExpression  go to state 57
-    unaryOp          go to state 58
-    factor           go to state 59
+    term             go to state 112
+    unaryExpression  go to state 68
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 79
 
-   80 relExpression: sumExpression GREATER_EQ . sumExpression
+   82 relExpression: sumExpression GREATER_THAN . sumExpression
 
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
@@ -1233,22 +1220,21 @@ State 79
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type       go to state 50
-    sumExpression    go to state 110
-    term             go to state 56
-    unaryExpression  go to state 57
-    unaryOp          go to state 58
-    factor           go to state 59
+    sumExpression    go to state 113
+    term             go to state 57
+    unaryExpression  go to state 68
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 80
 
-   82 relExpression: sumExpression EQUAL . sumExpression
+   83 relExpression: sumExpression LESSER_THAN . sumExpression
 
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
@@ -1258,22 +1244,21 @@ State 80
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type       go to state 50
-    sumExpression    go to state 111
-    term             go to state 56
-    unaryExpression  go to state 57
-    unaryOp          go to state 58
-    factor           go to state 59
+    sumExpression    go to state 114
+    term             go to state 57
+    unaryExpression  go to state 68
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 81
 
-   81 relExpression: sumExpression NOT_EQ . sumExpression
+   84 relExpression: sumExpression LESS_EQ . sumExpression
 
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
@@ -1283,22 +1268,21 @@ State 81
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type       go to state 50
-    sumExpression    go to state 112
-    term             go to state 56
-    unaryExpression  go to state 57
-    unaryOp          go to state 58
-    factor           go to state 59
+    sumExpression    go to state 115
+    term             go to state 57
+    unaryExpression  go to state 68
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 82
 
-   83 relExpression: sumExpression '|' . sumExpression
+   85 relExpression: sumExpression GREATER_EQ . sumExpression
 
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
@@ -1308,22 +1292,21 @@ State 82
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type       go to state 50
-    sumExpression    go to state 113
-    term             go to state 56
-    unaryExpression  go to state 57
-    unaryOp          go to state 58
-    factor           go to state 59
+    sumExpression    go to state 116
+    term             go to state 57
+    unaryExpression  go to state 68
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 83
 
-   84 relExpression: sumExpression '&' . sumExpression
+   87 relExpression: sumExpression EQUAL . sumExpression
 
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
@@ -1333,22 +1316,21 @@ State 83
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type       go to state 50
-    sumExpression    go to state 114
-    term             go to state 56
-    unaryExpression  go to state 57
-    unaryOp          go to state 58
-    factor           go to state 59
+    sumExpression    go to state 117
+    term             go to state 57
+    unaryExpression  go to state 68
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 84
 
-   89 term: term MULTIPLY . unaryExpression
+   86 relExpression: sumExpression NOT_EQ . sumExpression
 
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
@@ -1358,20 +1340,21 @@ State 84
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type       go to state 50
-    unaryExpression  go to state 115
-    unaryOp          go to state 58
-    factor           go to state 59
+    sumExpression    go to state 118
+    term             go to state 57
+    unaryExpression  go to state 68
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 85
 
-   90 term: term DIVIDE . unaryExpression
+   88 relExpression: sumExpression '|' . sumExpression
 
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
@@ -1381,20 +1364,21 @@ State 85
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type       go to state 50
-    unaryExpression  go to state 116
-    unaryOp          go to state 58
-    factor           go to state 59
+    sumExpression    go to state 119
+    term             go to state 57
+    unaryExpression  go to state 68
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 86
 
-   91 term: term MOD . unaryExpression
+   89 relExpression: sumExpression '&' . sumExpression
 
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
@@ -1404,525 +1388,508 @@ State 86
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type       go to state 50
-    unaryExpression  go to state 117
-    unaryOp          go to state 58
-    factor           go to state 59
+    sumExpression    go to state 120
+    term             go to state 57
+    unaryExpression  go to state 68
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 87
 
-   93 unaryExpression: unaryOp unaryExpression .
+   94 term: term MULTIPLY . unaryExpression
 
-    $default  reduce using rule 93 (unaryExpression)
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 41
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    '('           shift, and go to state 44
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    const_type       go to state 50
+    unaryExpression  go to state 121
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 88
 
-   34 paramId: IDENTIFIER '[' . ']'
+   95 term: term DIVIDE . unaryExpression
 
-    ']'  shift, and go to state 118
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 41
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    '('           shift, and go to state 44
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    const_type       go to state 50
+    unaryExpression  go to state 122
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 89
 
-   43 compoundStmt: '{' . localDeclarations statementList '}'
+   96 term: term MOD . unaryExpression
 
-    $default  reduce using rule 45 (localDeclarations)
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 41
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    '('           shift, and go to state 44
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
-    localDeclarations  go to state 119
+    const_type       go to state 50
+    unaryExpression  go to state 123
+    unaryOp          go to state 59
+    factor           go to state 60
 
 
 State 90
 
-   24 funDeclaration: typeSpecifier MAIN '(' params ')' compoundStmt .
+   16 assignmentOperator: ASSIGN .
 
-    $default  reduce using rule 24 (funDeclaration)
+    $default  reduce using rule 16 (assignmentOperator)
 
 
 State 91
 
-   30 paramList: paramList ',' paramTypeList .
+   17 assignmentOperator: ADD_ASSIGN .
 
-    $default  reduce using rule 30 (paramList)
+    $default  reduce using rule 17 (assignmentOperator)
 
 
 State 92
 
-   26 noDefDeclare: typeSpecifier IDENTIFIER '(' params ')' ';' .
+   18 assignmentOperator: SUB_ASSIGN .
 
-    $default  reduce using rule 26 (noDefDeclare)
+    $default  reduce using rule 18 (assignmentOperator)
 
 
 State 93
 
-   23 funDeclaration: typeSpecifier IDENTIFIER '(' params ')' compoundStmt .
+   19 assignmentOperator: MUL_ASSIGN .
 
-    $default  reduce using rule 23 (funDeclaration)
+    $default  reduce using rule 19 (assignmentOperator)
 
 
 State 94
 
-   69 expression: DECREMENT IDENTIFIER .
+   20 assignmentOperator: DIV_ASSIGN .
 
-    $default  reduce using rule 69 (expression)
+    $default  reduce using rule 20 (assignmentOperator)
 
 
 State 95
 
-   68 expression: INCREMENT IDENTIFIER .
+   21 assignmentOperator: MOD_ASSIGN .
 
-    $default  reduce using rule 68 (expression)
+    $default  reduce using rule 21 (assignmentOperator)
 
 
 State 96
 
-   62 expression: IDENTIFIER ASSIGN . expression
+   13 assignmentExpression: unaryExpression assignmentOperator . assignmentExpression
 
     NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
     INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 69
+    IDENTIFIER    shift, and go to state 41
     UMINUS        shift, and go to state 42
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
-    const_type          go to state 50
-    expression          go to state 120
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    assignmentExpression  go to state 124
+    const_type            go to state 50
+    conditionalStmt       go to state 51
+    simpleExpression      go to state 52
+    andExpression         go to state 53
+    unaryRelExpression    go to state 54
+    relExpression         go to state 55
+    sumExpression         go to state 56
+    term                  go to state 57
+    unaryExpression       go to state 58
+    unaryOp               go to state 59
+    factor                go to state 60
 
 
 State 97
 
-   63 expression: IDENTIFIER ADD_ASSIGN . expression
+   98 unaryExpression: unaryOp unaryExpression .
 
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 69
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    const_type          go to state 50
-    expression          go to state 121
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    $default  reduce using rule 98 (unaryExpression)
 
 
 State 98
 
-   64 expression: IDENTIFIER SUB_ASSIGN . expression
+   42 paramId: IDENTIFIER '[' . ']'
 
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 69
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    const_type          go to state 50
-    expression          go to state 122
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    ']'  shift, and go to state 125
 
 
 State 99
 
-   65 expression: IDENTIFIER MUL_ASSIGN . expression
+   51 compoundStmt: '{' . localDeclarations statementList '}'
 
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 69
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    $default  reduce using rule 53 (localDeclarations)
 
-    const_type          go to state 50
-    expression          go to state 123
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    localDeclarations  go to state 126
 
 
 State 100
 
-   66 expression: IDENTIFIER DIV_ASSIGN . expression
+   32 funDeclaration: typeSpecifier MAIN '(' params ')' compoundStmt .
 
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 69
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    const_type          go to state 50
-    expression          go to state 124
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    $default  reduce using rule 32 (funDeclaration)
 
 
 State 101
 
-   67 expression: IDENTIFIER MOD_ASSIGN . expression
+   38 paramList: paramList ',' paramTypeList .
 
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 69
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    const_type          go to state 50
-    expression          go to state 125
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    $default  reduce using rule 38 (paramList)
 
 
 State 102
 
-  103 factor: '(' expression ')' .
+   34 noDefDeclare: typeSpecifier IDENTIFIER '(' params ')' ';' .
 
-    $default  reduce using rule 103 (factor)
+    $default  reduce using rule 34 (noDefDeclare)
 
 
 State 103
 
-   71 simpleExpression: simpleExpression LG_OR andExpression .
-   73 andExpression: andExpression . LG_AND unaryRelExpression
+   31 funDeclaration: typeSpecifier IDENTIFIER '(' params ')' compoundStmt .
 
-    LG_AND  shift, and go to state 73
-
-    $default  reduce using rule 71 (simpleExpression)
+    $default  reduce using rule 31 (funDeclaration)
 
 
 State 104
 
-   73 andExpression: andExpression LG_AND unaryRelExpression .
+   74 expression: DECREMENT IDENTIFIER .
 
-    $default  reduce using rule 73 (andExpression)
+    $default  reduce using rule 74 (expression)
 
 
 State 105
 
-   86 sumExpression: sumExpression ADD term .
-   89 term: term . MULTIPLY unaryExpression
-   90     | term . DIVIDE unaryExpression
-   91     | term . MOD unaryExpression
+   73 expression: INCREMENT IDENTIFIER .
 
-    MULTIPLY  shift, and go to state 84
-    DIVIDE    shift, and go to state 85
-    MOD       shift, and go to state 86
-
-    $default  reduce using rule 86 (sumExpression)
+    $default  reduce using rule 73 (expression)
 
 
 State 106
 
-   87 sumExpression: sumExpression SUBTRACT term .
-   89 term: term . MULTIPLY unaryExpression
-   90     | term . DIVIDE unaryExpression
-   91     | term . MOD unaryExpression
+   72 expression: IDENTIFIER assignmentOperator . expression
 
-    MULTIPLY  shift, and go to state 84
-    DIVIDE    shift, and go to state 85
-    MOD       shift, and go to state 86
+    NOT           shift, and go to state 36
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 71
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    '('           shift, and go to state 44
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
-    $default  reduce using rule 87 (sumExpression)
+    const_type          go to state 50
+    expression          go to state 127
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 107
 
-   77 relExpression: sumExpression GREATER_THAN sumExpression .
-   86 sumExpression: sumExpression . ADD term
-   87              | sumExpression . SUBTRACT term
+  107 factor: '(' expression ')' .
 
-    ADD       shift, and go to state 74
-    SUBTRACT  shift, and go to state 75
-
-    $default  reduce using rule 77 (relExpression)
+    $default  reduce using rule 107 (factor)
 
 
 State 108
 
-   78 relExpression: sumExpression LESSER_THAN sumExpression .
-   86 sumExpression: sumExpression . ADD term
-   87              | sumExpression . SUBTRACT term
+   76 simpleExpression: simpleExpression LG_OR andExpression .
+   78 andExpression: andExpression . LG_AND unaryRelExpression
 
-    ADD       shift, and go to state 74
-    SUBTRACT  shift, and go to state 75
+    LG_AND  shift, and go to state 76
 
-    $default  reduce using rule 78 (relExpression)
+    $default  reduce using rule 76 (simpleExpression)
 
 
 State 109
 
-   79 relExpression: sumExpression LESS_EQ sumExpression .
-   86 sumExpression: sumExpression . ADD term
-   87              | sumExpression . SUBTRACT term
+   70 conditionalStmt: simpleExpression '?' expression . ':' conditionalStmt
 
-    ADD       shift, and go to state 74
-    SUBTRACT  shift, and go to state 75
-
-    $default  reduce using rule 79 (relExpression)
+    ':'  shift, and go to state 128
 
 
 State 110
 
-   80 relExpression: sumExpression GREATER_EQ sumExpression .
-   86 sumExpression: sumExpression . ADD term
-   87              | sumExpression . SUBTRACT term
+   78 andExpression: andExpression LG_AND unaryRelExpression .
 
-    ADD       shift, and go to state 74
-    SUBTRACT  shift, and go to state 75
-
-    $default  reduce using rule 80 (relExpression)
+    $default  reduce using rule 78 (andExpression)
 
 
 State 111
 
-   82 relExpression: sumExpression EQUAL sumExpression .
-   86 sumExpression: sumExpression . ADD term
-   87              | sumExpression . SUBTRACT term
+   91 sumExpression: sumExpression ADD term .
+   94 term: term . MULTIPLY unaryExpression
+   95     | term . DIVIDE unaryExpression
+   96     | term . MOD unaryExpression
 
-    ADD       shift, and go to state 74
-    SUBTRACT  shift, and go to state 75
+    MULTIPLY  shift, and go to state 87
+    DIVIDE    shift, and go to state 88
+    MOD       shift, and go to state 89
 
-    $default  reduce using rule 82 (relExpression)
+    $default  reduce using rule 91 (sumExpression)
 
 
 State 112
 
-   81 relExpression: sumExpression NOT_EQ sumExpression .
-   86 sumExpression: sumExpression . ADD term
-   87              | sumExpression . SUBTRACT term
+   92 sumExpression: sumExpression SUBTRACT term .
+   94 term: term . MULTIPLY unaryExpression
+   95     | term . DIVIDE unaryExpression
+   96     | term . MOD unaryExpression
 
-    ADD       shift, and go to state 74
-    SUBTRACT  shift, and go to state 75
+    MULTIPLY  shift, and go to state 87
+    DIVIDE    shift, and go to state 88
+    MOD       shift, and go to state 89
 
-    $default  reduce using rule 81 (relExpression)
+    $default  reduce using rule 92 (sumExpression)
 
 
 State 113
 
-   83 relExpression: sumExpression '|' sumExpression .
-   86 sumExpression: sumExpression . ADD term
-   87              | sumExpression . SUBTRACT term
+   82 relExpression: sumExpression GREATER_THAN sumExpression .
+   91 sumExpression: sumExpression . ADD term
+   92              | sumExpression . SUBTRACT term
 
-    ADD       shift, and go to state 74
-    SUBTRACT  shift, and go to state 75
+    ADD       shift, and go to state 77
+    SUBTRACT  shift, and go to state 78
 
-    $default  reduce using rule 83 (relExpression)
+    $default  reduce using rule 82 (relExpression)
 
 
 State 114
 
-   84 relExpression: sumExpression '&' sumExpression .
-   86 sumExpression: sumExpression . ADD term
-   87              | sumExpression . SUBTRACT term
+   83 relExpression: sumExpression LESSER_THAN sumExpression .
+   91 sumExpression: sumExpression . ADD term
+   92              | sumExpression . SUBTRACT term
 
-    ADD       shift, and go to state 74
-    SUBTRACT  shift, and go to state 75
+    ADD       shift, and go to state 77
+    SUBTRACT  shift, and go to state 78
 
-    $default  reduce using rule 84 (relExpression)
+    $default  reduce using rule 83 (relExpression)
 
 
 State 115
 
-   89 term: term MULTIPLY unaryExpression .
+   84 relExpression: sumExpression LESS_EQ sumExpression .
+   91 sumExpression: sumExpression . ADD term
+   92              | sumExpression . SUBTRACT term
 
-    $default  reduce using rule 89 (term)
+    ADD       shift, and go to state 77
+    SUBTRACT  shift, and go to state 78
+
+    $default  reduce using rule 84 (relExpression)
 
 
 State 116
 
-   90 term: term DIVIDE unaryExpression .
+   85 relExpression: sumExpression GREATER_EQ sumExpression .
+   91 sumExpression: sumExpression . ADD term
+   92              | sumExpression . SUBTRACT term
 
-    $default  reduce using rule 90 (term)
+    ADD       shift, and go to state 77
+    SUBTRACT  shift, and go to state 78
+
+    $default  reduce using rule 85 (relExpression)
 
 
 State 117
 
-   91 term: term MOD unaryExpression .
+   87 relExpression: sumExpression EQUAL sumExpression .
+   91 sumExpression: sumExpression . ADD term
+   92              | sumExpression . SUBTRACT term
 
-    $default  reduce using rule 91 (term)
+    ADD       shift, and go to state 77
+    SUBTRACT  shift, and go to state 78
+
+    $default  reduce using rule 87 (relExpression)
 
 
 State 118
 
-   34 paramId: IDENTIFIER '[' ']' .
+   86 relExpression: sumExpression NOT_EQ sumExpression .
+   91 sumExpression: sumExpression . ADD term
+   92              | sumExpression . SUBTRACT term
 
-    $default  reduce using rule 34 (paramId)
+    ADD       shift, and go to state 77
+    SUBTRACT  shift, and go to state 78
+
+    $default  reduce using rule 86 (relExpression)
 
 
 State 119
 
-   43 compoundStmt: '{' localDeclarations . statementList '}'
-   44 localDeclarations: localDeclarations . varDeclaration
+   88 relExpression: sumExpression '|' sumExpression .
+   91 sumExpression: sumExpression . ADD term
+   92              | sumExpression . SUBTRACT term
+
+    ADD       shift, and go to state 77
+    SUBTRACT  shift, and go to state 78
+
+    $default  reduce using rule 88 (relExpression)
+
+
+State 120
+
+   89 relExpression: sumExpression '&' sumExpression .
+   91 sumExpression: sumExpression . ADD term
+   92              | sumExpression . SUBTRACT term
+
+    ADD       shift, and go to state 77
+    SUBTRACT  shift, and go to state 78
+
+    $default  reduce using rule 89 (relExpression)
+
+
+State 121
+
+   94 term: term MULTIPLY unaryExpression .
+
+    $default  reduce using rule 94 (term)
+
+
+State 122
+
+   95 term: term DIVIDE unaryExpression .
+
+    $default  reduce using rule 95 (term)
+
+
+State 123
+
+   96 term: term MOD unaryExpression .
+
+    $default  reduce using rule 96 (term)
+
+
+State 124
+
+   13 assignmentExpression: unaryExpression assignmentOperator assignmentExpression .
+
+    $default  reduce using rule 13 (assignmentExpression)
+
+
+State 125
+
+   42 paramId: IDENTIFIER '[' ']' .
+
+    $default  reduce using rule 42 (paramId)
+
+
+State 126
+
+   51 compoundStmt: '{' localDeclarations . statementList '}'
+   52 localDeclarations: localDeclarations . varDeclaration
 
     INT   shift, and go to state 1
     LONG  shift, and go to state 2
     CHAR  shift, and go to state 3
 
-    $default  reduce using rule 47 (statementList)
+    $default  reduce using rule 55 (statementList)
 
-    varDeclaration  go to state 126
-    typeSpecifier   go to state 127
-    statementList   go to state 128
-
-
-State 120
-
-   62 expression: IDENTIFIER ASSIGN expression .
-
-    $default  reduce using rule 62 (expression)
-
-
-State 121
-
-   63 expression: IDENTIFIER ADD_ASSIGN expression .
-
-    $default  reduce using rule 63 (expression)
-
-
-State 122
-
-   64 expression: IDENTIFIER SUB_ASSIGN expression .
-
-    $default  reduce using rule 64 (expression)
-
-
-State 123
-
-   65 expression: IDENTIFIER MUL_ASSIGN expression .
-
-    $default  reduce using rule 65 (expression)
-
-
-State 124
-
-   66 expression: IDENTIFIER DIV_ASSIGN expression .
-
-    $default  reduce using rule 66 (expression)
-
-
-State 125
-
-   67 expression: IDENTIFIER MOD_ASSIGN expression .
-
-    $default  reduce using rule 67 (expression)
-
-
-State 126
-
-   44 localDeclarations: localDeclarations varDeclaration .
-
-    $default  reduce using rule 44 (localDeclarations)
+    varDeclaration  go to state 129
+    typeSpecifier   go to state 130
+    statementList   go to state 131
 
 
 State 127
 
+   72 expression: IDENTIFIER assignmentOperator expression .
+
+    $default  reduce using rule 72 (expression)
+
+
+State 128
+
+   70 conditionalStmt: simpleExpression '?' expression ':' . conditionalStmt
+
+    NOT           shift, and go to state 36
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 41
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    '('           shift, and go to state 44
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    const_type          go to state 50
+    conditionalStmt     go to state 132
+    simpleExpression    go to state 52
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
+
+
+State 129
+
+   52 localDeclarations: localDeclarations varDeclaration .
+
+    $default  reduce using rule 52 (localDeclarations)
+
+
+State 130
+
     6 varDeclaration: typeSpecifier . varDeclList ';'
-   17 typeSpecifier: typeSpecifier . pointer
+   25 typeSpecifier: typeSpecifier . pointer
 
     MULTIPLY    shift, and go to state 15
     IDENTIFIER  shift, and go to state 34
@@ -1933,373 +1900,301 @@ State 127
     pointer            go to state 20
 
 
-State 128
-
-   43 compoundStmt: '{' localDeclarations statementList . '}'
-   46 statementList: statementList . statement
-
-    IF            shift, and go to state 129
-    FOR           shift, and go to state 130
-    DO            shift, and go to state 131
-    WHILE         shift, and go to state 132
-    GOTO          shift, and go to state 133
-    BREAK         shift, and go to state 134
-    CONTINUE      shift, and go to state 135
-    RETURN        shift, and go to state 136
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 137
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    ';'           shift, and go to state 138
-    '('           shift, and go to state 44
-    '{'           shift, and go to state 89
-    '}'           shift, and go to state 139
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    const_type          go to state 50
-    funCall             go to state 140
-    statement           go to state 141
-    compoundStmt        go to state 142
-    expressionStmt      go to state 143
-    selectionStmt       go to state 144
-    iterationStmt       go to state 145
-    jumpStmt            go to state 146
-    returnStmt          go to state 147
-    breakStmt           go to state 148
-    expression          go to state 149
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
-
-
-State 129
-
-   50 selectionStmt: IF . '(' simpleExpression ')' statement
-   51              | IF . '(' simpleExpression ')' statement ELSE statement
-
-    '('  shift, and go to state 150
-
-
-State 130
-
-   54 iterationStmt: FOR . '(' optExpression ';' optExpression ';' optExpression ')' statement
-
-    '('  shift, and go to state 151
-
-
 State 131
 
-   53 iterationStmt: DO . statement WHILE '(' expression ')'
+   51 compoundStmt: '{' localDeclarations statementList . '}'
+   54 statementList: statementList . statement
 
-    IF            shift, and go to state 129
-    FOR           shift, and go to state 130
-    DO            shift, and go to state 131
-    WHILE         shift, and go to state 132
-    GOTO          shift, and go to state 133
-    BREAK         shift, and go to state 134
-    CONTINUE      shift, and go to state 135
-    RETURN        shift, and go to state 136
+    IF            shift, and go to state 133
+    FOR           shift, and go to state 134
+    DO            shift, and go to state 135
+    WHILE         shift, and go to state 136
+    GOTO          shift, and go to state 137
+    BREAK         shift, and go to state 138
+    CONTINUE      shift, and go to state 139
+    RETURN        shift, and go to state 140
     NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
     INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 137
+    IDENTIFIER    shift, and go to state 141
     UMINUS        shift, and go to state 42
     UPLUS         shift, and go to state 43
-    ';'           shift, and go to state 138
+    ';'           shift, and go to state 142
     '('           shift, and go to state 44
-    '{'           shift, and go to state 89
+    '{'           shift, and go to state 99
+    '}'           shift, and go to state 143
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type          go to state 50
-    funCall             go to state 140
-    statement           go to state 152
-    compoundStmt        go to state 142
-    expressionStmt      go to state 143
-    selectionStmt       go to state 144
-    iterationStmt       go to state 145
-    jumpStmt            go to state 146
-    returnStmt          go to state 147
-    breakStmt           go to state 148
-    expression          go to state 149
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    funCall             go to state 144
+    statement           go to state 145
+    compoundStmt        go to state 146
+    expressionStmt      go to state 147
+    selectionStmt       go to state 148
+    iterationStmt       go to state 149
+    jumpStmt            go to state 150
+    returnStmt          go to state 151
+    breakStmt           go to state 152
+    expression          go to state 153
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 132
 
-   52 iterationStmt: WHILE . '(' simpleExpression ')' statement
+   70 conditionalStmt: simpleExpression '?' expression ':' conditionalStmt .
 
-    '('  shift, and go to state 153
+    $default  reduce using rule 70 (conditionalStmt)
 
 
 State 133
 
-   57 jumpStmt: GOTO . IDENTIFIER ';'
+   58 selectionStmt: IF . '(' simpleExpression ')' statement
+   59              | IF . '(' simpleExpression ')' statement ELSE statement
 
-    IDENTIFIER  shift, and go to state 154
+    '('  shift, and go to state 154
 
 
 State 134
 
-   61 breakStmt: BREAK . ';'
+   62 iterationStmt: FOR . '(' optExpression ';' optExpression ';' optExpression ')' statement
 
-    ';'  shift, and go to state 155
+    '('  shift, and go to state 155
 
 
 State 135
 
-   58 jumpStmt: CONTINUE . ';'
+   61 iterationStmt: DO . statement WHILE '(' expression ')'
 
-    ';'  shift, and go to state 156
+    IF            shift, and go to state 133
+    FOR           shift, and go to state 134
+    DO            shift, and go to state 135
+    WHILE         shift, and go to state 136
+    GOTO          shift, and go to state 137
+    BREAK         shift, and go to state 138
+    CONTINUE      shift, and go to state 139
+    RETURN        shift, and go to state 140
+    NOT           shift, and go to state 36
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 141
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    ';'           shift, and go to state 142
+    '('           shift, and go to state 44
+    '{'           shift, and go to state 99
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    const_type          go to state 50
+    funCall             go to state 144
+    statement           go to state 156
+    compoundStmt        go to state 146
+    expressionStmt      go to state 147
+    selectionStmt       go to state 148
+    iterationStmt       go to state 149
+    jumpStmt            go to state 150
+    returnStmt          go to state 151
+    breakStmt           go to state 152
+    expression          go to state 153
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 136
 
-   59 returnStmt: RETURN . ';'
-   60           | RETURN . expression
+   60 iterationStmt: WHILE . '(' simpleExpression ')' statement
 
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 69
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    ';'           shift, and go to state 157
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    const_type          go to state 50
-    expression          go to state 158
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    '('  shift, and go to state 157
 
 
 State 137
 
-   27 funCall: IDENTIFIER . '(' params ')' statement
-   62 expression: IDENTIFIER . ASSIGN expression
-   63           | IDENTIFIER . ADD_ASSIGN expression
-   64           | IDENTIFIER . SUB_ASSIGN expression
-   65           | IDENTIFIER . MUL_ASSIGN expression
-   66           | IDENTIFIER . DIV_ASSIGN expression
-   67           | IDENTIFIER . MOD_ASSIGN expression
-  102 factor: IDENTIFIER .
+   65 jumpStmt: GOTO . IDENTIFIER ';'
 
-    ASSIGN      shift, and go to state 96
-    ADD_ASSIGN  shift, and go to state 97
-    SUB_ASSIGN  shift, and go to state 98
-    MUL_ASSIGN  shift, and go to state 99
-    DIV_ASSIGN  shift, and go to state 100
-    MOD_ASSIGN  shift, and go to state 101
-    '('         shift, and go to state 159
-
-    $default  reduce using rule 102 (factor)
+    IDENTIFIER  shift, and go to state 158
 
 
 State 138
 
-   49 expressionStmt: ';' .
+   69 breakStmt: BREAK . ';'
 
-    $default  reduce using rule 49 (expressionStmt)
+    ';'  shift, and go to state 159
 
 
 State 139
 
-   43 compoundStmt: '{' localDeclarations statementList '}' .
-
-    $default  reduce using rule 43 (compoundStmt)
-
-
-State 140
-
-   42 statement: funCall .
-
-    $default  reduce using rule 42 (statement)
-
-
-State 141
-
-   46 statementList: statementList statement .
-
-    $default  reduce using rule 46 (statementList)
-
-
-State 142
-
-   36 statement: compoundStmt .
-
-    $default  reduce using rule 36 (statement)
-
-
-State 143
-
-   35 statement: expressionStmt .
-
-    $default  reduce using rule 35 (statement)
-
-
-State 144
-
-   37 statement: selectionStmt .
-
-    $default  reduce using rule 37 (statement)
-
-
-State 145
-
-   38 statement: iterationStmt .
-
-    $default  reduce using rule 38 (statement)
-
-
-State 146
-
-   39 statement: jumpStmt .
-
-    $default  reduce using rule 39 (statement)
-
-
-State 147
-
-   40 statement: returnStmt .
-
-    $default  reduce using rule 40 (statement)
-
-
-State 148
-
-   41 statement: breakStmt .
-
-    $default  reduce using rule 41 (statement)
-
-
-State 149
-
-   48 expressionStmt: expression . ';'
+   66 jumpStmt: CONTINUE . ';'
 
     ';'  shift, and go to state 160
 
 
-State 150
+State 140
 
-   50 selectionStmt: IF '(' . simpleExpression ')' statement
-   51              | IF '(' . simpleExpression ')' statement ELSE statement
+   67 returnStmt: RETURN . ';'
+   68           | RETURN . expression
 
     NOT           shift, and go to state 36
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
     INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 41
+    IDENTIFIER    shift, and go to state 71
     UMINUS        shift, and go to state 42
     UPLUS         shift, and go to state 43
+    ';'           shift, and go to state 161
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type          go to state 50
-    simpleExpression    go to state 161
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    expression          go to state 162
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
+
+
+State 141
+
+   35 funCall: IDENTIFIER . '(' params ')' statement
+   72 expression: IDENTIFIER . assignmentOperator expression
+  106 factor: IDENTIFIER .
+
+    ASSIGN      shift, and go to state 90
+    ADD_ASSIGN  shift, and go to state 91
+    SUB_ASSIGN  shift, and go to state 92
+    MUL_ASSIGN  shift, and go to state 93
+    DIV_ASSIGN  shift, and go to state 94
+    MOD_ASSIGN  shift, and go to state 95
+    '('         shift, and go to state 163
+
+    $default  reduce using rule 106 (factor)
+
+    assignmentOperator  go to state 106
+
+
+State 142
+
+   57 expressionStmt: ';' .
+
+    $default  reduce using rule 57 (expressionStmt)
+
+
+State 143
+
+   51 compoundStmt: '{' localDeclarations statementList '}' .
+
+    $default  reduce using rule 51 (compoundStmt)
+
+
+State 144
+
+   50 statement: funCall .
+
+    $default  reduce using rule 50 (statement)
+
+
+State 145
+
+   54 statementList: statementList statement .
+
+    $default  reduce using rule 54 (statementList)
+
+
+State 146
+
+   44 statement: compoundStmt .
+
+    $default  reduce using rule 44 (statement)
+
+
+State 147
+
+   43 statement: expressionStmt .
+
+    $default  reduce using rule 43 (statement)
+
+
+State 148
+
+   45 statement: selectionStmt .
+
+    $default  reduce using rule 45 (statement)
+
+
+State 149
+
+   46 statement: iterationStmt .
+
+    $default  reduce using rule 46 (statement)
+
+
+State 150
+
+   47 statement: jumpStmt .
+
+    $default  reduce using rule 47 (statement)
 
 
 State 151
 
-   54 iterationStmt: FOR '(' . optExpression ';' optExpression ';' optExpression ')' statement
+   48 statement: returnStmt .
 
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 69
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    $default  reduce using rule 56 (optExpression)
-
-    const_type          go to state 50
-    optExpression       go to state 162
-    expression          go to state 163
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    $default  reduce using rule 48 (statement)
 
 
 State 152
 
-   53 iterationStmt: DO statement . WHILE '(' expression ')'
+   49 statement: breakStmt .
 
-    WHILE  shift, and go to state 164
+    $default  reduce using rule 49 (statement)
 
 
 State 153
 
-   52 iterationStmt: WHILE '(' . simpleExpression ')' statement
+   56 expressionStmt: expression . ';'
+
+    ';'  shift, and go to state 164
+
+
+State 154
+
+   58 selectionStmt: IF '(' . simpleExpression ')' statement
+   59              | IF '(' . simpleExpression ')' statement ELSE statement
 
     NOT           shift, and go to state 36
     HEX_CONSTANT  shift, and go to state 37
@@ -2310,562 +2205,624 @@ State 153
     UPLUS         shift, and go to state 43
     '('           shift, and go to state 44
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type          go to state 50
     simpleExpression    go to state 165
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
-
-
-State 154
-
-   57 jumpStmt: GOTO IDENTIFIER . ';'
-
-    ';'  shift, and go to state 166
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 155
 
-   61 breakStmt: BREAK ';' .
+   62 iterationStmt: FOR '(' . optExpression ';' optExpression ';' optExpression ')' statement
 
-    $default  reduce using rule 61 (breakStmt)
+    NOT           shift, and go to state 36
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 71
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    '('           shift, and go to state 44
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    $default  reduce using rule 64 (optExpression)
+
+    const_type          go to state 50
+    optExpression       go to state 166
+    expression          go to state 167
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 156
 
-   58 jumpStmt: CONTINUE ';' .
+   61 iterationStmt: DO statement . WHILE '(' expression ')'
 
-    $default  reduce using rule 58 (jumpStmt)
+    WHILE  shift, and go to state 168
 
 
 State 157
 
-   59 returnStmt: RETURN ';' .
+   60 iterationStmt: WHILE '(' . simpleExpression ')' statement
 
-    $default  reduce using rule 59 (returnStmt)
+    NOT           shift, and go to state 36
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 41
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    '('           shift, and go to state 44
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    const_type          go to state 50
+    simpleExpression    go to state 169
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 158
 
-   60 returnStmt: RETURN expression .
+   65 jumpStmt: GOTO IDENTIFIER . ';'
 
-    $default  reduce using rule 60 (returnStmt)
+    ';'  shift, and go to state 170
 
 
 State 159
 
-   27 funCall: IDENTIFIER '(' . params ')' statement
+   69 breakStmt: BREAK ';' .
+
+    $default  reduce using rule 69 (breakStmt)
+
+
+State 160
+
+   66 jumpStmt: CONTINUE ';' .
+
+    $default  reduce using rule 66 (jumpStmt)
+
+
+State 161
+
+   67 returnStmt: RETURN ';' .
+
+    $default  reduce using rule 67 (returnStmt)
+
+
+State 162
+
+   68 returnStmt: RETURN expression .
+
+    $default  reduce using rule 68 (returnStmt)
+
+
+State 163
+
+   35 funCall: IDENTIFIER '(' . params ')' statement
 
     INT   shift, and go to state 1
     LONG  shift, and go to state 2
     CHAR  shift, and go to state 3
 
-    $default  reduce using rule 29 (params)
+    $default  reduce using rule 37 (params)
 
     typeSpecifier  go to state 28
-    params         go to state 167
+    params         go to state 171
     paramList      go to state 30
     paramTypeList  go to state 31
 
 
-State 160
-
-   48 expressionStmt: expression ';' .
-
-    $default  reduce using rule 48 (expressionStmt)
-
-
-State 161
-
-   50 selectionStmt: IF '(' simpleExpression . ')' statement
-   51              | IF '(' simpleExpression . ')' statement ELSE statement
-   71 simpleExpression: simpleExpression . LG_OR andExpression
-
-    LG_OR  shift, and go to state 72
-    ')'    shift, and go to state 168
-
-
-State 162
-
-   54 iterationStmt: FOR '(' optExpression . ';' optExpression ';' optExpression ')' statement
-
-    ';'  shift, and go to state 169
-
-
-State 163
-
-   55 optExpression: expression .
-
-    $default  reduce using rule 55 (optExpression)
-
-
 State 164
 
-   53 iterationStmt: DO statement WHILE . '(' expression ')'
+   56 expressionStmt: expression ';' .
 
-    '('  shift, and go to state 170
+    $default  reduce using rule 56 (expressionStmt)
 
 
 State 165
 
-   52 iterationStmt: WHILE '(' simpleExpression . ')' statement
-   71 simpleExpression: simpleExpression . LG_OR andExpression
+   58 selectionStmt: IF '(' simpleExpression . ')' statement
+   59              | IF '(' simpleExpression . ')' statement ELSE statement
+   76 simpleExpression: simpleExpression . LG_OR andExpression
 
-    LG_OR  shift, and go to state 72
-    ')'    shift, and go to state 171
+    LG_OR  shift, and go to state 74
+    ')'    shift, and go to state 172
 
 
 State 166
 
-   57 jumpStmt: GOTO IDENTIFIER ';' .
+   62 iterationStmt: FOR '(' optExpression . ';' optExpression ';' optExpression ')' statement
 
-    $default  reduce using rule 57 (jumpStmt)
+    ';'  shift, and go to state 173
 
 
 State 167
 
-   27 funCall: IDENTIFIER '(' params . ')' statement
+   63 optExpression: expression .
 
-    ')'  shift, and go to state 172
+    $default  reduce using rule 63 (optExpression)
 
 
 State 168
 
-   50 selectionStmt: IF '(' simpleExpression ')' . statement
-   51              | IF '(' simpleExpression ')' . statement ELSE statement
+   61 iterationStmt: DO statement WHILE . '(' expression ')'
 
-    IF            shift, and go to state 129
-    FOR           shift, and go to state 130
-    DO            shift, and go to state 131
-    WHILE         shift, and go to state 132
-    GOTO          shift, and go to state 133
-    BREAK         shift, and go to state 134
-    CONTINUE      shift, and go to state 135
-    RETURN        shift, and go to state 136
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 137
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    ';'           shift, and go to state 138
-    '('           shift, and go to state 44
-    '{'           shift, and go to state 89
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    const_type          go to state 50
-    funCall             go to state 140
-    statement           go to state 173
-    compoundStmt        go to state 142
-    expressionStmt      go to state 143
-    selectionStmt       go to state 144
-    iterationStmt       go to state 145
-    jumpStmt            go to state 146
-    returnStmt          go to state 147
-    breakStmt           go to state 148
-    expression          go to state 149
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    '('  shift, and go to state 174
 
 
 State 169
 
-   54 iterationStmt: FOR '(' optExpression ';' . optExpression ';' optExpression ')' statement
+   60 iterationStmt: WHILE '(' simpleExpression . ')' statement
+   76 simpleExpression: simpleExpression . LG_OR andExpression
 
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 69
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    $default  reduce using rule 56 (optExpression)
-
-    const_type          go to state 50
-    optExpression       go to state 174
-    expression          go to state 163
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    LG_OR  shift, and go to state 74
+    ')'    shift, and go to state 175
 
 
 State 170
 
-   53 iterationStmt: DO statement WHILE '(' . expression ')'
+   65 jumpStmt: GOTO IDENTIFIER ';' .
 
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 69
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    const_type          go to state 50
-    expression          go to state 175
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    $default  reduce using rule 65 (jumpStmt)
 
 
 State 171
 
-   52 iterationStmt: WHILE '(' simpleExpression ')' . statement
+   35 funCall: IDENTIFIER '(' params . ')' statement
 
-    IF            shift, and go to state 129
-    FOR           shift, and go to state 130
-    DO            shift, and go to state 131
-    WHILE         shift, and go to state 132
-    GOTO          shift, and go to state 133
-    BREAK         shift, and go to state 134
-    CONTINUE      shift, and go to state 135
-    RETURN        shift, and go to state 136
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 137
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    ';'           shift, and go to state 138
-    '('           shift, and go to state 44
-    '{'           shift, and go to state 89
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    const_type          go to state 50
-    funCall             go to state 140
-    statement           go to state 176
-    compoundStmt        go to state 142
-    expressionStmt      go to state 143
-    selectionStmt       go to state 144
-    iterationStmt       go to state 145
-    jumpStmt            go to state 146
-    returnStmt          go to state 147
-    breakStmt           go to state 148
-    expression          go to state 149
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    ')'  shift, and go to state 176
 
 
 State 172
 
-   27 funCall: IDENTIFIER '(' params ')' . statement
+   58 selectionStmt: IF '(' simpleExpression ')' . statement
+   59              | IF '(' simpleExpression ')' . statement ELSE statement
 
-    IF            shift, and go to state 129
-    FOR           shift, and go to state 130
-    DO            shift, and go to state 131
-    WHILE         shift, and go to state 132
-    GOTO          shift, and go to state 133
-    BREAK         shift, and go to state 134
-    CONTINUE      shift, and go to state 135
-    RETURN        shift, and go to state 136
+    IF            shift, and go to state 133
+    FOR           shift, and go to state 134
+    DO            shift, and go to state 135
+    WHILE         shift, and go to state 136
+    GOTO          shift, and go to state 137
+    BREAK         shift, and go to state 138
+    CONTINUE      shift, and go to state 139
+    RETURN        shift, and go to state 140
     NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
     INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 137
+    IDENTIFIER    shift, and go to state 141
     UMINUS        shift, and go to state 42
     UPLUS         shift, and go to state 43
-    ';'           shift, and go to state 138
+    ';'           shift, and go to state 142
     '('           shift, and go to state 44
-    '{'           shift, and go to state 89
+    '{'           shift, and go to state 99
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
     const_type          go to state 50
-    funCall             go to state 140
+    funCall             go to state 144
     statement           go to state 177
-    compoundStmt        go to state 142
-    expressionStmt      go to state 143
-    selectionStmt       go to state 144
-    iterationStmt       go to state 145
-    jumpStmt            go to state 146
-    returnStmt          go to state 147
-    breakStmt           go to state 148
-    expression          go to state 149
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    compoundStmt        go to state 146
+    expressionStmt      go to state 147
+    selectionStmt       go to state 148
+    iterationStmt       go to state 149
+    jumpStmt            go to state 150
+    returnStmt          go to state 151
+    breakStmt           go to state 152
+    expression          go to state 153
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 173
 
-   50 selectionStmt: IF '(' simpleExpression ')' statement .
-   51              | IF '(' simpleExpression ')' statement . ELSE statement
+   62 iterationStmt: FOR '(' optExpression ';' . optExpression ';' optExpression ')' statement
 
-    ELSE  shift, and go to state 178
+    NOT           shift, and go to state 36
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 71
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    '('           shift, and go to state 44
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
 
-    $default  reduce using rule 50 (selectionStmt)
+    $default  reduce using rule 64 (optExpression)
+
+    const_type          go to state 50
+    optExpression       go to state 178
+    expression          go to state 167
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 174
 
-   54 iterationStmt: FOR '(' optExpression ';' optExpression . ';' optExpression ')' statement
+   61 iterationStmt: DO statement WHILE '(' . expression ')'
 
-    ';'  shift, and go to state 179
+    NOT           shift, and go to state 36
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 71
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    '('           shift, and go to state 44
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    const_type          go to state 50
+    expression          go to state 179
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 175
 
-   53 iterationStmt: DO statement WHILE '(' expression . ')'
+   60 iterationStmt: WHILE '(' simpleExpression ')' . statement
 
-    ')'  shift, and go to state 180
+    IF            shift, and go to state 133
+    FOR           shift, and go to state 134
+    DO            shift, and go to state 135
+    WHILE         shift, and go to state 136
+    GOTO          shift, and go to state 137
+    BREAK         shift, and go to state 138
+    CONTINUE      shift, and go to state 139
+    RETURN        shift, and go to state 140
+    NOT           shift, and go to state 36
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 141
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    ';'           shift, and go to state 142
+    '('           shift, and go to state 44
+    '{'           shift, and go to state 99
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    const_type          go to state 50
+    funCall             go to state 144
+    statement           go to state 180
+    compoundStmt        go to state 146
+    expressionStmt      go to state 147
+    selectionStmt       go to state 148
+    iterationStmt       go to state 149
+    jumpStmt            go to state 150
+    returnStmt          go to state 151
+    breakStmt           go to state 152
+    expression          go to state 153
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 176
 
-   52 iterationStmt: WHILE '(' simpleExpression ')' statement .
+   35 funCall: IDENTIFIER '(' params ')' . statement
 
-    $default  reduce using rule 52 (iterationStmt)
+    IF            shift, and go to state 133
+    FOR           shift, and go to state 134
+    DO            shift, and go to state 135
+    WHILE         shift, and go to state 136
+    GOTO          shift, and go to state 137
+    BREAK         shift, and go to state 138
+    CONTINUE      shift, and go to state 139
+    RETURN        shift, and go to state 140
+    NOT           shift, and go to state 36
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 141
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    ';'           shift, and go to state 142
+    '('           shift, and go to state 44
+    '{'           shift, and go to state 99
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    const_type          go to state 50
+    funCall             go to state 144
+    statement           go to state 181
+    compoundStmt        go to state 146
+    expressionStmt      go to state 147
+    selectionStmt       go to state 148
+    iterationStmt       go to state 149
+    jumpStmt            go to state 150
+    returnStmt          go to state 151
+    breakStmt           go to state 152
+    expression          go to state 153
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 177
 
-   27 funCall: IDENTIFIER '(' params ')' statement .
+   58 selectionStmt: IF '(' simpleExpression ')' statement .
+   59              | IF '(' simpleExpression ')' statement . ELSE statement
 
-    $default  reduce using rule 27 (funCall)
+    ELSE  shift, and go to state 182
+
+    $default  reduce using rule 58 (selectionStmt)
 
 
 State 178
 
-   51 selectionStmt: IF '(' simpleExpression ')' statement ELSE . statement
+   62 iterationStmt: FOR '(' optExpression ';' optExpression . ';' optExpression ')' statement
 
-    IF            shift, and go to state 129
-    FOR           shift, and go to state 130
-    DO            shift, and go to state 131
-    WHILE         shift, and go to state 132
-    GOTO          shift, and go to state 133
-    BREAK         shift, and go to state 134
-    CONTINUE      shift, and go to state 135
-    RETURN        shift, and go to state 136
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 137
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    ';'           shift, and go to state 138
-    '('           shift, and go to state 44
-    '{'           shift, and go to state 89
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    const_type          go to state 50
-    funCall             go to state 140
-    statement           go to state 181
-    compoundStmt        go to state 142
-    expressionStmt      go to state 143
-    selectionStmt       go to state 144
-    iterationStmt       go to state 145
-    jumpStmt            go to state 146
-    returnStmt          go to state 147
-    breakStmt           go to state 148
-    expression          go to state 149
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    ';'  shift, and go to state 183
 
 
 State 179
 
-   54 iterationStmt: FOR '(' optExpression ';' optExpression ';' . optExpression ')' statement
+   61 iterationStmt: DO statement WHILE '(' expression . ')'
 
-    NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
-    HEX_CONSTANT  shift, and go to state 37
-    DEC_CONSTANT  shift, and go to state 38
-    INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 69
-    UMINUS        shift, and go to state 42
-    UPLUS         shift, and go to state 43
-    '('           shift, and go to state 44
-    '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
-
-    $default  reduce using rule 56 (optExpression)
-
-    const_type          go to state 50
-    optExpression       go to state 182
-    expression          go to state 163
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    ')'  shift, and go to state 184
 
 
 State 180
 
-   53 iterationStmt: DO statement WHILE '(' expression ')' .
+   60 iterationStmt: WHILE '(' simpleExpression ')' statement .
 
-    $default  reduce using rule 53 (iterationStmt)
+    $default  reduce using rule 60 (iterationStmt)
 
 
 State 181
 
-   51 selectionStmt: IF '(' simpleExpression ')' statement ELSE statement .
+   35 funCall: IDENTIFIER '(' params ')' statement .
 
-    $default  reduce using rule 51 (selectionStmt)
+    $default  reduce using rule 35 (funCall)
 
 
 State 182
 
-   54 iterationStmt: FOR '(' optExpression ';' optExpression ';' optExpression . ')' statement
+   59 selectionStmt: IF '(' simpleExpression ')' statement ELSE . statement
 
-    ')'  shift, and go to state 183
+    IF            shift, and go to state 133
+    FOR           shift, and go to state 134
+    DO            shift, and go to state 135
+    WHILE         shift, and go to state 136
+    GOTO          shift, and go to state 137
+    BREAK         shift, and go to state 138
+    CONTINUE      shift, and go to state 139
+    RETURN        shift, and go to state 140
+    NOT           shift, and go to state 36
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 141
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    ';'           shift, and go to state 142
+    '('           shift, and go to state 44
+    '{'           shift, and go to state 99
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    const_type          go to state 50
+    funCall             go to state 144
+    statement           go to state 185
+    compoundStmt        go to state 146
+    expressionStmt      go to state 147
+    selectionStmt       go to state 148
+    iterationStmt       go to state 149
+    jumpStmt            go to state 150
+    returnStmt          go to state 151
+    breakStmt           go to state 152
+    expression          go to state 153
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 183
 
-   54 iterationStmt: FOR '(' optExpression ';' optExpression ';' optExpression ')' . statement
+   62 iterationStmt: FOR '(' optExpression ';' optExpression ';' . optExpression ')' statement
 
-    IF            shift, and go to state 129
-    FOR           shift, and go to state 130
-    DO            shift, and go to state 131
-    WHILE         shift, and go to state 132
-    GOTO          shift, and go to state 133
-    BREAK         shift, and go to state 134
-    CONTINUE      shift, and go to state 135
-    RETURN        shift, and go to state 136
     NOT           shift, and go to state 36
-    DECREMENT     shift, and go to state 67
-    INCREMENT     shift, and go to state 68
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
     HEX_CONSTANT  shift, and go to state 37
     DEC_CONSTANT  shift, and go to state 38
     INT_CONSTANT  shift, and go to state 39
-    IDENTIFIER    shift, and go to state 137
+    IDENTIFIER    shift, and go to state 71
     UMINUS        shift, and go to state 42
     UPLUS         shift, and go to state 43
-    ';'           shift, and go to state 138
     '('           shift, and go to state 44
-    '{'           shift, and go to state 89
     '*'           shift, and go to state 45
-    '?'           shift, and go to state 46
-    '!'           shift, and go to state 47
-    '~'           shift, and go to state 48
-    '^'           shift, and go to state 49
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    $default  reduce using rule 64 (optExpression)
 
     const_type          go to state 50
-    funCall             go to state 140
-    statement           go to state 184
-    compoundStmt        go to state 142
-    expressionStmt      go to state 143
-    selectionStmt       go to state 144
-    iterationStmt       go to state 145
-    jumpStmt            go to state 146
-    returnStmt          go to state 147
-    breakStmt           go to state 148
-    expression          go to state 149
-    simpleExpression    go to state 71
-    andExpression       go to state 52
-    unaryRelExpression  go to state 53
-    relExpression       go to state 54
-    sumExpression       go to state 55
-    term                go to state 56
-    unaryExpression     go to state 57
-    unaryOp             go to state 58
-    factor              go to state 59
+    optExpression       go to state 186
+    expression          go to state 167
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
 
 
 State 184
 
-   54 iterationStmt: FOR '(' optExpression ';' optExpression ';' optExpression ')' statement .
+   61 iterationStmt: DO statement WHILE '(' expression ')' .
 
-    $default  reduce using rule 54 (iterationStmt)
+    $default  reduce using rule 61 (iterationStmt)
+
+
+State 185
+
+   59 selectionStmt: IF '(' simpleExpression ')' statement ELSE statement .
+
+    $default  reduce using rule 59 (selectionStmt)
+
+
+State 186
+
+   62 iterationStmt: FOR '(' optExpression ';' optExpression ';' optExpression . ')' statement
+
+    ')'  shift, and go to state 187
+
+
+State 187
+
+   62 iterationStmt: FOR '(' optExpression ';' optExpression ';' optExpression ')' . statement
+
+    IF            shift, and go to state 133
+    FOR           shift, and go to state 134
+    DO            shift, and go to state 135
+    WHILE         shift, and go to state 136
+    GOTO          shift, and go to state 137
+    BREAK         shift, and go to state 138
+    CONTINUE      shift, and go to state 139
+    RETURN        shift, and go to state 140
+    NOT           shift, and go to state 36
+    DECREMENT     shift, and go to state 69
+    INCREMENT     shift, and go to state 70
+    HEX_CONSTANT  shift, and go to state 37
+    DEC_CONSTANT  shift, and go to state 38
+    INT_CONSTANT  shift, and go to state 39
+    IDENTIFIER    shift, and go to state 141
+    UMINUS        shift, and go to state 42
+    UPLUS         shift, and go to state 43
+    ';'           shift, and go to state 142
+    '('           shift, and go to state 44
+    '{'           shift, and go to state 99
+    '*'           shift, and go to state 45
+    '!'           shift, and go to state 46
+    '~'           shift, and go to state 47
+    '^'           shift, and go to state 48
+
+    const_type          go to state 50
+    funCall             go to state 144
+    statement           go to state 188
+    compoundStmt        go to state 146
+    expressionStmt      go to state 147
+    selectionStmt       go to state 148
+    iterationStmt       go to state 149
+    jumpStmt            go to state 150
+    returnStmt          go to state 151
+    breakStmt           go to state 152
+    expression          go to state 153
+    simpleExpression    go to state 73
+    andExpression       go to state 53
+    unaryRelExpression  go to state 54
+    relExpression       go to state 55
+    sumExpression       go to state 56
+    term                go to state 57
+    unaryExpression     go to state 68
+    unaryOp             go to state 59
+    factor              go to state 60
+
+
+State 188
+
+   62 iterationStmt: FOR '(' optExpression ';' optExpression ';' optExpression ')' statement .
+
+    $default  reduce using rule 62 (iterationStmt)
