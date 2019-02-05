@@ -47,6 +47,8 @@ hex [0-9a-fA-F]
 "continue"                          {return CONTINUE;}
 "main"                              {return MAIN;}
 "return"                            {return RETURN;}
+"struct"                            {return STRUCT_UNI;}
+"union"                             {return STRUCT_UNI;}
 
 
  /* Constants */

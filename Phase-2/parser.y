@@ -20,7 +20,7 @@
 
 
 /* Random Tokens I declared to silence errors */
-%token MAIN ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN MOD ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
+%token STRUCT_UNI MAIN ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN MOD ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
 
 /* Keywords */
 %token VOID IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN
@@ -79,7 +79,9 @@
 
     declarationList : declarationList declaration | declaration;
 
-    declaration : varDeclaration | funDeclaration;
+    declaration : varDeclaration | funDeclaration | strucUniDecl;
+
+    strucUniDecl : STRUCT_UNI '{' varDeclaration '}' IDENTIFIER ';';
 
     varDeclaration : typeSpecifier varDeclList ';' ;
 
