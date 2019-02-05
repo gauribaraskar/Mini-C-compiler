@@ -49,6 +49,10 @@ hex [0-9a-fA-F]
 "return"                            {return RETURN;}
 "struct"                            {return STRUCT_UNI;}
 "union"                             {return STRUCT_UNI;}
+"case"                              {return CASE;}
+"default"                           {return DEFAULT;}
+"switch"                            {return SWITCH;}
+
 
 
  /* Constants */

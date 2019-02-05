@@ -20,7 +20,7 @@
 
 
 /* Random Tokens I declared to silence errors */
-%token STRUCT_UNI MAIN ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN MOD ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
+%token SWITCH CASE DEFAULT STRUCT_UNI MAIN ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN MOD ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
 
 /* Keywords */
 %token VOID IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN
@@ -123,7 +123,9 @@
 
   paramId : IDENTIFIER | IDENTIFIER '[' ']';
 
-  statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | funCall ;
+  statement : labeledStmt | expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | funCall ;
+
+  labeledStmt : IDENTIFIER ':' statement | CASE conditionalStmt ':' statement | DEFAULT ':' statement
 
   compoundStmt : '{' localDeclarations statementList '}' ;
 
@@ -132,9 +134,10 @@
   statementList : statementList statement
                   |
                   ;
+
   expressionStmt : expression ';' | ';' ;
 
-  selectionStmt : IF '(' simpleExpression ')' statement %prec IFX | IF '(' simpleExpression ')' statement ELSE statement ;
+  selectionStmt : IF '(' simpleExpression ')' statement %prec IFX | IF '(' simpleExpression ')' statement ELSE statement | SWITCH '(' simpleExpression ')' statement;
 
   iterationStmt : WHILE '(' simpleExpression ')' statement | DO statement WHILE '(' expression ')' | FOR '(' optExpression ';' optExpression ';' optExpression ')' statement;
 
@@ -146,7 +149,7 @@
 
   breakStmt : BREAK ';' ;
 
-    conditionalStmt : simpleExpression '?' expression ':' conditionalStmt  | simpleExpression;
+  conditionalStmt : simpleExpression '?' expression ':' conditionalStmt  | simpleExpression;
 
 
   expression : IDENTIFIER assignmentOperator expression
