@@ -129,7 +129,9 @@
 
   selectionStmt : IF '(' simpleExpression ')' statement %prec IFX | IF '(' simpleExpression ')' statement ELSE statement ;
 
-  iterationStmt : WHILE '(' simpleExpression ')' statement | DO statement WHILE '(' expression ')' | FOR '(' expression ';' expression ';' expression ')' statement;
+  iterationStmt : WHILE '(' simpleExpression ')' statement | DO statement WHILE '(' expression ')' | FOR '(' optExpression ';' optExpression ';' optExpression ')' statement;
+
+  optExpression : expression | ;
 
   jumpStmt : GOTO IDENTIFIER ';' | CONTINUE ';' ;
 
