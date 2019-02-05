@@ -51,15 +51,15 @@ hex [0-9a-fA-F]
 
  /* Constants */
 
-[0][x|X]{hex}+                {yylval.dval = (int)strtol(yytext, NULL, 16); InsertEntry(ConstantTable, yytext , yylval.dval,"HEX");return HEX_CONSTANT;}
-[+/-]?{digit}+                      {yylval.dval = (int) atoi(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"INT");return INT_CONSTANT;}
-[+/-]?({digit}*)["."]({digit}+)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT");return DEC_CONSTANT;}
-[+/-]?({digit}+)["."]({digit}*)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT");return DEC_CONSTANT;}
+[0][x|X]{hex}+                {yylval.dval = (int)strtol(yytext, NULL, 16); InsertEntry(ConstantTable, yytext , yylval.dval,"HEX",yylineno);return HEX_CONSTANT;}
+[+/-]?{digit}+                      {yylval.dval = (int) atoi(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"INT",yylineno);return INT_CONSTANT;}
+[+/-]?({digit}*)["."]({digit}+)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno);return DEC_CONSTANT;}
+[+/-]?({digit}+)["."]({digit}*)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno);return DEC_CONSTANT;}
 
 {identifier} {
   if(strlen(yytext) <= 32)
     {
-     yylval.tbEntry = InsertEntry(SymbolTable, yytext, INT_MAX , "INT");
+     yylval.tbEntry = InsertEntry(SymbolTable, yytext, INT_MAX , "INT",yylineno);
       return IDENTIFIER;
     }
   else
@@ -145,12 +145,12 @@ hex [0-9a-fA-F]
   }
   else
   {
-    InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR");
+    InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR",yylineno);
     return STRING;
   }
 }
 
-\'[^\'\n]\'                         {InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR"); return STRING;}
+\'[^\'\n]\'                         {InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR",yylineno); return STRING;}
 
 
  /* Punctuators */

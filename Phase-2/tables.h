@@ -18,6 +18,7 @@
 
 struct table_entry{
 
+    int line_number;
     char *lexeme;
     double value;
     char* data_type;
@@ -70,7 +71,7 @@ int Search(entry** TablePointer, char *lexeme)
   return 0;
 }
 
-entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataType )
+entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataType,int line_number )
 {
     int temp = hash(lexeme);
   if(Search(TablePointer,lexeme) == 1)
@@ -87,6 +88,7 @@ entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataTyp
     tempPoint->lexeme = strdup(lexeme);
     tempPoint->value = value;
     tempPoint->data_type = strdup(DataType);
+    tempPoint->line_number = line_number;
     tempPoint->next = NULL;
 
     if (head == NULL)
@@ -113,14 +115,14 @@ void Display(entry** TablePointer)
 
   printf("-----------------------------------------\n");
 
-  printf("\n\t(lexeme, value, Data type)\n" );
+  printf("\n\t(lexeme, value, Data type, Line Number)\n" );
 
   for(i=0;i<SIZE;i++)
   {
     temp = TablePointer[i];
     while(temp != NULL)
     {
-      printf("\t(%5s, %f, %s)\n",temp->lexeme,temp->value,temp->data_type);
+      printf("\t(%5s, %f, %s, %d)\n",temp->lexeme,temp->value,temp->data_type,temp->line_number);
       temp = temp->next;
     }
 
