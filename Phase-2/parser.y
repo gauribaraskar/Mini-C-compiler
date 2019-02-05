@@ -19,10 +19,10 @@
 
 
 /* Random Tokens I declared to silence errors */
-%token MAIN ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN MOD ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
+%token MAIN VOID ADD SUBTRACT MULTIPLY DIVIDE ASSIGN GREATER_THAN LESSER_THAN MOD ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN
 
 /* Keywords */
-%token VOID IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN
+%token IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN
 
 /* Data types */
 %token INT SHORT LONG CHAR SIGNED UNSIGNED
@@ -100,11 +100,13 @@
                   | CHAR {curr_data_type = strdup("CHAR");}
                   ;
 
+    
+
   pointer : MULTIPLY pointer | MULTIPLY;
 
-  funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt | typeSpecifier MAIN '(' params ')' compoundStmt | noDefDeclare ;
+  funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt | typeSpecifier MAIN '(' params ')' compoundStmt | noDefDeclare | VOID IDENTIFIER '(' params ')' compoundStmt | VOID MAIN '(' params ')' compoundStmt ;
 
-  noDefDeclare : typeSpecifier IDENTIFIER '(' params ')' ';';
+  noDefDeclare : typeSpecifier IDENTIFIER '(' params ')' ';' | VOID IDENTIFIER '(' params ')' ';';
 
   funCall : IDENTIFIER '(' params ')' statement;
 
