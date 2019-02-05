@@ -1,9 +1,9 @@
-int min()
+int main()
 {
     int a,b;
     int *c;
 
-    a= a - b;
+    a=a-b;
 
     while(a > 0)
     {

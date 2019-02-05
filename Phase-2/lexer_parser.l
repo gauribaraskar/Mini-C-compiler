@@ -145,13 +145,12 @@ hex [0-9a-fA-F]
   }
   else
   {
-
-    printf("\t%-50s : String\n", yytext);
+    InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR");
     return STRING;
   }
 }
 
-\'[^\'\n]\'                         {}
+\'[^\'\n]\'                         {InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR"); return STRING;}
 
 
  /* Punctuators */

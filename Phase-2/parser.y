@@ -85,7 +85,7 @@
 
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
 
-    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression ;
+    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression | varDecId ASSIGN STRING ;
 
     varDecId : IDENTIFIER {$1->data_type = curr_data_type;} | IDENTIFIER '[' INT_CONSTANT ']';
 
@@ -103,7 +103,7 @@
 
   pointer : MULTIPLY pointer | MULTIPLY;
 
-  funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt ;
+  funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt | typeSpecifier MAIN '(' params ')' compoundStmt ;
 
   funCall : IDENTIFIER '(' params ')' statement;
 
