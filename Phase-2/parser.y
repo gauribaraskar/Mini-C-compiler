@@ -1,4 +1,3 @@
-// Pointers , strings , chracters, comma declaration , array declaration
 %{
     #include<stdio.h>
 	  #include<stdlib.h>
@@ -70,7 +69,7 @@
 %right NOT
 
 
-
+%nonassoc UMINUS UPLUS
 %nonassoc IFX
 %nonassoc ELSE
 %%
@@ -111,9 +110,7 @@
 
   paramList :paramList ',' paramTypeList | paramTypeList ;
 
-  paramTypeList : typeSpecifier paramIdList;
-
-  paramIdList : paramIdList ',' paramId | paramId ;
+  paramTypeList : typeSpecifier paramId;
 
   paramId : IDENTIFIER | IDENTIFIER '[' ']';
 
@@ -164,8 +161,8 @@
                 | sumExpression
                 ;
 
-   sumExpression : sumExpression ADD term
-                 | sumExpression SUBTRACT term
+   sumExpression : sumExpression '+' term
+                 | sumExpression '-' term
                  | term
                  ;
 
@@ -174,9 +171,9 @@
        | term MOD unaryExpression
        | unaryExpression
        ;
-  unaryExpression : unaryOp unaryExpression | factor ;
+  unaryExpression : unaryOp %prec UMINUS unaryExpression | factor ;
 
-  unaryOp : '-'| '*' |  '?' ;
+  unaryOp : UMINUS | '*' |  '?' | UPLUS ;
 
   factor : IDENTIFIER | '(' expression ')' | const_type;
 

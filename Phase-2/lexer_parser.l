@@ -51,10 +51,10 @@ hex [0-9a-fA-F]
 
  /* Constants */
 
-[+/-]?[0][x|X]{hex}+                {yylval.dval = (int)strtol(yytext, NULL, 16); InsertEntry(ConstantTable, yytext , yylval.dval,"HEX");return HEX_CONSTANT;}
-[+/-]?{digit}+                      {yylval.dval = (int) atoi(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"INT");return INT_CONSTANT;}
-[+/-]?({digit}*)["."]({digit}+)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT");return DEC_CONSTANT;}
-[+/-]?({digit}+)["."]({digit}*)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT");return DEC_CONSTANT;}
+[0][x|X]{hex}+                {yylval.dval = (int)strtol(yytext, NULL, 16); InsertEntry(ConstantTable, yytext , yylval.dval,"HEX");return HEX_CONSTANT;}
+{digit}+                      {yylval.dval = (int) atoi(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"INT");return INT_CONSTANT;}
+({digit}*)["."]({digit}+)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT");return DEC_CONSTANT;}
+({digit}+)["."]({digit}*)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT");return DEC_CONSTANT;}
 
 {identifier} {
   if(strlen(yytext) <= 32)
@@ -108,8 +108,8 @@ hex [0-9a-fA-F]
 
  /* Operators */
 
-"+"                                 {return ADD;}
-"-"                                 {return SUBTRACT;}
+"+"                                 {return UPLUS;}
+"-"                                 {return UMINUS;}
 "*"                                 {return MULTIPLY;}
 "/"                                 {return DIVIDE;}
 "%"                                 {return MOD;}
