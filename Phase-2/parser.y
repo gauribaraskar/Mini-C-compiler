@@ -81,7 +81,9 @@
 
     declaration : varDeclaration | funDeclaration | strucUniDecl;
 
-    strucUniDecl : STRUCT_UNI '{' declarationRecur '}' IDENTIFIER ';';
+    strucUniDecl : STRUCT_UNI IDENTIFIER '{' declarationRecur '}' idBlock ';';
+
+    idBlock : idBlock ',' IDENTIFIER | idBlock ',' IDENTIFIER '[' INT_CONSTANT ']' | IDENTIFIER | IDENTIFIER '[' INT_CONSTANT ']';
 
     declarationRecur : declarationRecur declaration | declaration ;
 
