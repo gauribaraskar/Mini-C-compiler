@@ -101,7 +101,10 @@
     // Function declaration
     funDeclaration : typeSpecifier IDENTIFIER '(' params ')' compoundStmt | typeSpecifier MAIN '(' params ')' compoundStmt | noDefDeclare ;
     noDefDeclare : typeSpecifier IDENTIFIER '(' params ')' ';';
-    funCall : IDENTIFIER '(' params ')' statement;
+    funCall : IDENTIFIER '(' args ')' ';';
+
+    args : argList | ;
+    argList : argList ',' expression | expression ;
 
     // Rules for parameter list
     params : paramList | ;
@@ -142,7 +145,7 @@
 
 
     // All arithmetic expressions
-    expression : IDENTIFIER assignmentOperator expression
+    expression : IDENTIFIER assignmentOperator assignmentExpression
                | INCREMENT IDENTIFIER
                | DECREMENT IDENTIFIER
                | simpleExpression
