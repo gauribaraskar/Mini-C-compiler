@@ -9,7 +9,7 @@
 %}
 
 
- /* Declarations */
+/* Declarations */
 
 letter [a-zA-Z]
 digit [0-9]
@@ -18,7 +18,7 @@ identifier (_|{letter})({letter}|{digit}|_)*
 hex [0-9a-fA-F]
 
 
- /* States */
+/* States */
 
 %x PREPROCESSOR
 %x MACROPREPROCESSOR
@@ -28,7 +28,7 @@ hex [0-9a-fA-F]
 %%
 
 
- /* Keywords */
+/* Keywords */
 
 "int"                               {return INT;}
 "short"                             {return SHORT;}
@@ -55,9 +55,9 @@ hex [0-9a-fA-F]
 
 
 
- /* Constants */
+/* Constants */
 
-[0][x|X]{hex}+                {yylval.dval = (int)strtol(yytext, NULL, 16); InsertEntry(ConstantTable, yytext , yylval.dval,"HEX",yylineno);return HEX_CONSTANT;}
+[0][x|X]{hex}+                      {yylval.dval = (int)strtol(yytext, NULL, 16); InsertEntry(ConstantTable, yytext , yylval.dval,"HEX",yylineno);return HEX_CONSTANT;}
 [+/-]?{digit}+                      {yylval.dval = (int) atoi(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"INT",yylineno);return INT_CONSTANT;}
 [+/-]?({digit}*)["."]({digit}+)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno);return DEC_CONSTANT;}
 [+/-]?({digit}+)["."]({digit}*)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno);return DEC_CONSTANT;}
@@ -80,17 +80,17 @@ hex [0-9a-fA-F]
 {whitespace}                        ;
 
 
- /* Preprocessor Directives */
+/* Preprocessor Directives */
 
 ^"#include"                         {BEGIN PREPROCESSOR;}
 <PREPROCESSOR>{whitespace}          ;
 <PREPROCESSOR>"<"[^<>\n]*">"        {BEGIN INITIAL;}
 <PREPROCESSOR>\"[^<>\n]*\"          {BEGIN INITIAL;}
-<PREPROCESSOR>"\n"                  { yylineno++; BEGIN INITIAL;ErrFlag=1;}
+<PREPROCESSOR>"\n"                  { yylineno++; BEGIN INITIAL; ErrFlag=1;}
 <PREPROCESSOR>.                     {yyerror("Improper Header");}
 
 
- /* Macropreprocessor Directives */
+/* Macropreprocessor Directives */
 
 ^"#define"                                        {BEGIN MACROPREPROCESSOR;}
 <MACROPREPROCESSOR>{whitespace}                   ;
@@ -99,7 +99,7 @@ hex [0-9a-fA-F]
 <MACROPREPROCESSOR>.                              {BEGIN INITIAL;ErrFlag=1;}
 
 
- /* Comments */
+/* Comments */
 
 "/*"                                {BEGIN COMMENT;}
 <COMMENT>.|{whitespace}             ;
@@ -112,7 +112,7 @@ hex [0-9a-fA-F]
 <SLCOMMENT>\n                       {yylineno++; BEGIN INITIAL;}
 
 
- /* Operators */
+/* Operators */
 
 "+"                                 {return ADD;}
 "-"                                 {return SUBTRACT;}
@@ -123,11 +123,11 @@ hex [0-9a-fA-F]
 "--"                                {return DECREMENT;}
 "++"                                {return INCREMENT;}
 
-"+="                                 {return ADD_ASSIGN;}
-"-="                                 {return SUB_ASSIGN;}
-"*="                                  {return MUL_ASSIGN;}
-"/="                                  {return DIV_ASSIGN;}
-"%="                                  {return MOD_ASSIGN;}
+"+="                                {return ADD_ASSIGN;}
+"-="                                {return SUB_ASSIGN;}
+"*="                                {return MUL_ASSIGN;}
+"/="                                {return DIV_ASSIGN;}
+"%="                                {return MOD_ASSIGN;}
 
 ">"                                 {return GREATER_THAN;}
 "<"                                 {return LESSER_THAN;}

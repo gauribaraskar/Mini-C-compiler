@@ -1,4 +1,4 @@
-/* Parser code */
+/* The file describes the grammar for our parser */
 
 %{
     // Header files
