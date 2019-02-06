@@ -114,13 +114,13 @@
     paramId : IDENTIFIER | IDENTIFIER '[' ']';
 
     // Types os statements in C
-    statement : labeledStmt | expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | funCall ;
+    statement : labeledStmt | expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | funCall | varDeclaration;
 
     // Matches label for goto and grammar for switch statement
     labeledStmt : IDENTIFIER ':' statement | CASE conditionalStmt ':' statement | DEFAULT ':' statement
 
     // compound statements produces a list of statements with its local declarations
-    compoundStmt : '{' localDeclarations statementList '}' ;
+    compoundStmt : '{' localDeclarations statementList '}';
     localDeclarations : localDeclarations varDeclaration
                       |  ;
     statementList : statementList statement
