@@ -1,15 +1,14 @@
-
+ /* This file describes the rules for the lexer */
 %{
     #include<stdio.h>
     #include<stdlib.h>
     #include<limits.h>
     int ErrFlag = 0;
-
     #include "y.tab.h"
 %}
 
 
-/* Declarations */
+ /* Declarations */
 
 letter [a-zA-Z]
 digit [0-9]
@@ -18,7 +17,7 @@ identifier (_|{letter})({letter}|{digit}|_)*
 hex [0-9a-fA-F]
 
 
-/* States */
+ /* States */
 
 %x PREPROCESSOR
 %x MACROPREPROCESSOR
@@ -28,7 +27,7 @@ hex [0-9a-fA-F]
 %%
 
 
-/* Keywords */
+ /* Keywords */
 
 "int"                               {return INT;}
 "short"                             {return SHORT;}
@@ -55,7 +54,7 @@ hex [0-9a-fA-F]
 
 
 
-/* Constants */
+ /* Constants */
 
 [0][x|X]{hex}+                      {yylval.dval = (int)strtol(yytext, NULL, 16); InsertEntry(ConstantTable, yytext , yylval.dval,"HEX",yylineno);return HEX_CONSTANT;}
 [+/-]?{digit}+                      {yylval.dval = (int) atoi(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"INT",yylineno);return INT_CONSTANT;}
@@ -80,7 +79,7 @@ hex [0-9a-fA-F]
 {whitespace}                        ;
 
 
-/* Preprocessor Directives */
+ /* Preprocessor Directives */
 
 ^"#include"                         {BEGIN PREPROCESSOR;}
 <PREPROCESSOR>{whitespace}          ;
@@ -90,7 +89,7 @@ hex [0-9a-fA-F]
 <PREPROCESSOR>.                     {yyerror("Improper Header");}
 
 
-/* Macropreprocessor Directives */
+ /* Macropreprocessor Directives */
 
 ^"#define"                                        {BEGIN MACROPREPROCESSOR;}
 <MACROPREPROCESSOR>{whitespace}                   ;
@@ -99,7 +98,7 @@ hex [0-9a-fA-F]
 <MACROPREPROCESSOR>.                              {BEGIN INITIAL;ErrFlag=1;}
 
 
-/* Comments */
+ /* Comments */
 
 "/*"                                {BEGIN COMMENT;}
 <COMMENT>.|{whitespace}             ;
@@ -112,7 +111,7 @@ hex [0-9a-fA-F]
 <SLCOMMENT>\n                       {yylineno++; BEGIN INITIAL;}
 
 
-/* Operators */
+ /* Operators */
 
 "+"                                 {return ADD;}
 "-"                                 {return SUBTRACT;}

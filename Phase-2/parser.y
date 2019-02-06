@@ -79,7 +79,7 @@
     // Variables can also be initialised during declaration
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     // Assigment can be through a simple expression or conditional statement
-    varDeclInitialize : varDecId | varDecId ASSIGN STRING | varDecId ASSIGN assignmentExpression ;
+    varDeclInitialize : varDecId | varDecId ASSIGN assignmentExpression ;
     varDecId : IDENTIFIER {$1->data_type = curr_data_type;} | IDENTIFIER '[' INT_CONSTANT ']';
     assignmentExpression : conditionalStmt | unaryExpression assignmentOperator assignmentExpression;
     assignmentOperator : ASSIGN | ADD_ASSIGN | SUB_ASSIGN |MUL_ASSIGN|DIV_ASSIGN|MOD_ASSIGN;
@@ -88,6 +88,7 @@
     const_type : DEC_CONSTANT
                | INT_CONSTANT
                | HEX_CONSTANT
+               | STRING
                ;
     // data types
     typeSpecifier : typeSpecifier pointer
@@ -104,7 +105,7 @@
     funCall : IDENTIFIER '(' args ')' ';';
 
     args : argList | ;
-    argList : argList ',' expression | expression ;
+    argList : argList ',' expression | expression;
 
     // Rules for parameter list
     params : paramList | ;
@@ -162,8 +163,6 @@
                   | sumExpression GREATER_EQ sumExpression
                   | sumExpression NOT_EQ sumExpression
                   | sumExpression EQUAL sumExpression
-                  | sumExpression '|' sumExpression
-                  | sumExpression '&' sumExpression
                   | sumExpression
                   ;
      sumExpression : sumExpression ADD term
@@ -178,7 +177,7 @@
     unaryExpression : unaryOp %prec UMINUS unaryExpression
                     | factor ;
 
-    unaryOp : UMINUS | '*'| UPLUS | '!' | '~' | '^' ;
+    unaryOp : UMINUS | '*'| UPLUS | '!' | '~' | '^' | '&' ;
 
     factor : IDENTIFIER | '(' expression ')' | const_type;
 %%
