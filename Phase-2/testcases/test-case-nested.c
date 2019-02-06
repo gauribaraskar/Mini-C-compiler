@@ -1,4 +1,5 @@
-int main(){
+int main()
+{
 
   int a = 10;
   int x = 1,y = 0;
@@ -12,6 +13,7 @@ int main(){
   int rem = x % y;
   printf ("Total = %d \n", total);
 
+  int result = IncreaseBy10(x);
 }
 
 int IncreaseBy10(int x)

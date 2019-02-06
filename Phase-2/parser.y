@@ -81,7 +81,7 @@
     // Assigment can be through a simple expression or conditional statement
     varDeclInitialize : varDecId | varDecId ASSIGN assignmentExpression ;
     varDecId : IDENTIFIER {$1->data_type = curr_data_type;} | IDENTIFIER '[' INT_CONSTANT ']';
-    assignmentExpression : conditionalStmt | unaryExpression assignmentOperator assignmentExpression;
+    assignmentExpression : conditionalStmt | unaryExpression assignmentOperator assignmentExpression ;
     assignmentOperator : ASSIGN | ADD_ASSIGN | SUB_ASSIGN |MUL_ASSIGN|DIV_ASSIGN|MOD_ASSIGN;
 
     // Types for constants
@@ -94,6 +94,7 @@
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");}
                   | LONG INT
+                  | VOID
                   | CHAR {curr_data_type = strdup("CHAR");}
                   ;
     // Pointer declaration
@@ -114,14 +115,14 @@
     paramId : IDENTIFIER | IDENTIFIER '[' ']';
 
     // Types os statements in C
-    statement : labeledStmt | expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | funCall | varDeclaration;
+    statement : labeledStmt | expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | funCall;
 
     // Matches label for goto and grammar for switch statement
     labeledStmt : IDENTIFIER ':' statement | CASE conditionalStmt ':' statement | DEFAULT ':' statement
 
     // compound statements produces a list of statements with its local declarations
     compoundStmt : '{' localDeclarations statementList '}';
-    localDeclarations : localDeclarations varDeclaration
+    localDeclarations : localDeclarations statementList varDeclaration
                       |  ;
     statementList : statementList statement
                   |  ;
