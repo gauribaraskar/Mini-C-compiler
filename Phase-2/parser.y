@@ -57,7 +57,6 @@
 %right NOT
 
 
-%nonassoc UMINUS UPLUS
 %nonassoc IFX
 %nonassoc ELSE
 %%
@@ -175,10 +174,10 @@
          | term MOD unaryExpression
          | unaryExpression
          ;
-    unaryExpression : unaryOp %prec UMINUS unaryExpression
+    unaryExpression : unaryOp unaryExpression
                     | factor ;
 
-    unaryOp : UMINUS | '*'| UPLUS | '!' | '~' | '^' | '&' ;
+    unaryOp : ADD | SUBTRACT ;
 
     factor : IDENTIFIER | '(' expression ')' | const_type;
 %%
