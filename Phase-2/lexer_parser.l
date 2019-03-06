@@ -44,13 +44,11 @@ hex [0-9a-fA-F]
 "goto"                              {return GOTO;}
 "break"                             {return BREAK;}
 "continue"                          {return CONTINUE;}
-"main"                              {return MAIN;}
 "return"                            {return RETURN;}
-"struct"                            {return STRUCT_UNI;}
-"union"                             {return STRUCT_UNI;}
 "case"                              {return CASE;}
 "default"                           {return DEFAULT;}
 "switch"                            {return SWITCH;}
+"static"                            {return SWITCH;}
 
 
 
