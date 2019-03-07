@@ -26,9 +26,9 @@
 /* Relational Operators */
 %token GREATER_THAN LESSER_THAN LESS_EQ GREATER_EQ NOT_EQ EQUAL
 /* Keywords */
-%token VOID IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN SWITCH CASE DEFAULT STATIC
+%token VOID IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN 
 /* Data types */
-%token INT SHORT LONG CHAR SIGNED UNSIGNED
+%token INT SHORT LONG CHAR 
 /* Logical Operators */
 %token LG_OR LG_AND NOT
 /* Assignment Operators */
@@ -67,18 +67,17 @@
     // Variable declarations
     /* Variable declaration can be a list */
     varDeclaration : typeSpecifier varDeclList ';' ;
-    scoperVarDeclaration : scopedTypeSpecifier varDeclList ';';
     // Variables can also be initialised during declaration
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     // Assigment can be through a simple expression or conditional statement
     varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression ;
     varDecId : IDENTIFIER {$1->data_type = curr_data_type;} | IDENTIFIER '[' INT_CONSTANT ']';
-    scopedTypeSpecifier : STATIC typeSpecifier | typeSpecifier ;
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");}
                   | VOID
                   | CHAR {curr_data_type = strdup("CHAR");}
                   ;
+
     //assignmentExpression : conditionalStmt | unaryExpression assignmentOperator assignmentExpression ;
     //assignmentOperator : ASSIGN | ADD_ASSIGN | SUB_ASSIGN |MUL_ASSIGN|DIV_ASSIGN|MOD_ASSIGN;
     // Types for constants
@@ -97,19 +96,17 @@
     paramId : IDENTIFIER | IDENTIFIER '[' ']';
     
     // Types os statements in C
-    statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt ;
+    statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | varDeclaration ;
 
     // compound statements produces a list of statements with its local declarations
-    compoundStmt : '{' localDeclarations statementList '}' ;
-    localDeclarations : localDeclarations scoperVarDeclaration 
-                      | ;
+    compoundStmt : '{' statementList '}' ;
     statementList : statementList statement
                   |  ;
     // Expressions
     expressionStmt : expression ';' | ';' ;
     selectionStmt : IF '(' simpleExpression ')' statement %prec IFX
                   | IF '(' simpleExpression ')' statement ELSE statement
-                  | SWITCH '(' simpleExpression ')' statement;
+                  ;
 
     iterationStmt : WHILE '(' simpleExpression ')' statement
                   | DO statement WHILE '(' expression ')' ';'
@@ -151,9 +148,9 @@
                   | sumExpression
                   ;
     sumExpression : sumExpression ADD term
-                   | sumExpression SUBTRACT term
-                   | term
-                   ;
+                  | sumExpression SUBTRACT term
+                  | term
+                  ;
 
     //sumop : ADD | SUBTRACT ;
 

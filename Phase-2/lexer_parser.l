@@ -33,8 +33,6 @@ hex [0-9a-fA-F]
 "short"                             {return SHORT;}
 "long"                              {return LONG;}
 "char"                              {return CHAR;}
-"signed"                            {return SIGNED;}
-"unsigned"                          {return UNSIGNED;}
 "void"                              {return VOID;}
 "if"                                {return IF;}
 "else"                              {return ELSE;}
@@ -45,10 +43,7 @@ hex [0-9a-fA-F]
 "break"                             {return BREAK;}
 "continue"                          {return CONTINUE;}
 "return"                            {return RETURN;}
-"case"                              {return CASE;}
-"default"                           {return DEFAULT;}
-"switch"                            {return SWITCH;}
-"static"                            {return SWITCH;}
+
 
 
 
