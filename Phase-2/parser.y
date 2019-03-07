@@ -40,6 +40,11 @@
 /* Identifier */
 %token <tbEntry> IDENTIFIER
 
+%type <dval> expression unaryExpression unaryRelExpression simpleExpression andExpression
+ sumExpression relExpression term factor mutable immutable call
+ %type <dval> const_type
+
+
 // Start Symbol of the grammar
 %start program
 
@@ -119,63 +124,61 @@
                | RETURN expression ;
     breakStmt : BREAK ';' ;
 
-    expression : mutable ASSIGN expression
-               | mutable ADD_ASSIGN expression 
-               | mutable SUB_ASSIGN expression 
-               | mutable MUL_ASSIGN expression 
-               | mutable DIV_ASSIGN expression
-               | mutable MOD_ASSIGN expression 
-               | mutable INCREMENT
-               | mutable DECREMENT
-               | simpleExpression
+    expression : mutable ASSIGN expression {$1 = $3;}
+               | mutable ADD_ASSIGN expression {$1 = $1+$3;}
+               | mutable SUB_ASSIGN expression  { $1 = $1-$3;}
+               | mutable MUL_ASSIGN expression { $1 = $1*$3;}
+               | mutable DIV_ASSIGN expression {$1 = $1/ $3;}
+               | mutable INCREMENT { $1 = $1+1;}
+               | mutable DECREMENT {  $1 = $1-1;}
+               | simpleExpression  {$$=$1;}
                ;
 
-    simpleExpression : simpleExpression LG_OR andExpression
-                     | andExpression ;
+    simpleExpression : simpleExpression LG_OR andExpression {$$ = $1 || $3;}
+                     | andExpression{$$=$1;};
 
-    andExpression : andExpression LG_AND unaryRelExpression
-                  | unaryRelExpression ;
+    andExpression : andExpression LG_AND unaryRelExpression {$$ = $1 && $3;}
+                  | unaryRelExpression {$$=$1;};
 
-    unaryRelExpression : NOT unaryRelExpression
-                       | relExpression  ;
+    unaryRelExpression : NOT unaryRelExpression {$$ = (!$2);}
+                       | relExpression {$$=$1;} ;
 
-    relExpression : sumExpression GREATER_THAN sumExpression
-                  | sumExpression LESSER_THAN sumExpression
-                  | sumExpression LESS_EQ sumExpression
-                  | sumExpression GREATER_EQ sumExpression
-                  | sumExpression NOT_EQ sumExpression
-                  | sumExpression EQUAL sumExpression
-                  | sumExpression
+    relExpression : sumExpression GREATER_THAN sumExpression {$$ = ($1 > $3); printf("%f",$$);}
+                  | sumExpression LESSER_THAN sumExpression  {$$ = ($1 < $3);}
+                  | sumExpression LESS_EQ sumExpression  {$$ = ($1 <= $3);}
+                  | sumExpression GREATER_EQ sumExpression {$$ = ($1 >= $3);}
+                  | sumExpression NOT_EQ sumExpression {$$ = ($1 != $3);}
+                  | sumExpression EQUAL sumExpression {$$ = ($1 == $3);}
+                  | sumExpression {$$=$1;}
                   ;
-    sumExpression : sumExpression ADD term
-                  | sumExpression SUBTRACT term
-                  | term
+    sumExpression : sumExpression ADD term {$$ = ($1 + $3); printf("%f",$$);}
+                  | sumExpression SUBTRACT term {$$ = $1 - $3;}
+                  | term {$$=$1;}
                   ;
 
     //sumop : ADD | SUBTRACT ;
 
-     term : term MULTIPLY unaryExpression
-         | term DIVIDE unaryExpression
-         | term MOD unaryExpression
-         | unaryExpression
+     term : term MULTIPLY unaryExpression {$$ = $1 * $3;}
+         | term DIVIDE unaryExpression {$$ = $1 / $3;}
+         | unaryExpression {$$=$1;}
          ;
 
-    unaryExpression : unaryOp unaryExpression
-                    | factor ;
+    unaryExpression : ADD unaryExpression {$$=+$2;}
+                    | SUBTRACT unaryExpression {$$=-$2;}
+                    | factor {$$=$1;};
 
-    unaryOp : ADD | SUBTRACT | MULTIPLY ;
 
-    factor : immutable | mutable ;
-    mutable : IDENTIFIER | mutable '[' expression ']' ;
-    immutable : '(' expression ')' | call | const_type ;
-    call : IDENTIFIER '(' args ')' ;
+    factor : immutable {$$=$1;} | mutable {$$=$1;} ;
+    mutable : IDENTIFIER {$$=$1->value;}| mutable '[' expression ']'{$$=0;} ;
+    immutable : '(' expression ')' {$$=$2;} | call {$$=$1;}| const_type {$$=$1;};
+    call : IDENTIFIER '(' args ')'{$$=0;} ;
     args : argList | ;
     argList : argList ',' expression | expression;
 
-    const_type : DEC_CONSTANT
-               | INT_CONSTANT
-               | HEX_CONSTANT
-               | STRING
+    const_type : DEC_CONSTANT { $$ = $1;}
+               | INT_CONSTANT { $$ = $1;}
+               | HEX_CONSTANT { $$ = $1;}
+             
                ;
 %%
 
