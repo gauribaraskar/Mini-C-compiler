@@ -17,6 +17,7 @@
     char* curr_data_type;
     int yylex(void);
     int is_bool = 1;
+    int isfunDec = 0;
     int curr_nest_level = 1;
 
     extern int yylineno;
@@ -81,7 +82,7 @@
     declaration : varDeclaration | funDeclaration ;
     // Variable declarations
     /* Variable declaration can be a list */
-    varDeclaration : typeSpecifier varDeclList ';' ;
+    varDeclaration : {isfunDec = 0;}typeSpecifier varDeclList ';' ;
     // Variables can also be initialised during declaration
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     // Assigment can be through a simple expression or conditional statement
@@ -102,7 +103,7 @@
     pointer : MULTIPLY pointer | MULTIPLY;
 
     // Function declaration
-    funDeclaration : typeSpecifier identifier '(' params ')' statement 
+    funDeclaration : typeSpecifier {isfunDec=1;} identifier  '(' params ')' statement 
     | IDENTIFIER '(' params ')' statement ;
 
      // Rules for parameter list
@@ -191,7 +192,18 @@
                | HEX_CONSTANT { $$ = $1;}
 
                ;
-    identifier : IDENTIFIER {InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level);}
+    identifier : IDENTIFIER {if(isfunDec){
+        entry* ent = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level);
+        ent->is_function = 1;
+        printf("FUNCTION");
+        isfunDec = 0;
+        }
+        else
+        {
+            entry* ent = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level);
+        ent->is_function = 0;
+        } 
+    }
 %%
 
 void disp()
@@ -230,7 +242,6 @@ int checkScope(char *val)
     }
     else
     {
-        
         int level = res->nesting_level;
         int endLine = -1;
         if(Nester[level] == NULL)
