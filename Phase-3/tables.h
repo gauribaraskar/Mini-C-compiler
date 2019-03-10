@@ -73,7 +73,6 @@ entry* Search(entry** TablePointer, char *lexeme)
 
 void set_is_function(entry** TablePointer, char *lexeme){
 
-	printf("start");
 	
 	entry* Entry = Search(TablePointer,lexeme);
 	if (Entry == NULL)
@@ -81,7 +80,7 @@ void set_is_function(entry** TablePointer, char *lexeme){
 	else
 	Entry->is_function = 1;
 
-	printf("done");
+
 
 
 }

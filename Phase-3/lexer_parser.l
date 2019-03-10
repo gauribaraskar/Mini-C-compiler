@@ -57,7 +57,8 @@ hex [0-9a-fA-F]
 {identifier} {
   if(strlen(yytext) <= 32)
     {
-     
+      yylval.str = yytext;
+      printf(" identifier : %s ",yylval.str);
       return IDENTIFIER;
     }
   else

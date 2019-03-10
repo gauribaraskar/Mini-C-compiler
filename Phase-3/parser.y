@@ -4,6 +4,7 @@
     #include<stdio.h>
 	  #include<stdlib.h>
 	  #include "tables.h"
+    #include<limits.h>
 
     // Initialising Symbol table and constant table
     entry **SymbolTable = NULL;
@@ -12,8 +13,11 @@
     int yyerror(char *msg);
     char* curr_data_type;
     int yylex(void);
-
     int is_bool = 1;
+
+    extern int yylineno;
+    extern char* yytext;
+
 %}
 
 // Data types of tokens
@@ -78,7 +82,7 @@
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     // Assigment can be through a simple expression or conditional statement
     varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression ;
-    varDecId : IDENTIFIER {$1->data_type = curr_data_type;} | IDENTIFIER '[' INT_CONSTANT ']';
+    varDecId : identifier | identifier '[' INT_CONSTANT ']';
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");}
                   | VOID
@@ -94,7 +98,8 @@
     pointer : MULTIPLY pointer | MULTIPLY;
 
     // Function declaration
-    funDeclaration : typeSpecifier IDENTIFIER '(' params ')' statement | IDENTIFIER '(' params ')' statement ;
+    funDeclaration : typeSpecifier identifier '(' params ')' statement 
+    | IDENTIFIER '(' params ')' statement ;
 
      // Rules for parameter list
     params : paramList | ;
@@ -182,6 +187,7 @@
                | HEX_CONSTANT { $$ = $1;}
 
                ;
+    identifier : IDENTIFIER {InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno);}
 %%
 
 void disp()
