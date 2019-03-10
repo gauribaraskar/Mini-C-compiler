@@ -23,10 +23,42 @@ struct table_entry{
     double value;
     char* data_type;
     int is_function;
+    int nesting_level;
     struct table_entry *next;
 };
 
+struct nested{
+    int nesting_level;
+    int line_end;
+};
+
+struct nested **Nester = NULL;
+
+void nested_homekeeping()
+{
+  Nester = malloc(sizeof(struct nested*)*SIZE);
+
+  int i;
+  for(i = 0;i<SIZE;i++)
+  {
+    Nester[i] = NULL;
+  }
+}
+
+void insertNest(int nesting_level,int line_end)
+{
+  struct nested *temp = NULL;
+  temp = malloc(sizeof(struct nested));
+  temp->nesting_level =  nesting_level;
+  temp->line_end = line_end;
+
+  Nester[nesting_level] = temp;
+}
+
+
 typedef struct table_entry entry;
+
+void Display(entry** TablePointer);
 int hash(char *lexeme)
 {
   int hash = 0,i=0;
@@ -58,11 +90,13 @@ entry* Search(entry** TablePointer, char *lexeme)
   int temp = hash(lexeme);
   entry *head = NULL;
   head = TablePointer[temp];
-
+  //Display(TablePointer);
   while(head != NULL)
   {
     if(strcmp(head->lexeme,lexeme) == 0)
+    {
       return head;
+    }
     else
       head = head->next;
   }
@@ -71,20 +105,16 @@ entry* Search(entry** TablePointer, char *lexeme)
   return head;
 }
 
-void set_is_function(entry** TablePointer, char *lexeme){
-
-	
+void set_is_function(entry** TablePointer, char *lexeme)
+{
 	entry* Entry = Search(TablePointer,lexeme);
 	if (Entry == NULL)
 	return ;
 	else
 	Entry->is_function = 1;
-
-
-
-
 }
-entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataType,int line_number )
+
+entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataType,int line_number ,int nesting_level)
 {
     int temp = hash(lexeme);
   if(Search(TablePointer,lexeme) != NULL)
@@ -102,6 +132,7 @@ entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataTyp
     tempPoint->value = value;
     tempPoint->data_type = strdup(DataType);
     tempPoint->line_number = line_number;
+    tempPoint->nesting_level = nesting_level;
     tempPoint->next = NULL;
 
     if (head == NULL)
@@ -128,14 +159,14 @@ void Display(entry** TablePointer)
 
   printf("-----------------------------------------\n");
 
-  printf("\n\t(lexeme, value, Data type, Line Number is Function)\n" );
+  printf("\n\t(lexeme, value, Data type, Line Number, isFunction, Nesting Level)\n" );
 
   for(i=0;i<SIZE;i++)
   {
     temp = TablePointer[i];
     while(temp != NULL)
     {
-      printf("\t(%5s, %f, %s, %d, %d)\n",temp->lexeme,temp->value,temp->data_type,temp->line_number,temp->is_function);
+      printf("\t(%5s, %f, %s, %d, %d, %d)\n",temp->lexeme,temp->value,temp->data_type,temp->line_number,temp->is_function,temp->nesting_level);
       temp = temp->next;
     }
 

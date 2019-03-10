@@ -5,15 +5,18 @@
 	  #include<stdlib.h>
 	  #include "tables.h"
     #include<limits.h>
+    #include<ctype.h>
 
     // Initialising Symbol table and constant table
     entry **SymbolTable = NULL;
     entry **ConstantTable = NULL;
 
     int yyerror(char *msg);
+    int checkScope(char *value);
     char* curr_data_type;
     int yylex(void);
     int is_bool = 1;
+    int curr_nest_level = 1;
 
     extern int yylineno;
     extern char* yytext;
@@ -111,7 +114,7 @@
     statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | varDeclaration ;
 
     // compound statements produces a list of statements with its local declarations
-    compoundStmt : '{' statementList '}' ;
+    compoundStmt : {curr_nest_level++;}'{' statementList '}' {insertNest(curr_nest_level,yylineno);};
     statementList : statementList statement
                   |  ;
     // Expressions
@@ -176,7 +179,7 @@
 
 
     factor : immutable {$$=$1;} | mutable {$$=$1;} ;
-    mutable : IDENTIFIER {$$=$1->value;}| mutable '[' expression ']'{$$=0;} ;
+    mutable : IDENTIFIER {checkScope(yylval.str); $$=$1->value;}| mutable '[' expression ']'{$$=0;} ;
     immutable : '(' expression ')' {$$=$2;} | call {$$=$1;}| const_type {$$=$1;};
     call : IDENTIFIER '(' args ')'{$$=0;} ;
     args : argList | ;
@@ -187,7 +190,7 @@
                | HEX_CONSTANT { $$ = $1;}
 
                ;
-    identifier : IDENTIFIER {InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno);}
+    identifier : IDENTIFIER {InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level);}
 %%
 
 void disp()
@@ -198,11 +201,59 @@ void disp()
     Display(ConstantTable);
 }
 
+int checkScope(char *val)
+{
+    char *extract;
+    int i;
+    printf("%s\n\n",val);
+
+    // Don't touch this CRUCIAL AS FUCK
+    
+    for(i = 0;val[i] != '\0';i++)
+    {
+        if(isalnum(*(val + i)) || *(val + i) == '_')
+        {
+            *(extract + i) = *(val + i);
+        }
+        else
+        {
+            *(extract + i) = '\0';
+            break;
+        }
+    }
+    entry *res = Search(SymbolTable,extract);
+    // First check if variable exists then check for nesting level
+    if (res == NULL)
+    {
+        yyerror("Variable Not Declared\n");
+        return 0;
+    }
+    else
+    {
+        int level = res->nesting_level;
+        int endLine = -1;
+        if(Nester[level] == NULL)
+            endLine = yylineno + 100;
+        else
+            endLine = Nester[level]->line_end;
+        if(level <= curr_nest_level && yylineno <= endLine)
+        {
+            return 1;
+        }
+        else
+        {
+            yyerror("Variable Out Of Scope\n");
+            return 0;
+        }
+    }
+}
+
 #include "lex.yy.c"
 int main(int argc , char *argv[]){
 
     SymbolTable = CreateTable();
     ConstantTable = CreateTable();
+    nested_homekeeping();
 
     // Open a file for parsing
     yyin = fopen(argv[1], "r");

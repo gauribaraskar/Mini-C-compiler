@@ -49,16 +49,15 @@ hex [0-9a-fA-F]
 
  /* Constants */
 
-[0][x|X]{hex}+                      {yylval.dval = (int)strtol(yytext, NULL, 16); InsertEntry(ConstantTable, yytext , yylval.dval,"HEX",yylineno);return HEX_CONSTANT;}
-[+/-]?{digit}+                      {yylval.dval = (int) atoi(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"INT",yylineno);return INT_CONSTANT;}
-[+/-]?({digit}*)["."]({digit}+)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno);return DEC_CONSTANT;}
-[+/-]?({digit}+)["."]({digit}*)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno);return DEC_CONSTANT;}
+[0][x|X]{hex}+                      {yylval.dval = (int)strtol(yytext, NULL, 16); InsertEntry(ConstantTable, yytext , yylval.dval,"HEX",yylineno,0);return HEX_CONSTANT;}
+[+/-]?{digit}+                      {yylval.dval = (int) atoi(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"INT",yylineno,0);return INT_CONSTANT;}
+[+/-]?({digit}*)["."]({digit}+)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno,0);return DEC_CONSTANT;}
+[+/-]?({digit}+)["."]({digit}*)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno,0);return DEC_CONSTANT;}
 
 {identifier} {
   if(strlen(yytext) <= 32)
     {
       yylval.str = yytext;
-      printf(" identifier : %s ",yylval.str);
       return IDENTIFIER;
     }
   else
@@ -144,12 +143,12 @@ hex [0-9a-fA-F]
   }
   else
   {
-    InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR",yylineno);
+    InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR",yylineno,0);
     return STRING;
   }
 }
 
-\'[^\'\n]\'                         {InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR",yylineno); return STRING;}
+\'[^\'\n]\'                         {InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR",yylineno,0); return STRING;}
 
 
  /* Punctuators */
