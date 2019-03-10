@@ -166,6 +166,7 @@
 	  #include "tables.h"
     #include<limits.h>
     #include<ctype.h>
+    #include<string.h>
 
     // Initialising Symbol table and constant table
     entry **SymbolTable = NULL;
@@ -203,14 +204,14 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 27 "parser.y"
+#line 28 "parser.y"
 {
   	char *str;
   	entry *tbEntry;
   	double dval;
 }
 /* Line 193 of yacc.c.  */
-#line 214 "y.tab.c"
+#line 215 "y.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -223,7 +224,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 227 "y.tab.c"
+#line 228 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -548,17 +549,17 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    76,    76,    78,    78,    80,    80,    83,    85,    85,
-      87,    87,    88,    88,    89,    90,    91,    92,   101,   101,
-     104,   105,   108,   108,   109,   109,   110,   111,   111,   114,
-     114,   114,   114,   114,   114,   114,   114,   117,   117,   118,
-     119,   121,   121,   122,   123,   126,   127,   128,   130,   130,
-     132,   132,   133,   134,   135,   137,   138,   139,   140,   141,
-     142,   143,   144,   147,   148,   150,   151,   153,   154,   156,
-     157,   158,   159,   160,   161,   162,   164,   165,   166,   171,
-     172,   173,   176,   177,   178,   181,   181,   182,   182,   183,
-     183,   183,   184,   185,   185,   186,   186,   188,   189,   190,
-     193
+       0,    77,    77,    79,    79,    81,    81,    84,    86,    86,
+      88,    88,    89,    89,    90,    91,    92,    93,   102,   102,
+     105,   106,   109,   109,   110,   110,   111,   112,   112,   115,
+     115,   115,   115,   115,   115,   115,   115,   118,   118,   119,
+     120,   122,   122,   123,   124,   127,   128,   129,   131,   131,
+     133,   133,   134,   135,   136,   138,   139,   140,   141,   142,
+     143,   144,   145,   148,   149,   151,   152,   154,   155,   157,
+     158,   159,   160,   161,   162,   163,   165,   166,   167,   172,
+     173,   174,   177,   178,   179,   182,   182,   183,   183,   184,
+     184,   184,   185,   186,   186,   187,   187,   189,   190,   191,
+     194
 };
 #endif
 
@@ -1602,238 +1603,238 @@ yyreduce:
   switch (yyn)
     {
         case 15:
-#line 90 "parser.y"
+#line 91 "parser.y"
     {curr_data_type = strdup("INT");}
     break;
 
   case 17:
-#line 92 "parser.y"
+#line 93 "parser.y"
     {curr_data_type = strdup("CHAR");}
     break;
 
   case 37:
-#line 117 "parser.y"
+#line 118 "parser.y"
     {curr_nest_level++;}
     break;
 
   case 38:
-#line 117 "parser.y"
+#line 118 "parser.y"
     {insertNest(curr_nest_level,yylineno);}
     break;
 
   case 55:
-#line 137 "parser.y"
+#line 138 "parser.y"
     {(yyvsp[(1) - (3)].dval) = (yyvsp[(3) - (3)].dval);}
     break;
 
   case 56:
-#line 138 "parser.y"
+#line 139 "parser.y"
     {(yyvsp[(1) - (3)].dval) = (yyvsp[(1) - (3)].dval)+(yyvsp[(3) - (3)].dval);}
     break;
 
   case 57:
-#line 139 "parser.y"
+#line 140 "parser.y"
     { (yyvsp[(1) - (3)].dval) = (yyvsp[(1) - (3)].dval)-(yyvsp[(3) - (3)].dval);}
     break;
 
   case 58:
-#line 140 "parser.y"
+#line 141 "parser.y"
     { (yyvsp[(1) - (3)].dval) = (yyvsp[(1) - (3)].dval)*(yyvsp[(3) - (3)].dval);}
     break;
 
   case 59:
-#line 141 "parser.y"
+#line 142 "parser.y"
     {(yyvsp[(1) - (3)].dval) = (yyvsp[(1) - (3)].dval)/ (yyvsp[(3) - (3)].dval);}
     break;
 
   case 60:
-#line 142 "parser.y"
+#line 143 "parser.y"
     { (yyvsp[(1) - (2)].dval) = (yyvsp[(1) - (2)].dval)+1;}
     break;
 
   case 61:
-#line 143 "parser.y"
+#line 144 "parser.y"
     {  (yyvsp[(1) - (2)].dval) = (yyvsp[(1) - (2)].dval)-1;}
     break;
 
   case 62:
-#line 144 "parser.y"
+#line 145 "parser.y"
     {(yyval.dval)=(yyvsp[(1) - (1)].dval);}
     break;
 
   case 63:
-#line 147 "parser.y"
+#line 148 "parser.y"
     {(yyval.dval) = (yyvsp[(1) - (3)].dval) || (yyvsp[(3) - (3)].dval);}
     break;
 
   case 64:
-#line 148 "parser.y"
+#line 149 "parser.y"
     {(yyval.dval)=(yyvsp[(1) - (1)].dval);}
     break;
 
   case 65:
-#line 150 "parser.y"
+#line 151 "parser.y"
     {(yyval.dval) = (yyvsp[(1) - (3)].dval) && (yyvsp[(3) - (3)].dval);}
     break;
 
   case 66:
-#line 151 "parser.y"
+#line 152 "parser.y"
     {(yyval.dval)=(yyvsp[(1) - (1)].dval);}
     break;
 
   case 67:
-#line 153 "parser.y"
+#line 154 "parser.y"
     {(yyval.dval) = (!(yyvsp[(2) - (2)].dval));}
     break;
 
   case 68:
-#line 154 "parser.y"
+#line 155 "parser.y"
     {(yyval.dval)=(yyvsp[(1) - (1)].dval);}
     break;
 
   case 69:
-#line 156 "parser.y"
+#line 157 "parser.y"
     {(yyval.dval) = ((yyvsp[(1) - (3)].dval) > (yyvsp[(3) - (3)].dval)); printf("%f",(yyval.dval));}
     break;
 
   case 70:
-#line 157 "parser.y"
+#line 158 "parser.y"
     {(yyval.dval) = ((yyvsp[(1) - (3)].dval) < (yyvsp[(3) - (3)].dval));}
     break;
 
   case 71:
-#line 158 "parser.y"
+#line 159 "parser.y"
     {(yyval.dval) = ((yyvsp[(1) - (3)].dval) <= (yyvsp[(3) - (3)].dval));}
     break;
 
   case 72:
-#line 159 "parser.y"
+#line 160 "parser.y"
     {(yyval.dval) = ((yyvsp[(1) - (3)].dval) >= (yyvsp[(3) - (3)].dval));}
     break;
 
   case 73:
-#line 160 "parser.y"
+#line 161 "parser.y"
     {(yyval.dval) = ((yyvsp[(1) - (3)].dval) != (yyvsp[(3) - (3)].dval));}
     break;
 
   case 74:
-#line 161 "parser.y"
+#line 162 "parser.y"
     {(yyval.dval) = ((yyvsp[(1) - (3)].dval) == (yyvsp[(3) - (3)].dval));}
     break;
 
   case 75:
-#line 162 "parser.y"
+#line 163 "parser.y"
     {(yyval.dval)=(yyvsp[(1) - (1)].dval);}
     break;
 
   case 76:
-#line 164 "parser.y"
+#line 165 "parser.y"
     {(yyval.dval) = ((yyvsp[(1) - (3)].dval) + (yyvsp[(3) - (3)].dval)); printf("%f",(yyval.dval));}
     break;
 
   case 77:
-#line 165 "parser.y"
+#line 166 "parser.y"
     {(yyval.dval) = (yyvsp[(1) - (3)].dval) - (yyvsp[(3) - (3)].dval);}
     break;
 
   case 78:
-#line 166 "parser.y"
+#line 167 "parser.y"
     {(yyval.dval)=(yyvsp[(1) - (1)].dval);}
     break;
 
   case 79:
-#line 171 "parser.y"
+#line 172 "parser.y"
     {(yyval.dval) = (yyvsp[(1) - (3)].dval) * (yyvsp[(3) - (3)].dval);}
     break;
 
   case 80:
-#line 172 "parser.y"
+#line 173 "parser.y"
     {(yyval.dval) = (yyvsp[(1) - (3)].dval) / (yyvsp[(3) - (3)].dval);}
     break;
 
   case 81:
-#line 173 "parser.y"
+#line 174 "parser.y"
     {(yyval.dval)=(yyvsp[(1) - (1)].dval);}
     break;
 
   case 82:
-#line 176 "parser.y"
+#line 177 "parser.y"
     {(yyval.dval)=+(yyvsp[(2) - (2)].dval);}
     break;
 
   case 83:
-#line 177 "parser.y"
+#line 178 "parser.y"
     {(yyval.dval)=-(yyvsp[(2) - (2)].dval);}
     break;
 
   case 84:
-#line 178 "parser.y"
+#line 179 "parser.y"
     {(yyval.dval)=(yyvsp[(1) - (1)].dval);}
     break;
 
   case 85:
-#line 181 "parser.y"
+#line 182 "parser.y"
     {(yyval.dval)=(yyvsp[(1) - (1)].dval);}
     break;
 
   case 86:
-#line 181 "parser.y"
+#line 182 "parser.y"
     {(yyval.dval)=(yyvsp[(1) - (1)].dval);}
     break;
 
   case 87:
-#line 182 "parser.y"
+#line 183 "parser.y"
     {checkScope(yylval.str); (yyval.dval)=(yyvsp[(1) - (1)].tbEntry)->value;}
     break;
 
   case 88:
-#line 182 "parser.y"
+#line 183 "parser.y"
     {(yyval.dval)=0;}
     break;
 
   case 89:
-#line 183 "parser.y"
+#line 184 "parser.y"
     {(yyval.dval)=(yyvsp[(2) - (3)].dval);}
     break;
 
   case 90:
-#line 183 "parser.y"
+#line 184 "parser.y"
     {(yyval.dval)=(yyvsp[(1) - (1)].dval);}
     break;
 
   case 91:
-#line 183 "parser.y"
+#line 184 "parser.y"
     {(yyval.dval)=(yyvsp[(1) - (1)].dval);}
     break;
 
   case 92:
-#line 184 "parser.y"
+#line 185 "parser.y"
     {(yyval.dval)=0;}
     break;
 
   case 97:
-#line 188 "parser.y"
-    { (yyval.dval) = (yyvsp[(1) - (1)].dval);}
-    break;
-
-  case 98:
 #line 189 "parser.y"
     { (yyval.dval) = (yyvsp[(1) - (1)].dval);}
     break;
 
-  case 99:
+  case 98:
 #line 190 "parser.y"
     { (yyval.dval) = (yyvsp[(1) - (1)].dval);}
     break;
 
+  case 99:
+#line 191 "parser.y"
+    { (yyval.dval) = (yyvsp[(1) - (1)].dval);}
+    break;
+
   case 100:
-#line 193 "parser.y"
+#line 194 "parser.y"
     {InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level);}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1837 "y.tab.c"
+#line 1838 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2047,7 +2048,7 @@ yyreturn:
 }
 
 
-#line 194 "parser.y"
+#line 195 "parser.y"
 
 
 void disp()
@@ -2060,15 +2061,13 @@ void disp()
 
 int checkScope(char *val)
 {
-    char *extract;
+    char *extract = (char *)malloc(sizeof(char)*32);
     int i;
-    printf("%s\n\n",val);
-
     // Don't touch this CRUCIAL AS FUCK
-    
-    for(i = 0;val[i] != '\0';i++)
+    for(i = 0; i < strlen(val) ;i=i+1)
     {
-        if(isalnum(*(val + i)) || *(val + i) == '_')
+        //printf("%d\n",i);
+        if((isalnum(*(val + i)) != 0) || (*(val + i)) == '_')
         {
             *(extract + i) = *(val + i);
         }
@@ -2078,6 +2077,7 @@ int checkScope(char *val)
             break;
         }
     }
+    
     entry *res = Search(SymbolTable,extract);
     // First check if variable exists then check for nesting level
     if (res == NULL)
@@ -2087,6 +2087,7 @@ int checkScope(char *val)
     }
     else
     {
+        
         int level = res->nesting_level;
         int endLine = -1;
         if(Nester[level] == NULL)
@@ -2095,14 +2096,17 @@ int checkScope(char *val)
             endLine = Nester[level]->line_end;
         if(level <= curr_nest_level && yylineno <= endLine)
         {
+            
             return 1;
         }
         else
         {
+            
             yyerror("Variable Out Of Scope\n");
             return 0;
         }
     }
+    
 }
 
 #include "lex.yy.c"

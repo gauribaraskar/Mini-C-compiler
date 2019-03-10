@@ -50,9 +50,9 @@ hex [0-9a-fA-F]
  /* Constants */
 
 [0][x|X]{hex}+                      {yylval.dval = (int)strtol(yytext, NULL, 16); InsertEntry(ConstantTable, yytext , yylval.dval,"HEX",yylineno,0);return HEX_CONSTANT;}
-[+/-]?{digit}+                      {yylval.dval = (int) atoi(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"INT",yylineno,0);return INT_CONSTANT;}
-[+/-]?({digit}*)["."]({digit}+)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno,0);return DEC_CONSTANT;}
-[+/-]?({digit}+)["."]({digit}*)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno,0);return DEC_CONSTANT;}
+{digit}+                      {yylval.dval = (int) atoi(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"INT",yylineno,0);return INT_CONSTANT;}
+({digit}*)["."]({digit}+)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno,0);return DEC_CONSTANT;}
+({digit}+)["."]({digit}*)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno,0);return DEC_CONSTANT;}
 
 {identifier} {
   if(strlen(yytext) <= 32)

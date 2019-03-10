@@ -6,6 +6,7 @@
 	  #include "tables.h"
     #include<limits.h>
     #include<ctype.h>
+    #include<string.h>
 
     // Initialising Symbol table and constant table
     entry **SymbolTable = NULL;
@@ -203,15 +204,13 @@ void disp()
 
 int checkScope(char *val)
 {
-    char *extract;
+    char *extract = (char *)malloc(sizeof(char)*32);
     int i;
-    printf("%s\n\n",val);
-
     // Don't touch this CRUCIAL AS FUCK
-    
-    for(i = 0;val[i] != '\0';i++)
+    for(i = 0; i < strlen(val) ;i=i+1)
     {
-        if(isalnum(*(val + i)) || *(val + i) == '_')
+        //printf("%d\n",i);
+        if((isalnum(*(val + i)) != 0) || (*(val + i)) == '_')
         {
             *(extract + i) = *(val + i);
         }
@@ -221,6 +220,7 @@ int checkScope(char *val)
             break;
         }
     }
+    
     entry *res = Search(SymbolTable,extract);
     // First check if variable exists then check for nesting level
     if (res == NULL)
@@ -230,6 +230,7 @@ int checkScope(char *val)
     }
     else
     {
+        
         int level = res->nesting_level;
         int endLine = -1;
         if(Nester[level] == NULL)
@@ -238,14 +239,17 @@ int checkScope(char *val)
             endLine = Nester[level]->line_end;
         if(level <= curr_nest_level && yylineno <= endLine)
         {
+            
             return 1;
         }
         else
         {
+            
             yyerror("Variable Out Of Scope\n");
             return 0;
         }
     }
+    
 }
 
 #include "lex.yy.c"
