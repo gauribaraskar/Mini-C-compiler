@@ -1607,6 +1607,11 @@ yyreduce:
     {curr_data_type = strdup("INT");}
     break;
 
+  case 16:
+#line 92 "parser.y"
+    {curr_data_type = strdup("VOID");}
+    break;
+
   case 17:
 #line 93 "parser.y"
     {curr_data_type = strdup("CHAR");}
@@ -1834,7 +1839,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1838 "y.tab.c"
+#line 1843 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

@@ -89,7 +89,7 @@
     varDecId : identifier | identifier '[' INT_CONSTANT ']';
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");}
-                  | VOID
+                  | VOID {curr_data_type = strdup("VOID");}
                   | CHAR {curr_data_type = strdup("CHAR");}
                   ;
 
