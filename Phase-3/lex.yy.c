@@ -1006,7 +1006,7 @@ YY_RULE_SETUP
 {
   if(strlen(yytext) <= 32)
     {
-     yylval.tbEntry = InsertEntry(SymbolTable, yytext, INT_MAX , "INT",yylineno);
+     
       return IDENTIFIER;
     }
   else

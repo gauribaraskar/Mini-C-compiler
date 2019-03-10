@@ -22,11 +22,11 @@ struct table_entry{
     char *lexeme;
     double value;
     char* data_type;
+    int is_function;
     struct table_entry *next;
 };
 
 typedef struct table_entry entry;
-
 int hash(char *lexeme)
 {
   int hash = 0,i=0;
@@ -53,7 +53,7 @@ entry** CreateTable()
   return TablePointer;
 }
 
-int Search(entry** TablePointer, char *lexeme)
+entry* Search(entry** TablePointer, char *lexeme)
 {
   int temp = hash(lexeme);
   entry *head = NULL;
@@ -62,19 +62,33 @@ int Search(entry** TablePointer, char *lexeme)
   while(head != NULL)
   {
     if(strcmp(head->lexeme,lexeme) == 0)
-      return 1;
+      return head;
     else
       head = head->next;
   }
   if(head == NULL)
-    return 0;
-  return 0;
+    return NULL;
+  return head;
 }
 
+void set_is_function(entry** TablePointer, char *lexeme){
+
+	printf("start");
+	
+	entry* Entry = Search(TablePointer,lexeme);
+	if (Entry == NULL)
+	return ;
+	else
+	Entry->is_function = 1;
+
+	printf("done");
+
+
+}
 entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataType,int line_number )
 {
     int temp = hash(lexeme);
-  if(Search(TablePointer,lexeme) == 1)
+  if(Search(TablePointer,lexeme) != NULL)
     return TablePointer[temp];
   else
   {
@@ -115,14 +129,14 @@ void Display(entry** TablePointer)
 
   printf("-----------------------------------------\n");
 
-  printf("\n\t(lexeme, value, Data type, Line Number)\n" );
+  printf("\n\t(lexeme, value, Data type, Line Number is Function)\n" );
 
   for(i=0;i<SIZE;i++)
   {
     temp = TablePointer[i];
     while(temp != NULL)
     {
-      printf("\t(%5s, %f, %s, %d)\n",temp->lexeme,temp->value,temp->data_type,temp->line_number);
+      printf("\t(%5s, %f, %s, %d, %d)\n",temp->lexeme,temp->value,temp->data_type,temp->line_number,temp->is_function);
       temp = temp->next;
     }
 

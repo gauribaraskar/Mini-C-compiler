@@ -12,6 +12,8 @@
     int yyerror(char *msg);
     char* curr_data_type;
     int yylex(void);
+
+    int is_bool = 1;
 %}
 
 // Data types of tokens
@@ -26,9 +28,9 @@
 /* Relational Operators */
 %token GREATER_THAN LESSER_THAN LESS_EQ GREATER_EQ NOT_EQ EQUAL
 /* Keywords */
-%token VOID IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN 
+%token VOID IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN
 /* Data types */
-%token INT SHORT LONG CHAR 
+%token INT SHORT LONG CHAR
 /* Logical Operators */
 %token LG_OR LG_AND NOT
 /* Assignment Operators */
@@ -93,13 +95,13 @@
 
     // Function declaration
     funDeclaration : typeSpecifier IDENTIFIER '(' params ')' statement | IDENTIFIER '(' params ')' statement ;
-    
+
      // Rules for parameter list
     params : paramList | ;
     paramList : paramList ',' paramTypeList | paramTypeList;
     paramTypeList : typeSpecifier paramId;
     paramId : IDENTIFIER | IDENTIFIER '[' ']';
-    
+
     // Types os statements in C
     statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | varDeclaration ;
 
@@ -178,7 +180,7 @@
     const_type : DEC_CONSTANT { $$ = $1;}
                | INT_CONSTANT { $$ = $1;}
                | HEX_CONSTANT { $$ = $1;}
-             
+
                ;
 %%
 

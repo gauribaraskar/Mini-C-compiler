@@ -57,7 +57,7 @@ hex [0-9a-fA-F]
 {identifier} {
   if(strlen(yytext) <= 32)
     {
-     yylval.tbEntry = InsertEntry(SymbolTable, yytext, INT_MAX , "INT",yylineno);
+     
       return IDENTIFIER;
     }
   else
