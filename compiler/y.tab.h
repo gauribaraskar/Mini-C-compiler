@@ -70,17 +70,18 @@
      SHORT = 286,
      LONG = 287,
      CHAR = 288,
-     LG_OR = 289,
-     LG_AND = 290,
-     NOT = 291,
-     DECREMENT = 292,
-     INCREMENT = 293,
-     HEX_CONSTANT = 294,
-     DEC_CONSTANT = 295,
-     INT_CONSTANT = 296,
-     STRING = 297,
-     IDENTIFIER = 298,
-     IFX = 299
+     FLOAT = 289,
+     LG_OR = 290,
+     LG_AND = 291,
+     NOT = 292,
+     DECREMENT = 293,
+     INCREMENT = 294,
+     HEX_CONSTANT = 295,
+     DEC_CONSTANT = 296,
+     INT_CONSTANT = 297,
+     STRING = 298,
+     IDENTIFIER = 299,
+     IFX = 300
    };
 #endif
 /* Tokens.  */
@@ -115,31 +116,32 @@
 #define SHORT 286
 #define LONG 287
 #define CHAR 288
-#define LG_OR 289
-#define LG_AND 290
-#define NOT 291
-#define DECREMENT 292
-#define INCREMENT 293
-#define HEX_CONSTANT 294
-#define DEC_CONSTANT 295
-#define INT_CONSTANT 296
-#define STRING 297
-#define IDENTIFIER 298
-#define IFX 299
+#define FLOAT 289
+#define LG_OR 290
+#define LG_AND 291
+#define NOT 292
+#define DECREMENT 293
+#define INCREMENT 294
+#define HEX_CONSTANT 295
+#define DEC_CONSTANT 296
+#define INT_CONSTANT 297
+#define STRING 298
+#define IDENTIFIER 299
+#define IFX 300
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 40 "parser.y"
+#line 44 "parser.y"
 {
   	char *str;
   	entry *tbEntry;
   	double dval;
 }
 /* Line 1529 of yacc.c.  */
-#line 143 "y.tab.h"
+#line 145 "y.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

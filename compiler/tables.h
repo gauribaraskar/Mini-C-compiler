@@ -17,6 +17,7 @@
 
 extern int yyerror(char *msg);
 extern int curr_nest_level;
+
 struct table_entry{
 
     int line_number;
@@ -62,7 +63,6 @@ void insertNest(int nesting_level,int line_end)
 typedef struct table_entry entry;
 
 void Display(entry** TablePointer);
-
 int hash(char *lexeme)
 {
   int hash = 0,i=0;
@@ -97,7 +97,7 @@ entry* Search(entry** TablePointer, char *lexeme,int currScope)
   //Display(TablePointer);
   while(head != NULL)
   {
-    if((strcmp(head->lexeme,lexeme) == 0) && currScope == head->nesting_level)
+    if(strcmp(head->lexeme,lexeme) == 0 && currScope == head->nesting_level)
     {
       return head;
     }

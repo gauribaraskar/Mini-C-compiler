@@ -43,16 +43,17 @@ hex [0-9a-fA-F]
 "break"                             {return BREAK;}
 "continue"                          {return CONTINUE;}
 "return"                            {return RETURN;}
+"float"                             {return FLOAT;}
 
 
 
 
  /* Constants */
 
-[0][x|X]{hex}+                      {yylval.dval = (int)strtol(yytext, NULL, 16); InsertEntry(ConstantTable, yytext , yylval.dval,"HEX",yylineno,0);return HEX_CONSTANT;}
-{digit}+                      {yylval.dval = (int) atoi(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"INT",yylineno,0);return INT_CONSTANT;}
-({digit}*)["."]({digit}+)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno,0);return DEC_CONSTANT;}
-({digit}+)["."]({digit}*)     {yylval.dval = atof(yytext);InsertEntry(ConstantTable, yytext , yylval.dval,"FLOAT",yylineno,0);return DEC_CONSTANT;}
+[0][x|X]{hex}+                      {yylval.tbEntry = InsertEntry(ConstantTable, yytext , (int)strtol(yytext, NULL, 16),"HEX",yylineno,0);return HEX_CONSTANT;}
+{digit}+                      {yylval.tbEntry = InsertEntry(ConstantTable, yytext , (int) atoi(yytext),"INT",yylineno,0);return INT_CONSTANT;}
+({digit}*)["."]({digit}+)     {yylval.tbEntry = InsertEntry(ConstantTable, yytext , atof(yytext),"FLOAT",yylineno,0);return DEC_CONSTANT;}
+({digit}+)["."]({digit}*)     {yylval.tbEntry = InsertEntry(ConstantTable, yytext , atof(yytext),"FLOAT",yylineno,0);return DEC_CONSTANT;}
 
 {identifier} {
   if(strlen(yytext) <= 32)
@@ -148,7 +149,7 @@ hex [0-9a-fA-F]
   }
 }
 
-\'[^\'\n]\'                         {InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR",yylineno,0); return STRING;}
+\'[^\'\n]\'                         { yylval.tbEntry = InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR",yylineno,0); return STRING;}
 
 
  /* Punctuators */

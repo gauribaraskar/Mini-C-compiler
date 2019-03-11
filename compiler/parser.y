@@ -11,10 +11,10 @@
     // Initialising Symbol table and constant table
     entry **SymbolTable = NULL;
     entry **ConstantTable = NULL;
-
+    
     int yyerror(char *msg);
     int checkScope(char *value);
-    void type_check(int,int,int);
+    int typeCheck(char*,char*,char*);
     char* curr_data_type;
     int yylex(void);
     int is_bool = 1;
@@ -24,7 +24,8 @@
     extern char* yytext;
 
     
-    int is_func = 0;
+    int is_declaration = 0;
+    int is_function = 0;
     char* func_type;
     char *param_list[10];
      char *arg_list[10];
@@ -32,6 +33,9 @@
     int p_idx = 0;
     int p=0;
     char *param_list[10];
+
+   char *expr_type;
+   char *mut_type;
     
 
 %}
@@ -50,23 +54,21 @@
 /* Keywords */
 %token VOID IF ELSE FOR DO WHILE GOTO BREAK CONTINUE RETURN
 /* Data types */
-%token INT SHORT LONG CHAR
+%token INT SHORT LONG CHAR FLOAT
 /* Logical Operators */
 %token LG_OR LG_AND NOT
 /* Assignment Operators */
 %token DECREMENT INCREMENT
 /* Constants */
-%token <dval> HEX_CONSTANT DEC_CONSTANT INT_CONSTANT
+%token <tbEntry> HEX_CONSTANT DEC_CONSTANT INT_CONSTANT
 /* String */
 %token <str> STRING
 /* Identifier */
 %token <tbEntry> IDENTIFIER 
 
-%type <dval> expression unaryExpression unaryRelExpression simpleExpression andExpression
- sumExpression relExpression term factor mutable immutable call
- %type <dval> const_type
 
- %type <tbEntry> identifier 
+ %type <tbEntry> identifier varDecId
+ %type <str> mutable call factor expression simpleExpression andExpression sumExpression unaryExpression unaryRelExpression term immutable relExpression const_type
 
 
 // Start Symbol of the grammar
@@ -94,16 +96,17 @@
    
     declaration : varDeclaration | funDeclaration ;
    
-    varDeclaration : typeSpecifier varDeclList ';' ;
+    varDeclaration : typeSpecifier varDeclList ';' {is_declaration = 0;} ;
     
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     
-    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression ;
-    varDecId : identifier | identifier '[' INT_CONSTANT ']';
+    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression {typeCheck($1->data_type,$3,"=");} ;
+    varDecId : identifier {$$=$1;} | identifier '[' INT_CONSTANT ']' {$$=$1;};
     typeSpecifier : typeSpecifier pointer
-                  | INT {curr_data_type = strdup("INT");}
-                  | VOID {curr_data_type = strdup("VOID");}
-                  | CHAR {curr_data_type = strdup("CHAR");}
+                  | INT {curr_data_type = strdup("INT");  is_declaration = 1; }
+                  | VOID {curr_data_type = strdup("VOID");  is_declaration = 1; }
+                  | CHAR {curr_data_type = strdup("CHAR");  is_declaration = 1;}
+		  | FLOAT {curr_data_type = strdup("FLOAT");  is_declaration = 1;}
                   ;
 
     
@@ -113,16 +116,20 @@
     
     funDeclaration : typeSpecifier 
                      identifier             {
+						
                                                 
                                                 func_type = curr_data_type;
+						is_declaration = 0;
                                             }
                      '(' params ')'         {
                                                fill_parameter_list($2,param_list,p_idx);
                                                 p_idx = 0;
-                                                is_func = 1;
+                                                is_function = 1;
+						set_is_function(SymbolTable,$2->lexeme);
                                                 p=1;
                                             }  
-                     compoundStmt           { is_func = 0;};
+                     compoundStmt           { is_function = 0;
+					     };
 
      // Rules for parameter list
     params : paramList | ;
@@ -134,7 +141,7 @@
                                               strcpy(param_list[p_idx++],curr_data_type);
                                              
                                 };
-    paramId : IDENTIFIER | IDENTIFIER '[' ']';  
+    paramId : identifier | identifier '[' ']';  
     // Types os statements in C
     statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | varDeclaration ;
 
@@ -154,72 +161,96 @@
     // Optional expressions in case of for
     optExpression : expression | ;
 
-    jumpStmt : GOTO IDENTIFIER ';' | CONTINUE ';' ;
-    returnStmt : RETURN ';'
-               | RETURN expression ;
+    jumpStmt : GOTO identifier ';' | CONTINUE ';' ;
+    returnStmt : RETURN ';'  { if(is_function) { if(strcmp(func_type,"VOID")!=0) yyerror("return type (VOID) does not match functioN type");}}
+
+               | RETURN expression {} ;
     breakStmt : BREAK ';' ;
 
-    expression : mutable ASSIGN expression {type_check($1,$3,0);$1 = $3;}
-               | mutable ADD_ASSIGN expression {$1 = $1+$3;}
-               | mutable SUB_ASSIGN expression  { $1 = $1-$3;}
-               | mutable MUL_ASSIGN expression { $1 = $1*$3;}
-               | mutable DIV_ASSIGN expression {$1 = $1/ $3;}
-               | mutable INCREMENT { $1 = $1+1;}
-               | mutable DECREMENT {  $1 = $1-1;}
-               | simpleExpression  {$$=$1;}
+    expression : mutable ASSIGN expression {typeCheck($1,$3,"=");$$ = $1;}
+               | mutable ADD_ASSIGN expression {typeCheck($1,$3,"+=");$$ = $1;}
+               | mutable SUB_ASSIGN expression {typeCheck($1,$3,"-=");$$ = $1;}
+               | mutable MUL_ASSIGN expression {typeCheck($1,$3,"*=");$$ = $1;}
+               | mutable DIV_ASSIGN expression {typeCheck($1,$3,"/=");$$ = $1;}
+               | mutable INCREMENT { $$ = $1;}
+               | mutable DECREMENT { $$ = $1;}
+               | simpleExpression { $$ = $1;} 
                ;
 
-    simpleExpression : simpleExpression LG_OR andExpression {$$ = $1 || $3;}
-                     | andExpression{$$=$1;};
+    simpleExpression : simpleExpression LG_OR andExpression { $$ = $1;} 
+                     | andExpression { $$ = $1;};
 
-    andExpression : andExpression LG_AND unaryRelExpression {$$ = $1 && $3;}
-                  | unaryRelExpression {$$=$1;};
+    andExpression : andExpression LG_AND unaryRelExpression { $$ = $1;} 
+                  | unaryRelExpression { $$ = $1;} ;
 
-    unaryRelExpression : NOT unaryRelExpression {$$ = (!$2);}
-                       | relExpression {$$=$1;} ;
+    unaryRelExpression : NOT unaryRelExpression { $$ = $2;}
+                       | relExpression { $$ = $1;} ;
 
-    relExpression : sumExpression GREATER_THAN sumExpression {$$ = ($1 > $3); printf("%f",$$);}
-                  | sumExpression LESSER_THAN sumExpression  {$$ = ($1 < $3);}
-                  | sumExpression LESS_EQ sumExpression  {$$ = ($1 <= $3);}
-                  | sumExpression GREATER_EQ sumExpression {$$ = ($1 >= $3);}
-                  | sumExpression NOT_EQ sumExpression {$$ = ($1 != $3);}
-                  | sumExpression EQUAL sumExpression {$$ = ($1 == $3);}
-                  | sumExpression {$$=$1;}
+    relExpression : sumExpression GREATER_THAN sumExpression {typeCheck($1,$3,">");$$ = $1;}
+                  | sumExpression LESSER_THAN sumExpression {typeCheck($1,$3,"<");$$ = $1;} 
+                  | sumExpression LESS_EQ sumExpression {typeCheck($1,$3,"<=");$$ = $1;}
+                  | sumExpression GREATER_EQ sumExpression {typeCheck($1,$3,">=");$$ = $1;}
+                  | sumExpression NOT_EQ sumExpression {typeCheck($1,$3,"!=");$$ = $1;}
+                  | sumExpression EQUAL sumExpression {typeCheck($1,$3,"==");$$ = $1;}
+                  | sumExpression { $$ = $1;}
                   ;
-    sumExpression : sumExpression ADD term {$$ = ($1 + $3); printf("%f",$$);}
-                  | sumExpression SUBTRACT term {$$ = $1 - $3;}
-                  | term {$$=$1;}
+    sumExpression : sumExpression ADD term {typeCheck($1,$3,"+");$$ = $1;}
+                  | sumExpression SUBTRACT term {typeCheck($1,$3,"-");$$ = $1;}
+                  | term { $$ = $1;}
                   ;
 
-    //sumop : ADD | SUBTRACT ;
+   
 
-     term : term MULTIPLY unaryExpression {$$ = $1 * $3;}
-         | term DIVIDE unaryExpression {$$ = $1 / $3;}
-         | unaryExpression {$$=$1;}
+     term : term MULTIPLY unaryExpression {typeCheck($1,$3,"*");$$ = $1;}
+         | term DIVIDE unaryExpression {typeCheck($1,$3,"/");$$ = $1;}
+         | unaryExpression { $$ = $1;}
          ;
 
-    unaryExpression : ADD unaryExpression {$$=+$2;}
-                    | SUBTRACT unaryExpression {$$=-$2;}
-                    | factor {$$=$1;};
+    unaryExpression : ADD unaryExpression { $$ = $2;}
+                    | SUBTRACT unaryExpression { $$ = $2;}
+                    | factor { $$ = $1;} ;
 
 
-    factor : immutable {$$=$1;} | mutable {$$=$1;} ;
-    mutable : IDENTIFIER {checkScope(yylval.str); $$ = $1->value;}| mutable '[' expression ']' {$$=0;};
-    immutable : '(' expression ')'{$$= $2;}| call { $$ = $1;} | const_type {$$=$1;};
-    call : IDENTIFIER '(' args ')' {$$ = $1->value;
-					check_parameter_list($1,param_list,p_idx); p_idx = 0;};
+    factor : immutable {$$ = $1;} | mutable {$$ = $1;};
+    mutable : identifier {checkScope(yylval.str); $$ = $1->data_type;}| mutable '[' expression ']' { $$ = "";}
+    immutable : '(' expression ')' { $$ = $2;}| call {$$=$1;} | const_type {$$=$1;} ;
+    call : identifier '(' args ')' { $$ = $1->data_type;}
     args : argList | ;
-    argList : argList ',' expression	
-	    | expression ;
+    argList : argList ',' expression  {}	
+	    | expression {} ;
 
-    const_type : DEC_CONSTANT { $$ = $1;curr_data_type = "FLOAT";}
-               | INT_CONSTANT { $$ = $1;curr_data_type = "INT";}
-               | HEX_CONSTANT { $$ = $1;curr_data_type = "INT";}
+    const_type : DEC_CONSTANT { $$ = $1->data_type;}
+               | INT_CONSTANT { $$ = $1->data_type;}
+               | HEX_CONSTANT { $$ = $1->data_type;}
 
                ;
-    identifier : IDENTIFIER {$1 = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level); $$ = $1;};
+    identifier : IDENTIFIER { 
+					if(is_declaration){
+					$1 = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level);
+					$$ = $1;
+					}
+					
+					else 
+					{
+					$1 = Search(SymbolTable,yytext,curr_nest_level);
+					$$ = $1;
+					}
+				  
+				
+
+			    };
 %%
 
+int typeCheck(char *a,char *b,char *c){
+	
+	if(strcmp(a,b)!=0){
+		yyerror("Type Mismatch");
+		exit(0);
+	}
+
+	else 
+		return 1;
+}
 void disp()
 {
     printf("\n\tSymbol table");
@@ -276,21 +307,6 @@ int checkScope(char *val)
         }
     }
     
-}
-
-void type_check(int left, int right, int flag)
-{
-	printf("DID COME HERE\n");
-    printf("%d\t%d\n",left,right);
-    if(left != right)
-	{
-		switch(flag)
-		{
-			case 0: yyerror("Type mismatch in arithmetic expression"); break;
-			case 1: yyerror("Type mismatch in assignment expression"); break;
-			case 2: yyerror("Type mismatch in logical expression"); break;
-		}
-	}
 }
 
 #include "lex.yy.c"
