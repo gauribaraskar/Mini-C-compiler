@@ -89,6 +89,27 @@ entry** CreateTable()
   return TablePointer;
 }
 
+entry* SearchFunction(entry** TablePointer, char *lexeme)
+{
+  int temp = hash(lexeme);
+  entry *head = NULL;
+  head = TablePointer[temp];
+  Display(TablePointer);
+  while(head != NULL)
+  {
+    if(strcmp(head->lexeme,lexeme) == 0 && head->is_function==1)
+    {
+     
+      return head;
+    }
+    else
+      head = head->next;
+  }
+  if(head == NULL)
+    return NULL;
+  return head;
+}
+
 entry* Search(entry** TablePointer, char *lexeme,int currScope)
 {
   int temp = hash(lexeme);
@@ -99,6 +120,7 @@ entry* Search(entry** TablePointer, char *lexeme,int currScope)
   {
     if(strcmp(head->lexeme,lexeme) == 0 && currScope == head->nesting_level)
     {
+     
       return head;
     }
     else
@@ -156,11 +178,28 @@ entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataTyp
 
 }
 
+int check_arg(entry *tableEntry , char **list, int n){
+	
+	int i;
+	for (i=0;i<n;i++){
+	
+		if(strcmp(tableEntry->parameter_list[i],list[i])==0)
+		continue;
+
+		else
+		{
+		yyerror("Arguments and Parameters dont match");
+		return 0;
+		}
+		
+	}
+	return 1;
+
+}
 
 void fill_parameter_list(entry* tableEntry, char **list, int n)
 {
-  printf("start");
-
+  
    int i;
    for(i=0; i<n; i++)
    {

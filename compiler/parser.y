@@ -27,6 +27,7 @@
     int is_declaration = 0;
     int is_function = 0;
     char* func_type;
+    char *func_name;
     char *param_list[10];
      char *arg_list[10];
    
@@ -67,7 +68,7 @@
 %token <tbEntry> IDENTIFIER 
 
 
- %type <tbEntry> identifier varDecId
+ %type <tbEntry> identifier varDecId 
  %type <str> mutable call factor expression simpleExpression andExpression sumExpression unaryExpression unaryRelExpression term immutable relExpression const_type
 
 
@@ -164,7 +165,7 @@
     jumpStmt : GOTO identifier ';' | CONTINUE ';' ;
     returnStmt : RETURN ';'  { if(is_function) { if(strcmp(func_type,"VOID")!=0) yyerror("return type (VOID) does not match functioN type");}}
 
-               | RETURN expression {} ;
+               | RETURN expression { if(is_function){ if(strcmp(func_type,$2)!=0) yyerror("Return type mismatch"); }} ;
     breakStmt : BREAK ';' ;
 
     expression : mutable ASSIGN expression {typeCheck($1,$3,"=");$$ = $1;}
@@ -213,11 +214,13 @@
 
     factor : immutable {$$ = $1;} | mutable {$$ = $1;};
     mutable : identifier {checkScope(yylval.str); $$ = $1->data_type;}| mutable '[' expression ']' { $$ = "";}
-    immutable : '(' expression ')' { $$ = $2;}| call {$$=$1;} | const_type {$$=$1;} ;
-    call : identifier '(' args ')' { $$ = $1->data_type;}
+    immutable : '(' expression ')' { $$ = $2;}|call {$$=$1;} | const_type {$$=$1;} ;
+    call : identifier '(' args ')' {$$ = "fgh";};
     args : argList | ;
-    argList : argList ',' expression  {}	
-	    | expression {} ;
+    argList : argList ',' arg 
+	    | arg ;
+
+    arg : expression;
 
     const_type : DEC_CONSTANT { $$ = $1->data_type;}
                | INT_CONSTANT { $$ = $1->data_type;}
@@ -234,12 +237,21 @@
 					{
 					$1 = Search(SymbolTable,yytext,curr_nest_level);
 					$$ = $1;
+					
 					}
-				  
+					if(!$1){
+					SearchFunction(SymbolTable, yytext);
+					$$ = $1;
+					printf("%s",$$->data_type);
+					}
 				
 
 			    };
+
+
+   
 %%
+
 
 int typeCheck(char *a,char *b,char *c){
 	
