@@ -16,7 +16,7 @@
 #define SIZE 100
 
 extern int yyerror(char *msg);
-
+extern int curr_nest_level;
 struct table_entry{
 
     int line_number;
@@ -62,6 +62,7 @@ void insertNest(int nesting_level,int line_end)
 typedef struct table_entry entry;
 
 void Display(entry** TablePointer);
+
 int hash(char *lexeme)
 {
   int hash = 0,i=0;
@@ -88,7 +89,7 @@ entry** CreateTable()
   return TablePointer;
 }
 
-entry* Search(entry** TablePointer, char *lexeme)
+entry* Search(entry** TablePointer, char *lexeme,int currScope)
 {
   int temp = hash(lexeme);
   entry *head = NULL;
@@ -96,7 +97,7 @@ entry* Search(entry** TablePointer, char *lexeme)
   //Display(TablePointer);
   while(head != NULL)
   {
-    if(strcmp(head->lexeme,lexeme) == 0)
+    if((strcmp(head->lexeme,lexeme) == 0) && currScope == head->nesting_level)
     {
       return head;
     }
@@ -110,7 +111,7 @@ entry* Search(entry** TablePointer, char *lexeme)
 
 void set_is_function(entry** TablePointer, char *lexeme)
 {
-	entry* Entry = Search(TablePointer,lexeme);
+	entry* Entry = Search(TablePointer,lexeme,curr_nest_level);
 	if (Entry == NULL)
 	return ;
 	else
@@ -122,7 +123,7 @@ void set_is_function(entry** TablePointer, char *lexeme)
 entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataType,int line_number ,int nesting_level)
 {
     int temp = hash(lexeme);
-  if(Search(TablePointer,lexeme) != NULL)
+  if(Search(TablePointer,lexeme,curr_nest_level) != NULL)
     return TablePointer[temp];
   else
   {

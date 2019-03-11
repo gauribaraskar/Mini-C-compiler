@@ -1,0 +1,2 @@
+./script > /dev/null 2>&1
+echo "Execute a.out to run the compiler"

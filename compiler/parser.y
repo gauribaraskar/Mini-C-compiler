@@ -14,6 +14,7 @@
 
     int yyerror(char *msg);
     int checkScope(char *value);
+    void type_check(int,int,int);
     char* curr_data_type;
     int yylex(void);
     int is_bool = 1;
@@ -158,7 +159,7 @@
                | RETURN expression ;
     breakStmt : BREAK ';' ;
 
-    expression : mutable ASSIGN expression {$1 = $3;}
+    expression : mutable ASSIGN expression {type_check($1,$3,0);$1 = $3;}
                | mutable ADD_ASSIGN expression {$1 = $1+$3;}
                | mutable SUB_ASSIGN expression  { $1 = $1-$3;}
                | mutable MUL_ASSIGN expression { $1 = $1*$3;}
@@ -246,7 +247,7 @@ int checkScope(char *val)
         }
     }
     
-    entry *res = Search(SymbolTable,extract);
+    entry *res = Search(SymbolTable,extract,curr_nest_level);
     // First check if variable exists then check for nesting level
     if (res == NULL)
     {
@@ -275,6 +276,21 @@ int checkScope(char *val)
         }
     }
     
+}
+
+void type_check(int left, int right, int flag)
+{
+	printf("DID COME HERE\n");
+    printf("%d\t%d\n",left,right);
+    if(left != right)
+	{
+		switch(flag)
+		{
+			case 0: yyerror("Type mismatch in arithmetic expression"); break;
+			case 1: yyerror("Type mismatch in assignment expression"); break;
+			case 2: yyerror("Type mismatch in logical expression"); break;
+		}
+	}
 }
 
 #include "lex.yy.c"
