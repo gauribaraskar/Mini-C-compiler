@@ -5,18 +5,33 @@
 	  #include<stdlib.h>
 	  #include "tables.h"
     #include<limits.h>
+    #include<ctype.h>
+    #include<string.h>
 
     // Initialising Symbol table and constant table
     entry **SymbolTable = NULL;
     entry **ConstantTable = NULL;
 
     int yyerror(char *msg);
+    int checkScope(char *value);
     char* curr_data_type;
     int yylex(void);
-    int is_function = 0;
+    int is_bool = 1;
+    int curr_nest_level = 1;
 
     extern int yylineno;
     extern char* yytext;
+
+    
+    int is_func = 0;
+    char* func_type;
+    char *param_list[10];
+     char *arg_list[10];
+   
+    int p_idx = 0;
+    int p=0;
+    char *param_list[10];
+    
 
 %}
 
@@ -44,12 +59,13 @@
 /* String */
 %token <str> STRING
 /* Identifier */
-%token <tbEntry> IDENTIFIER
+%token <tbEntry> IDENTIFIER 
 
 %type <dval> expression unaryExpression unaryRelExpression simpleExpression andExpression
  sumExpression relExpression term factor mutable immutable call
-%type <dval> const_type
-%type <tbEntry> identifier
+ %type <dval> const_type
+
+ %type <tbEntry> identifier 
 
 
 // Start Symbol of the grammar
@@ -70,50 +86,59 @@
 %nonassoc IFX
 %nonassoc ELSE
 %%
-    /* Program is made up of declarations */
+   
     program : declarationList;
-    // Program can have multiple declarations
+   
     declarationList : declarationList declaration | declaration;
-    // Types of declaration in C
+   
     declaration : varDeclaration | funDeclaration ;
-    // Variable declarations
-    /* Variable declaration can be a list */
+   
     varDeclaration : typeSpecifier varDeclList ';' ;
-    // Variables can also be initialised during declaration
+    
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
-    // Assigment can be through a simple expression or conditional statement
+    
     varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression ;
-    varDecId : identifier  {is_function=0;} | identifier '[' INT_CONSTANT ']'  {is_function=0;};
+    varDecId : identifier | identifier '[' INT_CONSTANT ']';
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");}
-                  | VOID
+                  | VOID {curr_data_type = strdup("VOID");}
                   | CHAR {curr_data_type = strdup("CHAR");}
                   ;
 
-  
-
-
-    // Pointer declaration
+    
+    
     pointer : MULTIPLY pointer | MULTIPLY;
 
-    // Function declaration
-    funDeclaration :typeSpecifier identifier {is_function=1;}
-
-		'(' params ')' {is_function=0;}  statement 
-
-    		| IDENTIFIER '(' params ')' statement ;
+    
+    funDeclaration : typeSpecifier 
+                     identifier             {
+                                                
+                                                func_type = curr_data_type;
+                                            }
+                     '(' params ')'         {
+                                               fill_parameter_list($2,param_list,p_idx);
+                                                p_idx = 0;
+                                                is_func = 1;
+                                                p=1;
+                                            }  
+                     compoundStmt           { is_func = 0;};
 
      // Rules for parameter list
     params : paramList | ;
     paramList : paramList ',' paramTypeList | paramTypeList;
-    paramTypeList : typeSpecifier paramId;
-    paramId : IDENTIFIER | IDENTIFIER '[' ']';
+    paramTypeList : typeSpecifier
 
+                      paramId   {
+                                              param_list[p_idx] = (char *)malloc(sizeof(curr_data_type));
+                                              strcpy(param_list[p_idx++],curr_data_type);
+                                             
+                                };
+    paramId : IDENTIFIER | IDENTIFIER '[' ']';  
     // Types os statements in C
     statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | varDeclaration ;
 
     // compound statements produces a list of statements with its local declarations
-    compoundStmt : '{' statementList '}' ;
+    compoundStmt : {curr_nest_level++;}'{' statementList '}' {insertNest(curr_nest_level,yylineno);};
     statementList : statementList statement
                   |  ;
     // Expressions
@@ -178,18 +203,20 @@
 
 
     factor : immutable {$$=$1;} | mutable {$$=$1;} ;
-    mutable : IDENTIFIER {$$=$1->value;}| mutable '[' expression ']'{$$=0;} ;
-    immutable : '(' expression ')' {$$=$2;} | call {$$=$1;}| const_type {$$=$1;};
-    call : IDENTIFIER '(' args ')'{$$=0;} ;
+    mutable : IDENTIFIER {checkScope(yylval.str); $$ = $1->value;}| mutable '[' expression ']' {$$=0;};
+    immutable : '(' expression ')'{$$= $2;}| call { $$ = $1;} | const_type {$$=$1;};
+    call : IDENTIFIER '(' args ')' {$$ = $1->value;
+					check_parameter_list($1,param_list,p_idx); p_idx = 0;};
     args : argList | ;
-    argList : argList ',' expression | expression;
+    argList : argList ',' expression	
+	    | expression ;
 
-    const_type : DEC_CONSTANT { $$ = $1;}
-               | INT_CONSTANT { $$ = $1;}
-               | HEX_CONSTANT { $$ = $1;}
+    const_type : DEC_CONSTANT { $$ = $1;curr_data_type = "FLOAT";}
+               | INT_CONSTANT { $$ = $1;curr_data_type = "INT";}
+               | HEX_CONSTANT { $$ = $1;curr_data_type = "INT";}
 
                ;
-    identifier : IDENTIFIER {InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno); if(is_function){set_is_function(SymbolTable,yytext);}}
+    identifier : IDENTIFIER {$1 = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level); $$ = $1;};
 %%
 
 void disp()
@@ -200,12 +227,63 @@ void disp()
     Display(ConstantTable);
 }
 
+int checkScope(char *val)
+{
+    char *extract = (char *)malloc(sizeof(char)*32);
+    int i;
+    // Don't touch this CRUCIAL AS FUCK
+    for(i = 0; i < strlen(val) ;i=i+1)
+    {
+        //printf("%d\n",i);
+        if((isalnum(*(val + i)) != 0) || (*(val + i)) == '_')
+        {
+            *(extract + i) = *(val + i);
+        }
+        else
+        {
+            *(extract + i) = '\0';
+            break;
+        }
+    }
+    
+    entry *res = Search(SymbolTable,extract);
+    // First check if variable exists then check for nesting level
+    if (res == NULL)
+    {
+        yyerror("Variable Not Declared\n");
+        return 0;
+    }
+    else
+    {
+        
+        int level = res->nesting_level;
+        int endLine = -1;
+        if(Nester[level] == NULL)
+            endLine = yylineno + 100;
+        else
+            endLine = Nester[level]->line_end;
+        if(level <= curr_nest_level && yylineno <= endLine)
+        {
+            
+            return 1;
+        }
+        else
+        {
+            
+            yyerror("Variable Out Of Scope\n");
+            return 0;
+        }
+    }
+    
+}
+
 #include "lex.yy.c"
 int main(int argc , char *argv[]){
 
     SymbolTable = CreateTable();
     ConstantTable = CreateTable();
-
+    nested_homekeeping();
+    int i;
     // Open a file for parsing
     yyin = fopen(argv[1], "r");
 
@@ -229,3 +307,5 @@ int yyerror(char *msg)
     printf("Line no: %d Error message: %s Token: %s\n", yylineno, msg, yytext);
     return 0;
 }
+
+

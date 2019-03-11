@@ -1,4 +1,3 @@
-
 /*
   This File implements all functions required to implement Symbol Table and
   Constant Table.
@@ -16,6 +15,7 @@
 
 #define SIZE 100
 
+extern int yyerror(char *msg);
 
 struct table_entry{
 
@@ -25,7 +25,7 @@ struct table_entry{
     char* data_type;
     int is_function;
     int nesting_level;
-    char* parameter_list; 
+    char* parameter_list[10]; 
     int num_params;
     struct table_entry *next;
 };
@@ -156,19 +156,37 @@ entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataTyp
 }
 
 
-void fill_parameter_list(entry* tableEntry, char* list[n], int n)
+void fill_parameter_list(entry* tableEntry, char **list, int n)
 {
   printf("start");
 
    int i;
    for(i=0; i<n; i++)
    {
-     tableEntry->parameter_list[i] = (char *)malloc(sizeof(char)*10);
-     printf("%s",list[i]);
+    tableEntry->parameter_list[i] = (char *)malloc(sizeof(char));
      strcpy(tableEntry->parameter_list[i],list[i]);
-     printf("%s",tableEntry->parameter_list[i]);
    }
    tableEntry->num_params = n;
+}
+
+int check_parameter_list(entry* tableEntry, char** list, int m)
+{
+
+	if(m != tableEntry->num_params)
+	{
+		yyerror("Number of parameters and arguments do not match");
+	}
+
+	int i;
+	for(i=0; i<m; i++)
+	{
+		if(list[i] != tableEntry->parameter_list[i])
+		yyerror("Parameter and argument types do not match");
+	}
+
+	printf("sdfghjk");
+
+	return 1;
 }
 
 
@@ -192,7 +210,7 @@ void Display(entry** TablePointer)
       int j;
       for(j=0; j < temp->num_params; j++)
       {
-          printf("%s",*(temp->parameter_list[j]));
+          printf("%s",temp->parameter_list[j]);
           printf("\n");
       }
       temp = temp->next;
@@ -202,6 +220,3 @@ void Display(entry** TablePointer)
 
   printf("-----------------------------------------\n");
 }
-
-tables.h
-Displaying tables.h.
