@@ -243,13 +243,12 @@
     const_type : DEC_CONSTANT { $$ = $1->data_type;}
                | INT_CONSTANT { $$ = $1->data_type;}
                | HEX_CONSTANT { $$ = $1->data_type;}
-
+               | STRING       
                ;
     identifier : IDENTIFIER { 
 					if(is_declaration){
-					$1 = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level);
+					// $1 = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level);
 					$$ = $1;
-                    is_declaration = 0;
                     is_function = 0;
 					}
 					else 

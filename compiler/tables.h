@@ -264,7 +264,11 @@ entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataTyp
 {
   int temp = hash(lexeme);  
   if(InsertSearch(TablePointer,lexeme,curr_nest_level) != NULL)
+  {
+    yyerror("Duplicate Variable Declaration not allowed\n");
     return TablePointer[temp];
+  }  
+    
   else
   {
 
