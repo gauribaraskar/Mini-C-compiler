@@ -33,8 +33,10 @@
      char *arg_list[10];
    
     int p_idx = 0;
+    int a_idx = 0;
     int p=0;
     char *param_list[10];
+    char *arg_list[10];
 
    char *expr_type;
    char *mut_type;
@@ -165,9 +167,12 @@
     optExpression : expression | ;
 
     jumpStmt : GOTO identifier ';' | CONTINUE ';' ;
-    returnStmt : RETURN ';'  { if(is_function) { if(strcmp(func_type,"VOID")!=0) yyerror("return type (VOID) does not match functioN type");}}
+    returnStmt : RETURN ';'  { if(is_function) { if(strcmp(func_type,"VOID")!=0) yyerror("return type (VOID) does not match function type");}}
 
-               | RETURN expression {} ;
+               | RETURN expression {
+                                      if(strcmp(curr_data_type,$2)!=0)
+                                        yyerror("return type does not match function type");
+                                   } ;
     breakStmt : BREAK ';' ;
 
     expression : mutable ASSIGN expression {typeCheck($1,$3,"=");$$ = $1;}
@@ -204,7 +209,7 @@
 
    
 
-     term : term MULTIPLY unaryExpression {typeCheck($1,$3,"*");$$ = $1;}
+    term : term MULTIPLY unaryExpression {typeCheck($1,$3,"*");$$ = $1;}
          | term DIVIDE unaryExpression {typeCheck($1,$3,"/");$$ = $1;}
          | unaryExpression { $$ = $1;}
          ;
@@ -217,10 +222,23 @@
     factor : immutable {$$ = $1;} | mutable {$$ = $1;};
     mutable : identifier {checkScope(yylval.str); $$ = $1->data_type;}| identifier '[' INT_CONSTANT ']' {if($3->value < 0 || $3->value >= $1->array_dim ){yyerror("Exceeds Array Dimensions\n"); } $$ = "";}
     immutable : '(' expression ')' { $$ = $2;}| call {$$=$1;} | const_type {$$=$1;} ;
-    call : identifier '(' args ')' { if(checkFunc($1->lexeme) == 0){return -1;};$$ = $1->data_type;}
+    call : identifier '(' args ')' { 
+                                      if(checkFunc($1->lexeme) == 0)
+                                        {return -1;};
+                                      $$ = $1->data_type;
+                                      check_parameter_list($1,arg_list,a_idx);
+                                      a_idx = 0;
+                                    }
     args : argList | ;
-    argList : argList ',' expression  {}	
-	    | expression {} ;
+  
+    argList : argList ',' arg
+	    | arg ;
+
+    arg : expression     {
+                            arg_list[a_idx] = (char *)malloc(sizeof($1));
+                            strcpy(arg_list[a_idx++],$1);
+                        }
+          ;
 
     const_type : DEC_CONSTANT { $$ = $1->data_type;}
                | INT_CONSTANT { $$ = $1->data_type;}

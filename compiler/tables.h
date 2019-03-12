@@ -1,3 +1,4 @@
+
 /*
   This File implements all functions required to implement Symbol Table and
   Constant Table.
@@ -314,16 +315,18 @@ int check_parameter_list(entry* tableEntry, char** list, int m)
 	if(m != tableEntry->num_params)
 	{
 		yyerror("Number of parameters and arguments do not match");
+    exit(0);
 	}
 
 	int i;
 	for(i=0; i<m; i++)
 	{
-		if(list[i] != tableEntry->parameter_list[i])
+		if( strcmp(list[i],tableEntry->parameter_list[i]) !=0 ){
 		yyerror("Parameter and argument types do not match");
-	}
+    exit(0);
+  }
 
-	printf("sdfghjk");
+	}
 
 	return 1;
 }
