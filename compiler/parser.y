@@ -15,6 +15,7 @@
     int yyerror(char *msg);
     int checkScope(char *value);
     int typeCheck(char*,char*,char*);
+    int checkFunc(char*);
     char* curr_data_type;
     int yylex(void);
     int is_bool = 1;
@@ -117,16 +118,17 @@
     
     funDeclaration : typeSpecifier 
                      identifier             {
-						
                                                 
                                                 func_type = curr_data_type;
 						is_declaration = 0;
+
                                             }
                      '(' params ')'         {
                                                fill_parameter_list($2,param_list,p_idx);
                                                 p_idx = 0;
                                                 is_function = 1;
-						set_is_function(SymbolTable,$2->lexeme);
+						int flag = set_is_function(SymbolTable,$2->lexeme);
+                        if(flag == 0){return -1;}
                                                 p=1;
                                             }  
                      compoundStmt           { is_function = 0;
@@ -215,7 +217,7 @@
     factor : immutable {$$ = $1;} | mutable {$$ = $1;};
     mutable : identifier {checkScope(yylval.str); $$ = $1->data_type;}| identifier '[' INT_CONSTANT ']' {if($3->value < 0 || $3->value >= $1->array_dim ){yyerror("Exceeds Array Dimensions\n"); } $$ = "";}
     immutable : '(' expression ')' { $$ = $2;}| call {$$=$1;} | const_type {$$=$1;} ;
-    call : identifier '(' args ')' { $$ = $1->data_type;}
+    call : identifier '(' args ')' { if(checkFunc($1->lexeme) == 0){return -1;};$$ = $1->data_type;}
     args : argList | ;
     argList : argList ',' expression  {}	
 	    | expression {} ;
@@ -229,18 +231,46 @@
 					if(is_declaration){
 					$1 = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level);
 					$$ = $1;
+                    is_declaration = 0;
+                    is_function = 0;
 					}
-					
 					else 
 					{
 					$1 = Search(SymbolTable,yytext);
 					$$ = $1;
+                    if($1 == NULL)
+                    {
+                        yyerror("Variable Not Declared");
+                        return -1;
+                    }
 					}
-				  
-				
-
 			    };
 %%
+
+
+int checkFunc(char* lexeme)
+{
+    entry *res = searchFunc(SymbolTable,lexeme);
+    if(res != NULL)
+    {
+        res = InsertSearch(SymbolTable,lexeme,curr_nest_level);
+        if(res != NULL)
+        {
+            yyerror("Defined as variable in this scope, calling not allowed");
+            return 0;
+        }
+        else
+        {
+            return 1;
+        }
+        
+    }
+    else
+    {
+        yyerror("No such declaration\n");
+        return 0;
+    }
+}
 
 int typeCheck(char *a,char *b,char *c){
 	
@@ -279,7 +309,7 @@ int checkScope(char *val)
         }
     }
     
-    entry *res = InsertSearch(SymbolTable,extract,curr_nest_level);
+    entry *res = Search(SymbolTable,extract);
     // First check if variable exists then check for nesting level
     if (res == NULL)
     {

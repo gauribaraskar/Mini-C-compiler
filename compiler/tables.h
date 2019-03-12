@@ -17,6 +17,8 @@
 
 extern int yyerror(char *msg);
 extern int curr_nest_level;
+extern int is_function;
+extern int yylineno;
 
 struct table_entry{
 
@@ -91,6 +93,26 @@ entry** CreateTable()
   return TablePointer;
 }
 
+entry* searchFunc(entry** TablePointer,char *lexeme)
+{
+  int temp = hash(lexeme);
+  entry *head = NULL;
+  head = TablePointer[temp];
+  //Display(TablePointer);
+  while(head != NULL)
+  {
+    if(strcmp(head->lexeme,lexeme) == 0 && head->is_function == 1)
+    {
+      return head;
+    }
+    else
+      head = head->next;
+  }
+  if(head == NULL)
+    return NULL;
+  return head;
+}
+
 entry* Search(entry** TablePointer, char *lexeme)
 {
   int temp = hash(lexeme);
@@ -131,20 +153,115 @@ entry* InsertSearch(entry** TablePointer, char *lexeme,int currScope)
   return head;
 }
 
-void set_is_function(entry** TablePointer, char *lexeme)
+int funcSearch(entry** TablePointer,char *lexeme,int currLine)
 {
-	entry* Entry = Search(TablePointer,lexeme);
+  int temp = hash(lexeme);
+  entry *head = NULL;
+  entry **array = NULL;
+  int raiseFlag = 0;
+
+  array = malloc(sizeof(entry*)*SIZE);
+
+  if(array == NULL)
+    return 0;
+
+  int i;
+  for(i=0;i<SIZE;i++)
+    array[i] = NULL;
+  i = 0;
+  head = TablePointer[temp];
+  //Display(TablePointer);
+  while(head != NULL)
+  {
+    if(strcmp(head->lexeme,lexeme) == 0 )
+    {
+      array[i] = head;
+      head=head->next;
+    }
+    else
+      head = head->next;
+  }
+  for(i=0;i<SIZE;i++)
+  {
+
+    entry* tempPoint = array[i];
+    if(tempPoint == NULL)
+      continue;
+    else if(tempPoint->is_function == 1)
+    {
+      raiseFlag = 1;
+      break;
+    }
+  }
+  if(raiseFlag == 1)
+  {
+    head = TablePointer[temp];
+    entry* prev = NULL;
+
+    printf("Deletion\n");
+    while(head != NULL)
+    {
+      printf("1\n");
+      if(strcmp(head->lexeme,lexeme) == 0 && head->line_number == currLine)
+      {
+        if(prev != NULL)
+        {
+          prev->next = head->next;
+          free(head);
+          printf("deleted\n");
+        } 
+        else
+        {
+          TablePointer[temp] = NULL;
+          free(head);
+          printf("deleted\n");
+        }
+        
+        return 0; 
+      }
+      else
+      {
+        prev = head;
+        head = head->next;
+      }
+      
+    }
+    return 0;
+  }
+  else
+  {
+    return 1;
+  }
+  
+  
+}
+
+int set_is_function(entry** TablePointer, char *lexeme)
+{
+	if(funcSearch(TablePointer,lexeme,yylineno))
+  {
+    entry* Entry = Search(TablePointer,lexeme);
 	if (Entry == NULL)
-	return ;
+	return 0;
 	else
 	Entry->is_function = 1;
+  return 1;
+  }
+  else
+  {
+    yyerror("Duplicate Functions Not allowed\n");
+    return 0;
+  }
+  
+
+  
 }
 
 
 
 entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataType,int line_number ,int nesting_level)
 {
-    int temp = hash(lexeme);
+  int temp = hash(lexeme);  
   if(InsertSearch(TablePointer,lexeme,curr_nest_level) != NULL)
     return TablePointer[temp];
   else
@@ -181,7 +298,6 @@ entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataTyp
 
 void fill_parameter_list(entry* tableEntry, char **list, int n)
 {
-  printf("start");
 
    int i;
    for(i=0; i<n; i++)
