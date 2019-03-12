@@ -102,7 +102,7 @@
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     
     varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression {typeCheck($1->data_type,$3,"=");} ;
-    varDecId : identifier {$$=$1;} | identifier '[' INT_CONSTANT  ']' { $$=$1; $1->is_array = 1; $1->array_dim = (int)$3->value;};
+    varDecId : identifier {$$=$1;} | identifier '[' INT_CONSTANT  ']' { if($3->value < 1){yyerror("Arrays can't have dimension lesser than 1");} $$=$1; $1->is_array = 1; $1->array_dim = (int)$3->value;};
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");  is_declaration = 1; }
                   | VOID {curr_data_type = strdup("VOID");  is_declaration = 1; }
