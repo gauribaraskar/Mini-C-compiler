@@ -25,7 +25,9 @@ struct table_entry{
     double value;
     char* data_type;
     int is_function;
+    int is_array;
     int nesting_level;
+    int array_dim;
     char* parameter_list[10]; 
     int num_params;
     struct table_entry *next;
@@ -89,7 +91,27 @@ entry** CreateTable()
   return TablePointer;
 }
 
-entry* Search(entry** TablePointer, char *lexeme,int currScope)
+entry* Search(entry** TablePointer, char *lexeme)
+{
+  int temp = hash(lexeme);
+  entry *head = NULL;
+  head = TablePointer[temp];
+  //Display(TablePointer);
+  while(head != NULL)
+  {
+    if(strcmp(head->lexeme,lexeme) == 0)
+    {
+      return head;
+    }
+    else
+      head = head->next;
+  }
+  if(head == NULL)
+    return NULL;
+  return head;
+}
+
+entry* InsertSearch(entry** TablePointer, char *lexeme,int currScope)
 {
   int temp = hash(lexeme);
   entry *head = NULL;
@@ -111,7 +133,7 @@ entry* Search(entry** TablePointer, char *lexeme,int currScope)
 
 void set_is_function(entry** TablePointer, char *lexeme)
 {
-	entry* Entry = Search(TablePointer,lexeme,curr_nest_level);
+	entry* Entry = Search(TablePointer,lexeme);
 	if (Entry == NULL)
 	return ;
 	else
@@ -123,7 +145,7 @@ void set_is_function(entry** TablePointer, char *lexeme)
 entry* InsertEntry(entry** TablePointer, char *lexeme,double value,char* DataType,int line_number ,int nesting_level)
 {
     int temp = hash(lexeme);
-  if(Search(TablePointer,lexeme,curr_nest_level) != NULL)
+  if(InsertSearch(TablePointer,lexeme,curr_nest_level) != NULL)
     return TablePointer[temp];
   else
   {
@@ -200,20 +222,27 @@ void Display(entry** TablePointer)
 
   printf("-----------------------------------------\n");
 
-  printf("\n\t(lexeme, value, Data type, Line Number, isFunction, Nesting Level, num_params, parameter_list)\n" );
+  printf("\n\t(lexeme, \t    value, Data type, Line Number, isArray, ArrayDimensions, isFunction, Nesting Level, num_params\n");
 
   for(i=0;i<SIZE;i++)
   {
     temp = TablePointer[i];
     while(temp != NULL)
     {
-      printf("\t(%5s, %f, %s, %d, %d, %d, %d)\n",temp->lexeme,temp->value,temp->data_type,temp->line_number,temp->is_function,temp->nesting_level, temp->num_params);
+      printf("\t(%5s, %-5f, %9s, %11d, %7d, %15d, %10d, %13d, %10d)\n",temp->lexeme,temp->value,temp->data_type,temp->line_number,temp->is_array,temp->array_dim,temp->is_function,temp->nesting_level, temp->num_params);
       int j;
-      for(j=0; j < temp->num_params; j++)
+      if(temp->num_params > 0)
       {
-          printf("%s",temp->parameter_list[j]);
-          printf("\n");
+        printf("\tParameter List for %s\n",temp->lexeme);
+        printf("\t( ");
+        for(j=0; j < temp->num_params; j++)
+        {
+            printf("%s",temp->parameter_list[j]);
+            printf("\t");
+        }
+        printf(" )\n");
       }
+      
       temp = temp->next;
     }
 

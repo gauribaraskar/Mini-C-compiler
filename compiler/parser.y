@@ -19,6 +19,7 @@
     int yylex(void);
     int is_bool = 1;
     int curr_nest_level = 1;
+    int arrayDim;
 
     extern int yylineno;
     extern char* yytext;
@@ -101,7 +102,7 @@
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     
     varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression {typeCheck($1->data_type,$3,"=");} ;
-    varDecId : identifier {$$=$1;} | identifier '[' INT_CONSTANT ']' {$$=$1;};
+    varDecId : identifier {$$=$1;} | identifier '[' INT_CONSTANT  ']' { $$=$1; $1->is_array = 1; $1->array_dim = (int)$3->value;};
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");  is_declaration = 1; }
                   | VOID {curr_data_type = strdup("VOID");  is_declaration = 1; }
@@ -212,7 +213,7 @@
 
 
     factor : immutable {$$ = $1;} | mutable {$$ = $1;};
-    mutable : identifier {checkScope(yylval.str); $$ = $1->data_type;}| mutable '[' expression ']' { $$ = "";}
+    mutable : identifier {checkScope(yylval.str); $$ = $1->data_type;}| identifier '[' INT_CONSTANT ']' {if($3->value < 0 || $3->value >= $1->array_dim ){yyerror("Exceeds Array Dimensions\n"); } $$ = "";}
     immutable : '(' expression ')' { $$ = $2;}| call {$$=$1;} | const_type {$$=$1;} ;
     call : identifier '(' args ')' { $$ = $1->data_type;}
     args : argList | ;
@@ -232,7 +233,7 @@
 					
 					else 
 					{
-					$1 = Search(SymbolTable,yytext,curr_nest_level);
+					$1 = Search(SymbolTable,yytext);
 					$$ = $1;
 					}
 				  
@@ -278,7 +279,7 @@ int checkScope(char *val)
         }
     }
     
-    entry *res = Search(SymbolTable,extract,curr_nest_level);
+    entry *res = InsertSearch(SymbolTable,extract,curr_nest_level);
     // First check if variable exists then check for nesting level
     if (res == NULL)
     {
@@ -286,8 +287,7 @@ int checkScope(char *val)
         return 0;
     }
     else
-    {
-        
+    { 
         int level = res->nesting_level;
         int endLine = -1;
         if(Nester[level] == NULL)
