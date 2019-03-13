@@ -20,7 +20,8 @@ int main()
         j=j*2;
     }
 
-    int res;
+    int res = abc(i);
+    
     res = abc(i);
 
     return res;

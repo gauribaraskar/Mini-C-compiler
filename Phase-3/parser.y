@@ -99,7 +99,7 @@
     
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     
-    varDeclInitialize : varDecId | varDecId ASSIGN simpleExpression {typeCheck($1->data_type,$3,"=");} ;
+    varDeclInitialize : varDecId | varDecId assign_symbol simpleExpression {typeCheck($1->data_type,$3,"="); is_declaration=1;} ;
     varDecId : identifier {$$=$1;} | identifier '[' INT_CONSTANT  ']' { if($3->value < 1){yyerror("Arrays can't have dimension lesser than 1");} $$=$1; $1->is_array = 1; $1->array_dim = (int)$3->value;};
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");  is_declaration = 1; }
@@ -108,7 +108,7 @@
 		          | FLOAT {curr_data_type = strdup("FLOAT");  is_declaration = 1;}
                   ;
 
-    
+    assign_symbol : ASSIGN {is_declaration = 0;}
     
     pointer : MULTIPLY pointer | MULTIPLY;
 
@@ -152,7 +152,7 @@
     statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | varDeclaration ;
 
     // compound statements produces a list of statements with its local declarations
-    compoundStmt : {curr_nest_level++;}'{' statementList '}' {curr_nest_level++; insertNest(curr_nest_level,yylineno);};
+    compoundStmt : {curr_nest_level++;}'{' statementList '}' {curr_nest_level++; insertNest(curr_nest_level - 1,yylineno);};
     statementList : statementList statement
                   |  ;
     // Expressions
@@ -343,6 +343,7 @@ int checkScope(char *val)
             endLine = yylineno + 100;
         else
             endLine = Nester[level]->line_end;
+        
         if(level <= curr_nest_level && yylineno <= endLine)
         {
             
@@ -376,6 +377,7 @@ int main(int argc , char *argv[]){
     else
     {
             printf("\nParsing failed.\n");
+            disp();
     }
 
     fclose(yyin);
