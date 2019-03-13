@@ -242,11 +242,11 @@ int set_is_function(entry** TablePointer, char *lexeme)
 	if(funcSearch(TablePointer,lexeme,yylineno))
   {
     entry* Entry = Search(TablePointer,lexeme);
-	if (Entry == NULL)
-	return 0;
-	else
-	Entry->is_function = 1;
-  return 1;
+	  if (Entry == NULL)
+	    return 0;
+	  else
+	    Entry->is_function = 1;
+    return 1;
   }
   else
   {
@@ -308,6 +308,11 @@ void fill_parameter_list(entry* tableEntry, char **list, int n)
    for(i=0; i<n; i++)
    {
     tableEntry->parameter_list[i] = (char *)malloc(sizeof(char));
+    if(strcmp(list[i],"VOID") == 0)
+    {
+      yyerror("Parameters of type void not allowed\n");
+      return;
+    }
      strcpy(tableEntry->parameter_list[i],list[i]);
    }
    tableEntry->num_params = n;
@@ -352,7 +357,7 @@ void Display(entry** TablePointer)
     temp = TablePointer[i];
     while(temp != NULL)
     {
-      printf("\t(%5s, %-5f, %9s, %11d, %7d, %15d, %10d, %13d, %10d)\n",temp->lexeme,temp->value,temp->data_type,temp->line_number,temp->is_array,temp->array_dim,temp->is_function,temp->nesting_level, temp->num_params);
+      printf("\t(%6s, %-5f, %9s, %11d, %7d, %15d, %10d, %13d, %10d)\n",temp->lexeme,temp->value,temp->data_type,temp->line_number,temp->is_array,temp->array_dim,temp->is_function,temp->nesting_level, temp->num_params);
       int j;
       if(temp->num_params > 0)
       {
@@ -366,6 +371,31 @@ void Display(entry** TablePointer)
         printf(" )\n");
       }
       
+      temp = temp->next;
+    }
+
+  }
+
+  printf("-----------------------------------------\n");
+}
+
+void DisplayConstant(entry** TablePointer)
+{
+  int i =0;
+  entry *temp = NULL;
+
+  printf("\n\n");
+
+  printf("-----------------------------------------\n");
+
+  printf("\n\t(lexeme,   value, Data type, Line Number\n");
+
+  for(i=0;i<SIZE;i++)
+  {
+    temp = TablePointer[i];
+    while(temp != NULL)
+    {
+      printf("\t(%5s, %5f, %9s, %11d)\n",temp->lexeme,temp->value,temp->data_type,temp->line_number);
       temp = temp->next;
     }
 

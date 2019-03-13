@@ -20,8 +20,7 @@
     int yylex(void);
     int is_bool = 1;
     int curr_nest_level = 1;
-    int arrayDim;
-
+    int return_exists = 0;
     extern int yylineno;
     extern char* yytext;
 
@@ -35,11 +34,8 @@
     int p_idx = 0;
     int a_idx = 0;
     int p=0;
-    char *param_list[10];
-    char *arg_list[10];
-
-   char *expr_type;
-   char *mut_type;
+    
+   
     
 
 %}
@@ -108,7 +104,7 @@
                   | INT {curr_data_type = strdup("INT");  is_declaration = 1; }
                   | VOID {curr_data_type = strdup("VOID");  is_declaration = 1; }
                   | CHAR {curr_data_type = strdup("CHAR");  is_declaration = 1;}
-		  | FLOAT {curr_data_type = strdup("FLOAT");  is_declaration = 1;}
+		          | FLOAT {curr_data_type = strdup("FLOAT");  is_declaration = 1;}
                   ;
 
     
@@ -120,18 +116,23 @@
                      identifier             {
                                                 
                                                 func_type = curr_data_type;
-						is_declaration = 0;
+						                        is_declaration = 0;
 
                                             }
                      '(' params ')'         {
                                                fill_parameter_list($2,param_list,p_idx);
                                                 p_idx = 0;
                                                 is_function = 1;
-						int flag = set_is_function(SymbolTable,$2->lexeme);
-                        if(flag == 0){return -1;}
+						                        int flag = set_is_function(SymbolTable,$2->lexeme);
+                                                if(flag == 0){return -1;}
                                                 p=1;
                                             }  
                      compoundStmt           { is_function = 0;
+                                              if(!return_exists && strcmp(func_type,"VOID") != 0)
+                                              {
+                                                yyerror("This Function must have a return type");
+                                                
+                                              }
 					     };
 
      // Rules for parameter list
@@ -149,7 +150,7 @@
     statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | varDeclaration ;
 
     // compound statements produces a list of statements with its local declarations
-    compoundStmt : {curr_nest_level++;}'{' statementList '}' {insertNest(curr_nest_level,yylineno);};
+    compoundStmt : {curr_nest_level++;}'{' statementList '}' {curr_nest_level++; insertNest(curr_nest_level-1,yylineno);};
     statementList : statementList statement
                   |  ;
     // Expressions
@@ -168,6 +169,7 @@
     returnStmt : RETURN ';'  { if(is_function) { if(strcmp(func_type,"VOID")!=0) yyerror("return type (VOID) does not match function type");}}
 
                | RETURN expression {
+                                      return_exists = 1;
                                       if(strcmp(curr_data_type,$2)!=0)
                                         yyerror("return type does not match function type");
                                    } ;
@@ -302,7 +304,7 @@ void disp()
     printf("\n\tSymbol table");
     Display(SymbolTable);
     printf("\n\tConstant table");
-    Display(ConstantTable);
+    DisplayConstant(ConstantTable);
 }
 
 int checkScope(char *val)
@@ -372,6 +374,7 @@ int main(int argc , char *argv[]){
     else
     {
             printf("\nParsing failed.\n");
+            disp();
     }
 
     fclose(yyin);
