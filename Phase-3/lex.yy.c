@@ -590,6 +590,7 @@ char *yytext;
     int ErrFlag = 0;
 
     extern int is_declaration;
+    extern int is_param;
 
     #include "y.tab.h"
 /* Declarations */
@@ -598,7 +599,7 @@ char *yytext;
 
 
 
-#line 602 "lex.yy.c"
+#line 603 "lex.yy.c"
 
 #define INITIAL 0
 #define PREPROCESSOR 1
@@ -787,13 +788,13 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 30 "lexer_parser.l"
+#line 31 "lexer_parser.l"
 
 
 
  /* Keywords */
 
-#line 797 "lex.yy.c"
+#line 798 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -885,110 +886,120 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 35 "lexer_parser.l"
+#line 36 "lexer_parser.l"
 {return INT;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 36 "lexer_parser.l"
+#line 37 "lexer_parser.l"
 {return SHORT;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 37 "lexer_parser.l"
+#line 38 "lexer_parser.l"
 {return LONG;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 38 "lexer_parser.l"
+#line 39 "lexer_parser.l"
 {return CHAR;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 39 "lexer_parser.l"
+#line 40 "lexer_parser.l"
 {return VOID;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 40 "lexer_parser.l"
+#line 41 "lexer_parser.l"
 {return IF;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 41 "lexer_parser.l"
+#line 42 "lexer_parser.l"
 {return ELSE;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 42 "lexer_parser.l"
+#line 43 "lexer_parser.l"
 {return FOR;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 43 "lexer_parser.l"
+#line 44 "lexer_parser.l"
 {return DO;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 44 "lexer_parser.l"
+#line 45 "lexer_parser.l"
 {return WHILE;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 45 "lexer_parser.l"
+#line 46 "lexer_parser.l"
 {return GOTO;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 46 "lexer_parser.l"
+#line 47 "lexer_parser.l"
 {return BREAK;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 47 "lexer_parser.l"
+#line 48 "lexer_parser.l"
 {return CONTINUE;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 48 "lexer_parser.l"
+#line 49 "lexer_parser.l"
 {return RETURN;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 49 "lexer_parser.l"
+#line 50 "lexer_parser.l"
 {return FLOAT;}
 	YY_BREAK
 /* Constants */
 case 16:
 YY_RULE_SETUP
-#line 56 "lexer_parser.l"
+#line 57 "lexer_parser.l"
 {yylval.tbEntry = InsertEntry(ConstantTable, yytext , (int)strtol(yytext, NULL, 16),"HEX",yylineno,0);return HEX_CONSTANT;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 57 "lexer_parser.l"
+#line 58 "lexer_parser.l"
 {yylval.tbEntry = InsertEntry(ConstantTable, yytext , (int) atoi(yytext),"INT",yylineno,0);return INT_CONSTANT;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 58 "lexer_parser.l"
+#line 59 "lexer_parser.l"
 {yylval.tbEntry = InsertEntry(ConstantTable, yytext , atof(yytext),"FLOAT",yylineno,0);return DEC_CONSTANT;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 59 "lexer_parser.l"
+#line 60 "lexer_parser.l"
 {yylval.tbEntry = InsertEntry(ConstantTable, yytext , atof(yytext),"FLOAT",yylineno,0);return DEC_CONSTANT;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 61 "lexer_parser.l"
+#line 62 "lexer_parser.l"
 {
   if(strlen(yytext) <= 32)
     {
       yylval.str = yytext;
       if(is_declaration)
       {
-        yylval.tbEntry = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level);
+        int nesting;
+        if(is_param)
+        {
+          is_param = 0;
+          nesting = curr_nest_level + 1;
+        }
+        else
+        {
+          nesting = curr_nest_level;
+        }
+        yylval.tbEntry = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,nesting);
       }
       return IDENTIFIER;
     }
@@ -1001,229 +1012,229 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 79 "lexer_parser.l"
+#line 90 "lexer_parser.l"
 {printf("Error %d: Illegal identifier format\n", yylineno); ErrFlag = 1;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 80 "lexer_parser.l"
+#line 91 "lexer_parser.l"
 ;
 	YY_BREAK
 /* Preprocessor Directives */
 case 23:
 YY_RULE_SETUP
-#line 85 "lexer_parser.l"
+#line 96 "lexer_parser.l"
 {BEGIN PREPROCESSOR;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 86 "lexer_parser.l"
+#line 97 "lexer_parser.l"
 ;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 87 "lexer_parser.l"
+#line 98 "lexer_parser.l"
 {BEGIN INITIAL;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 88 "lexer_parser.l"
+#line 99 "lexer_parser.l"
 {BEGIN INITIAL;}
 	YY_BREAK
 case 27:
 /* rule 27 can match eol */
 YY_RULE_SETUP
-#line 89 "lexer_parser.l"
+#line 100 "lexer_parser.l"
 { yylineno++; BEGIN INITIAL; ErrFlag=1;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 90 "lexer_parser.l"
+#line 101 "lexer_parser.l"
 {yyerror("Improper Header");}
 	YY_BREAK
 /* Macropreprocessor Directives */
 case 29:
 YY_RULE_SETUP
-#line 95 "lexer_parser.l"
+#line 106 "lexer_parser.l"
 {BEGIN MACROPREPROCESSOR;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 96 "lexer_parser.l"
+#line 107 "lexer_parser.l"
 ;
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 97 "lexer_parser.l"
+#line 108 "lexer_parser.l"
 {BEGIN INITIAL;}
 	YY_BREAK
 case 32:
 /* rule 32 can match eol */
 YY_RULE_SETUP
-#line 98 "lexer_parser.l"
+#line 109 "lexer_parser.l"
 {yylineno++; BEGIN INITIAL;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 99 "lexer_parser.l"
+#line 110 "lexer_parser.l"
 {BEGIN INITIAL;ErrFlag=1;}
 	YY_BREAK
 /* Comments */
 case 34:
 YY_RULE_SETUP
-#line 104 "lexer_parser.l"
+#line 115 "lexer_parser.l"
 {BEGIN COMMENT;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 105 "lexer_parser.l"
+#line 116 "lexer_parser.l"
 ;
 	YY_BREAK
 case 36:
 /* rule 36 can match eol */
 YY_RULE_SETUP
-#line 106 "lexer_parser.l"
+#line 117 "lexer_parser.l"
 {yylineno++;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 107 "lexer_parser.l"
+#line 118 "lexer_parser.l"
 {BEGIN INITIAL;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 108 "lexer_parser.l"
+#line 119 "lexer_parser.l"
 {yyerror("Improper Comment");yyterminate();}
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 109 "lexer_parser.l"
+#line 120 "lexer_parser.l"
 {yyerror("Improper Comment");yyterminate();}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 110 "lexer_parser.l"
+#line 121 "lexer_parser.l"
 {BEGIN SLCOMMENT;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 111 "lexer_parser.l"
+#line 122 "lexer_parser.l"
 ;
 	YY_BREAK
 case 41:
 /* rule 41 can match eol */
 YY_RULE_SETUP
-#line 112 "lexer_parser.l"
+#line 123 "lexer_parser.l"
 {yylineno++; BEGIN INITIAL;}
 	YY_BREAK
 /* Operators */
 case 42:
 YY_RULE_SETUP
-#line 117 "lexer_parser.l"
+#line 128 "lexer_parser.l"
 {return ADD;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 118 "lexer_parser.l"
+#line 129 "lexer_parser.l"
 {return SUBTRACT;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 119 "lexer_parser.l"
+#line 130 "lexer_parser.l"
 {return MULTIPLY;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 120 "lexer_parser.l"
+#line 131 "lexer_parser.l"
 {return DIVIDE;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 121 "lexer_parser.l"
+#line 132 "lexer_parser.l"
 {return MOD;}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 122 "lexer_parser.l"
+#line 133 "lexer_parser.l"
 {return ASSIGN;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 123 "lexer_parser.l"
+#line 134 "lexer_parser.l"
 {return DECREMENT;}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 124 "lexer_parser.l"
+#line 135 "lexer_parser.l"
 {return INCREMENT;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 126 "lexer_parser.l"
+#line 137 "lexer_parser.l"
 {return ADD_ASSIGN;}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 127 "lexer_parser.l"
+#line 138 "lexer_parser.l"
 {return SUB_ASSIGN;}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 128 "lexer_parser.l"
+#line 139 "lexer_parser.l"
 {return MUL_ASSIGN;}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 129 "lexer_parser.l"
+#line 140 "lexer_parser.l"
 {return DIV_ASSIGN;}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 130 "lexer_parser.l"
+#line 141 "lexer_parser.l"
 {return MOD_ASSIGN;}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 132 "lexer_parser.l"
+#line 143 "lexer_parser.l"
 {return GREATER_THAN;}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 133 "lexer_parser.l"
+#line 144 "lexer_parser.l"
 {return LESSER_THAN;}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 134 "lexer_parser.l"
+#line 145 "lexer_parser.l"
 {return GREATER_EQ;}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 135 "lexer_parser.l"
+#line 146 "lexer_parser.l"
 {return LESS_EQ;}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 136 "lexer_parser.l"
+#line 147 "lexer_parser.l"
 {return EQUAL;}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 138 "lexer_parser.l"
+#line 149 "lexer_parser.l"
 {return LG_OR;}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 139 "lexer_parser.l"
+#line 150 "lexer_parser.l"
 {return LG_AND;}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 140 "lexer_parser.l"
+#line 151 "lexer_parser.l"
 {return NOT;}
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 141 "lexer_parser.l"
+#line 152 "lexer_parser.l"
 {return NOT_EQ;}
 	YY_BREAK
 /* Strings and Characters */
@@ -1232,12 +1243,12 @@ case 64:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 146 "lexer_parser.l"
+#line 157 "lexer_parser.l"
 {ErrFlag=1; yyterminate();}
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 147 "lexer_parser.l"
+#line 158 "lexer_parser.l"
 {
   if(yytext[yyleng-2]=='\\') {
     yyless(yyleng-1);
@@ -1252,27 +1263,27 @@ YY_RULE_SETUP
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 159 "lexer_parser.l"
+#line 170 "lexer_parser.l"
 { yylval.tbEntry = InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR",yylineno,0); return STRING;}
 	YY_BREAK
 /* Punctuators */
 case 67:
 /* rule 67 can match eol */
 YY_RULE_SETUP
-#line 165 "lexer_parser.l"
+#line 176 "lexer_parser.l"
 {yylineno++;}
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 166 "lexer_parser.l"
+#line 177 "lexer_parser.l"
 {return yytext[0];}
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 168 "lexer_parser.l"
+#line 179 "lexer_parser.l"
 ECHO;
 	YY_BREAK
-#line 1276 "lex.yy.c"
+#line 1287 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(PREPROCESSOR):
 case YY_STATE_EOF(MACROPREPROCESSOR):
@@ -2275,7 +2286,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 168 "lexer_parser.l"
+#line 179 "lexer_parser.l"
 
 
 

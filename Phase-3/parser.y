@@ -21,6 +21,7 @@
     int is_loop = 0;
     int curr_nest_level = 1;
     int return_exists = 0;
+    int is_param = 0;
     extern int yylineno;
     extern char* yytext;
 
@@ -136,13 +137,14 @@
 					     };
 
      // Rules for parameter list
-    params : paramList | ;
+    params : {is_param = 1; }paramList | ;
     paramList : paramList ',' paramTypeList | paramTypeList;
     paramTypeList : typeSpecifier
 
                       paramId   {
                                               param_list[p_idx] = (char *)malloc(sizeof(curr_data_type));
                                               strcpy(param_list[p_idx++],curr_data_type);
+                                              is_declaration = 0;
                                              
                                 };
     paramId : identifier | identifier '[' ']';  
@@ -150,7 +152,7 @@
     statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | varDeclaration ;
 
     // compound statements produces a list of statements with its local declarations
-    compoundStmt : {curr_nest_level++;}'{' statementList '}' {curr_nest_level++; insertNest(curr_nest_level-1,yylineno);};
+    compoundStmt : {curr_nest_level++;}'{' statementList '}' {curr_nest_level++; insertNest(curr_nest_level,yylineno);};
     statementList : statementList statement
                   |  ;
     // Expressions
@@ -220,7 +222,7 @@
 
 
     factor : immutable {$$ = $1;} | mutable {$$ = $1;};
-    mutable : identifier {checkScope(yylval.str); $$ = $1->data_type;}| identifier '[' INT_CONSTANT ']' {if($3->value < 0 || $3->value >= $1->array_dim ){yyerror("Exceeds Array Dimensions\n"); } $$ = $1->data_type;}
+    mutable : identifier {if(checkScope(yylval.str) == 0){ return -1;}; $$ = $1->data_type;}| identifier '[' INT_CONSTANT ']' {if($3->value < 0 || $3->value >= $1->array_dim ){yyerror("Exceeds Array Dimensions\n"); } $$ = $1->data_type;}
     immutable : '(' expression ')' { $$ = $2;}| call {$$=$1;} | const_type {$$=$1;} ;
     call : identifier '(' args ')' { 
                                       if(checkFunc($1->lexeme) == 0)
@@ -374,7 +376,6 @@ int main(int argc , char *argv[]){
     else
     {
             printf("\nParsing failed.\n");
-            disp();
     }
 
     fclose(yyin);

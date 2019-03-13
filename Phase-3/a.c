@@ -1,10 +1,10 @@
 #include <stdio.h>
 
-int a(){int c; return 0;}
+int a(int c){int c; return 0;}
 
 int main(){
 int a;
-int b;
+int b,c;
 }
 
 int cdc(int a)

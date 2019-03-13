@@ -6,6 +6,7 @@
     int ErrFlag = 0;
 
     extern int is_declaration;
+    extern int is_param;
 
     #include "y.tab.h"
 %}
@@ -64,7 +65,17 @@ hex [0-9a-fA-F]
       yylval.str = yytext;
       if(is_declaration)
       {
-        yylval.tbEntry = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level);
+        int nesting;
+        if(is_param)
+        {
+          is_param = 0;
+          nesting = curr_nest_level + 1;
+        }
+        else
+        {
+          nesting = curr_nest_level;
+        }
+        yylval.tbEntry = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,nesting);
       }
       return IDENTIFIER;
     }

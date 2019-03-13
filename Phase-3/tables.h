@@ -199,7 +199,6 @@ int funcSearch(entry** TablePointer,char *lexeme,int currLine)
     head = TablePointer[temp];
     entry* prev = NULL;
 
-    printf("Deletion\n");
     while(head != NULL)
     {
       printf("1\n");
@@ -209,13 +208,11 @@ int funcSearch(entry** TablePointer,char *lexeme,int currLine)
         {
           prev->next = head->next;
           free(head);
-          printf("deleted\n");
         } 
         else
         {
           TablePointer[temp] = NULL;
           free(head);
-          printf("deleted\n");
         }
         
         return 0; 
