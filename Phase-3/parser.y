@@ -18,7 +18,7 @@
     int checkFunc(char*);
     char* curr_data_type;
     int yylex(void);
-    int is_bool = 1;
+    int is_loop = 0;
     int curr_nest_level = 1;
     int return_exists = 0;
     extern int yylineno;
@@ -159,13 +159,13 @@
                   | IF '(' simpleExpression ')' statement ELSE statement
                   ;
 
-    iterationStmt : WHILE '(' simpleExpression ')' statement
-                  | DO statement WHILE '(' expression ')' ';'
-                  | FOR '(' optExpression ';' optExpression ';' optExpression ')' statement;
+    iterationStmt : WHILE '(' simpleExpression ')' {is_loop = 1;} statement {is_loop = 0;}
+                  | DO {is_loop = 1;}statement WHILE '(' expression ')' ';' {is_loop = 0;}
+                  | FOR '(' optExpression ';' optExpression ';' optExpression ')'{is_loop = 1;} statement {is_loop = 0;};
     // Optional expressions in case of for
     optExpression : expression | ;
 
-    jumpStmt : GOTO identifier ';' | CONTINUE ';' ;
+    jumpStmt : GOTO identifier ';' | CONTINUE ';' {if(!is_loop) {yyerror("Illegal use of continue");}};
     returnStmt : RETURN ';'  { if(is_function) { if(strcmp(func_type,"VOID")!=0) yyerror("return type (VOID) does not match function type");}}
 
                | RETURN expression {
@@ -173,7 +173,7 @@
                                       if(strcmp(curr_data_type,$2)!=0)
                                         yyerror("return type does not match function type");
                                    } ;
-    breakStmt : BREAK ';' ;
+    breakStmt : BREAK ';' {if(!is_loop) {yyerror("Illegal use of break");}};
 
     expression : mutable ASSIGN expression {typeCheck($1,$3,"=");$$ = $1;}
                | mutable ADD_ASSIGN expression {typeCheck($1,$3,"+=");$$ = $1;}
