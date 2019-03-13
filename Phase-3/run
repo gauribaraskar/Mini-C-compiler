@@ -1,3 +1,2 @@
-lex lexer_parser.l
-yacc -d parser.y
-gcc y.tab.c -ll -ly
+./script > /dev/null 2>&1
+echo "Execute a.out to run the compiler"
