@@ -1245,7 +1245,7 @@ YY_RULE_SETUP
   }
   else
   {
-    InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR",yylineno,0);
+    yylval.tbEntry = InsertEntry(ConstantTable,yytext,yylval.dval,"CHAR",yylineno,0);
     return STRING;
   }
 }

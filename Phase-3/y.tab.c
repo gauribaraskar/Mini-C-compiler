@@ -573,17 +573,17 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    97,    97,    99,    99,   101,   101,   103,   105,   105,
-     107,   107,   108,   108,   109,   110,   111,   112,   113,   118,
-     118,   122,   128,   121,   140,   140,   141,   141,   142,   149,
-     149,   151,   151,   151,   151,   151,   151,   151,   151,   154,
-     154,   155,   156,   158,   158,   159,   160,   163,   164,   165,
-     167,   167,   169,   169,   170,   172,   176,   178,   179,   180,
-     181,   182,   183,   184,   185,   188,   189,   191,   192,   194,
-     195,   197,   198,   199,   200,   201,   202,   203,   205,   206,
-     207,   212,   213,   214,   217,   218,   219,   222,   222,   223,
-     223,   224,   224,   224,   225,   232,   232,   234,   235,   237,
-     243,   244,   245,   246,   248
+       0,    95,    95,    97,    97,    99,    99,   101,   103,   103,
+     105,   105,   106,   106,   107,   108,   109,   110,   111,   116,
+     116,   120,   126,   119,   138,   138,   139,   139,   140,   147,
+     147,   149,   149,   149,   149,   149,   149,   149,   149,   152,
+     152,   153,   154,   156,   156,   157,   158,   161,   162,   163,
+     165,   165,   167,   167,   168,   170,   174,   176,   177,   178,
+     179,   180,   181,   182,   183,   186,   187,   189,   190,   192,
+     193,   195,   196,   197,   198,   199,   200,   201,   203,   204,
+     205,   210,   211,   212,   215,   216,   217,   220,   220,   221,
+     221,   222,   222,   222,   223,   230,   230,   232,   233,   235,
+     241,   242,   243,   244,   246
 };
 #endif
 
@@ -1622,47 +1622,47 @@ yyreduce:
   switch (yyn)
     {
         case 7:
-#line 103 "parser.y"
+#line 101 "parser.y"
     {is_declaration = 0;}
     break;
 
   case 11:
-#line 107 "parser.y"
+#line 105 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].tbEntry)->data_type,(yyvsp[(3) - (3)].str),"=");}
     break;
 
   case 12:
-#line 108 "parser.y"
+#line 106 "parser.y"
     {(yyval.tbEntry)=(yyvsp[(1) - (1)].tbEntry);}
     break;
 
   case 13:
-#line 108 "parser.y"
+#line 106 "parser.y"
     { if((yyvsp[(3) - (4)].tbEntry)->value < 1){yyerror("Arrays can't have dimension lesser than 1");} (yyval.tbEntry)=(yyvsp[(1) - (4)].tbEntry); (yyvsp[(1) - (4)].tbEntry)->is_array = 1; (yyvsp[(1) - (4)].tbEntry)->array_dim = (int)(yyvsp[(3) - (4)].tbEntry)->value;}
     break;
 
   case 15:
-#line 110 "parser.y"
+#line 108 "parser.y"
     {curr_data_type = strdup("INT");  is_declaration = 1; }
     break;
 
   case 16:
-#line 111 "parser.y"
+#line 109 "parser.y"
     {curr_data_type = strdup("VOID");  is_declaration = 1; }
     break;
 
   case 17:
-#line 112 "parser.y"
+#line 110 "parser.y"
     {curr_data_type = strdup("CHAR");  is_declaration = 1;}
     break;
 
   case 18:
-#line 113 "parser.y"
+#line 111 "parser.y"
     {curr_data_type = strdup("FLOAT");  is_declaration = 1;}
     break;
 
   case 21:
-#line 122 "parser.y"
+#line 120 "parser.y"
     {
                                                 
                                                 func_type = curr_data_type;
@@ -1672,7 +1672,7 @@ yyreduce:
     break;
 
   case 22:
-#line 128 "parser.y"
+#line 126 "parser.y"
     {
                                                fill_parameter_list((yyvsp[(2) - (6)].tbEntry),param_list,p_idx);
                                                 p_idx = 0;
@@ -1684,13 +1684,13 @@ yyreduce:
     break;
 
   case 23:
-#line 136 "parser.y"
+#line 134 "parser.y"
     { is_function = 0;
 					     }
     break;
 
   case 28:
-#line 144 "parser.y"
+#line 142 "parser.y"
     {
                                               param_list[p_idx] = (char *)malloc(sizeof(curr_data_type));
                                               strcpy(param_list[p_idx++],curr_data_type);
@@ -1699,22 +1699,22 @@ yyreduce:
     break;
 
   case 39:
-#line 154 "parser.y"
+#line 152 "parser.y"
     {curr_nest_level++;}
     break;
 
   case 40:
-#line 154 "parser.y"
+#line 152 "parser.y"
     {insertNest(curr_nest_level,yylineno);}
     break;
 
   case 54:
-#line 170 "parser.y"
+#line 168 "parser.y"
     { if(is_function) { if(strcmp(func_type,"VOID")!=0) yyerror("return type (VOID) does not match function type");}}
     break;
 
   case 55:
-#line 172 "parser.y"
+#line 170 "parser.y"
     {
                                       if(strcmp(curr_data_type,(yyvsp[(2) - (2)].str))!=0)
                                         yyerror("return type does not match function type");
@@ -1722,192 +1722,192 @@ yyreduce:
     break;
 
   case 57:
-#line 178 "parser.y"
+#line 176 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"=");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 58:
-#line 179 "parser.y"
+#line 177 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"+=");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 59:
-#line 180 "parser.y"
+#line 178 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"-=");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 60:
-#line 181 "parser.y"
+#line 179 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"*=");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 61:
-#line 182 "parser.y"
+#line 180 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"/=");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 62:
-#line 183 "parser.y"
+#line 181 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (2)].str);}
     break;
 
   case 63:
-#line 184 "parser.y"
+#line 182 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (2)].str);}
     break;
 
   case 64:
-#line 185 "parser.y"
+#line 183 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (1)].str);}
     break;
 
   case 65:
-#line 188 "parser.y"
+#line 186 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 66:
-#line 189 "parser.y"
+#line 187 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (1)].str);}
     break;
 
   case 67:
-#line 191 "parser.y"
+#line 189 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 68:
-#line 192 "parser.y"
+#line 190 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (1)].str);}
     break;
 
   case 69:
-#line 194 "parser.y"
+#line 192 "parser.y"
     { (yyval.str) = (yyvsp[(2) - (2)].str);}
     break;
 
   case 70:
-#line 195 "parser.y"
+#line 193 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (1)].str);}
     break;
 
   case 71:
-#line 197 "parser.y"
+#line 195 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),">");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 72:
-#line 198 "parser.y"
+#line 196 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"<");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 73:
-#line 199 "parser.y"
+#line 197 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"<=");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 74:
-#line 200 "parser.y"
+#line 198 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),">=");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 75:
-#line 201 "parser.y"
+#line 199 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"!=");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 76:
-#line 202 "parser.y"
+#line 200 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"==");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 77:
-#line 203 "parser.y"
+#line 201 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (1)].str);}
     break;
 
   case 78:
-#line 205 "parser.y"
+#line 203 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"+");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 79:
-#line 206 "parser.y"
+#line 204 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"-");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 80:
-#line 207 "parser.y"
+#line 205 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (1)].str);}
     break;
 
   case 81:
-#line 212 "parser.y"
+#line 210 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"*");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 82:
-#line 213 "parser.y"
+#line 211 "parser.y"
     {typeCheck((yyvsp[(1) - (3)].str),(yyvsp[(3) - (3)].str),"/");(yyval.str) = (yyvsp[(1) - (3)].str);}
     break;
 
   case 83:
-#line 214 "parser.y"
+#line 212 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (1)].str);}
     break;
 
   case 84:
-#line 217 "parser.y"
+#line 215 "parser.y"
     { (yyval.str) = (yyvsp[(2) - (2)].str);}
     break;
 
   case 85:
-#line 218 "parser.y"
+#line 216 "parser.y"
     { (yyval.str) = (yyvsp[(2) - (2)].str);}
     break;
 
   case 86:
-#line 219 "parser.y"
+#line 217 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (1)].str);}
     break;
 
   case 87:
-#line 222 "parser.y"
+#line 220 "parser.y"
     {(yyval.str) = (yyvsp[(1) - (1)].str);}
     break;
 
   case 88:
-#line 222 "parser.y"
+#line 220 "parser.y"
     {(yyval.str) = (yyvsp[(1) - (1)].str);}
     break;
 
   case 89:
-#line 223 "parser.y"
+#line 221 "parser.y"
     {checkScope(yylval.str); (yyval.str) = (yyvsp[(1) - (1)].tbEntry)->data_type;}
     break;
 
   case 90:
-#line 223 "parser.y"
+#line 221 "parser.y"
     {if((yyvsp[(3) - (4)].tbEntry)->value < 0 || (yyvsp[(3) - (4)].tbEntry)->value >= (yyvsp[(1) - (4)].tbEntry)->array_dim ){yyerror("Exceeds Array Dimensions\n"); } (yyval.str) = (yyvsp[(1) - (4)].tbEntry)->data_type;}
     break;
 
   case 91:
-#line 224 "parser.y"
+#line 222 "parser.y"
     { (yyval.str) = (yyvsp[(2) - (3)].str);}
     break;
 
   case 92:
-#line 224 "parser.y"
+#line 222 "parser.y"
     {(yyval.str)=(yyvsp[(1) - (1)].str);}
     break;
 
   case 93:
-#line 224 "parser.y"
+#line 222 "parser.y"
     {(yyval.str)=(yyvsp[(1) - (1)].str);}
     break;
 
   case 94:
-#line 225 "parser.y"
+#line 223 "parser.y"
     { 
                                       if(checkFunc((yyvsp[(1) - (4)].tbEntry)->lexeme) == 0)
                                         {return -1;};
@@ -1918,7 +1918,7 @@ yyreduce:
     break;
 
   case 99:
-#line 237 "parser.y"
+#line 235 "parser.y"
     {
                             arg_list[a_idx] = (char *)malloc(sizeof((yyvsp[(1) - (1)].str)));
                             strcpy(arg_list[a_idx++],(yyvsp[(1) - (1)].str));
@@ -1926,22 +1926,27 @@ yyreduce:
     break;
 
   case 100:
-#line 243 "parser.y"
+#line 241 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (1)].tbEntry)->data_type;}
     break;
 
   case 101:
-#line 244 "parser.y"
+#line 242 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (1)].tbEntry)->data_type;}
     break;
 
   case 102:
-#line 245 "parser.y"
+#line 243 "parser.y"
+    { (yyval.str) = (yyvsp[(1) - (1)].tbEntry)->data_type;}
+    break;
+
+  case 103:
+#line 244 "parser.y"
     { (yyval.str) = (yyvsp[(1) - (1)].tbEntry)->data_type;}
     break;
 
   case 104:
-#line 248 "parser.y"
+#line 246 "parser.y"
     { 
 					if(is_declaration){
 					// $1 = InsertEntry(SymbolTable,yytext,INT_MAX,curr_data_type,yylineno,curr_nest_level);
@@ -1963,7 +1968,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1967 "y.tab.c"
+#line 1972 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2177,7 +2182,7 @@ yyreturn:
 }
 
 
-#line 265 "parser.y"
+#line 263 "parser.y"
 
 
 

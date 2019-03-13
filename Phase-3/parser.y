@@ -64,9 +64,7 @@
 /* Assignment Operators */
 %token DECREMENT INCREMENT
 /* Constants */
-%token <tbEntry> HEX_CONSTANT DEC_CONSTANT INT_CONSTANT
-/* String */
-%token <str> STRING
+%token <tbEntry> HEX_CONSTANT DEC_CONSTANT INT_CONSTANT STRING
 /* Identifier */
 %token <tbEntry> IDENTIFIER 
 
@@ -243,7 +241,7 @@
     const_type : DEC_CONSTANT { $$ = $1->data_type;}
                | INT_CONSTANT { $$ = $1->data_type;}
                | HEX_CONSTANT { $$ = $1->data_type;}
-               | STRING       
+               | STRING       { $$ = $1->data_type;}  
                ;
     identifier : IDENTIFIER { 
 					if(is_declaration){
