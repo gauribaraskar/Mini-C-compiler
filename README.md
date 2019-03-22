@@ -9,5 +9,5 @@ An implementation of a mini C compiler using lex and yacc
 ### Phases:
 1. **`DONE`**  Scanner/Lexical analyser
 2. **`DONE`** Parser                       
-3. **`In Progress`** Semantic Checker             
+3. **`DONE`** Semantic Checker             
 4. **`In Progress`** Intermediate Code Generator  
