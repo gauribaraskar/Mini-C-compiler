@@ -35,8 +35,9 @@
     int p_idx = 0;
     int a_idx = 0;
     int p=0;
-    
-   
+
+    int stack[100] = {0};
+    int top = 0;
     
 
 %}
@@ -152,7 +153,7 @@
     statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | varDeclaration ;
 
     // compound statements produces a list of statements with its local declarations
-    compoundStmt : {curr_nest_level++;}'{' statementList '}' {curr_nest_level++; insertNest(curr_nest_level - 1,yylineno);};
+    compoundStmt : {curr_nest_level++; stack[top] = curr_nest_level; top+=1; insertNestStart(curr_nest_level,yylineno);} '{' statementList '}' {curr_nest_level++; insertNestEnd(stack[top-1],yylineno);top-=1;};
     statementList : statementList statement
                   |  ;
     // Expressions
@@ -311,6 +312,7 @@ void disp()
 
 int checkScope(char *val)
 {
+    
     char *extract = (char *)malloc(sizeof(char)*32);
     int i;
     // Don't touch this CRUCIAL AS FUCK
@@ -328,7 +330,7 @@ int checkScope(char *val)
         }
     }
     
-    entry *res = Search(SymbolTable,extract);
+    entry *res = ScopeSearch(SymbolTable,extract,curr_nest_level);
     // First check if variable exists then check for nesting level
     if (res == NULL)
     {
@@ -339,12 +341,21 @@ int checkScope(char *val)
     { 
         int level = res->nesting_level;
         int endLine = -1;
+        int startLine = -1;
         if(Nester[level] == NULL)
+        {
+            startLine = 0;
             endLine = yylineno + 100;
+        }   
         else
+        {
+            startLine = Nester[level]->line_start;
             endLine = Nester[level]->line_end;
+        }
+
         
-        if(level <= curr_nest_level && yylineno <= endLine)
+
+        if((yylineno <= endLine && yylineno >= startLine))
         {
             
             return 1;
@@ -353,7 +364,7 @@ int checkScope(char *val)
         {
             
             yyerror("Variable Out Of Scope\n");
-            return 0;
+            return 0; 
         }
     }
     
@@ -368,7 +379,6 @@ int main(int argc , char *argv[]){
     int i;
     // Open a file for parsing
     yyin = fopen(argv[1], "r");
-
     if(!yyparse())
     {
         printf("\nParsing complete.\n");
@@ -376,9 +386,8 @@ int main(int argc , char *argv[]){
     }
     else
     {
-            printf("\nParsing failed.\n");
+        printf("\nParsing failed.\n");
     }
-
     fclose(yyin);
     return 0;
 }

@@ -1,15 +1,12 @@
 #include <stdio.h>
 
-int a(int c){int c; return 0;}
-
-int main(){
-int a;
-int b,c;
-}
-
-int cdc(int a)
+int main()
 {
-int bbc;
-return 0;
+int i=1;
+{
+int i=3;
+i = i + 1;
+}
+i =  i + 1;
 }
 

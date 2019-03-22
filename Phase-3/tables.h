@@ -38,6 +38,7 @@ struct table_entry{
 
 struct nested{
     int nesting_level;
+    int line_start;
     int line_end;
 };
 
@@ -52,16 +53,36 @@ void nested_homekeeping()
   {
     Nester[i] = NULL;
   }
+  struct nested *temp = NULL;
+  temp = malloc(sizeof(struct nested));
+  temp->nesting_level = 1;
+  temp->line_start = 0;
+  temp->line_end = 999999;
 }
 
-void insertNest(int nesting_level,int line_end)
+void insertNestStart(int nesting_level,int line_start)
 {
   struct nested *temp = NULL;
   temp = malloc(sizeof(struct nested));
   temp->nesting_level =  nesting_level;
-  temp->line_end = line_end;
+  temp->line_start = line_start;
+  temp->line_end = 999999;
 
   Nester[nesting_level] = temp;
+}
+
+
+void insertNestEnd(int nesting_level,int line_end)
+{
+  if(Nester[nesting_level] != NULL)
+  {
+    Nester[nesting_level]->line_end=line_end ;
+  }
+  else
+  {
+    return;
+  }
+  
 }
 
 
@@ -154,6 +175,35 @@ entry* InsertSearch(entry** TablePointer, char *lexeme,int currScope)
   return head;
 }
 
+entry* ScopeSearch(entry** TablePointer, char *lexeme,int currScope)
+{
+  int temp = hash(lexeme);
+  entry *head = NULL;
+  head = TablePointer[temp];
+
+  while(head != NULL)
+  {
+    if(strcmp(head->lexeme,lexeme) == 0)
+    {
+      if(Nester[head->nesting_level]->line_end < yylineno)
+      {
+        head = head->next;
+        continue;
+      }
+      else
+      {
+        return head;
+      }
+    }
+    else
+    {
+      head = head->next;
+    }
+    
+  }
+  return NULL;
+}
+
 int funcSearch(entry** TablePointer,char *lexeme,int currLine)
 {
   int temp = hash(lexeme);
@@ -201,7 +251,7 @@ int funcSearch(entry** TablePointer,char *lexeme,int currLine)
 
     while(head != NULL)
     {
-      printf("1\n");
+      
       if(strcmp(head->lexeme,lexeme) == 0 && head->line_number == currLine)
       {
         if(prev != NULL)
