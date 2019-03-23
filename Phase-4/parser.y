@@ -183,18 +183,18 @@
                | mutable SUB_ASSIGN expression {typeCheck($1,$3,"-=");$$ = $1;}
                | mutable MUL_ASSIGN expression {typeCheck($1,$3,"*=");$$ = $1;}
                | mutable DIV_ASSIGN expression {typeCheck($1,$3,"/=");$$ = $1;}
-               | mutable INCREMENT { $$ = $1;}
-               | mutable DECREMENT { $$ = $1;}
+               | mutable INCREMENT {typeCheck($1,$1,"++"); $$ = $1;}
+               | mutable DECREMENT {typeCheck($1,$1,"--"); $$ = $1;}
                | simpleExpression { $$ = $1;} 
                ;
 
-    simpleExpression : simpleExpression LG_OR andExpression { $$ = $1;} 
+    simpleExpression : simpleExpression LG_OR andExpression {typeCheck($1,$3,"||"); $$ = $1;} 
                      | andExpression { $$ = $1;};
 
-    andExpression : andExpression LG_AND unaryRelExpression { $$ = $1;} 
+    andExpression : andExpression LG_AND unaryRelExpression { typeCheck($1,$3,"&&");$$ = $1;} 
                   | unaryRelExpression { $$ = $1;} ;
 
-    unaryRelExpression : NOT unaryRelExpression { $$ = $2;}
+    unaryRelExpression : NOT unaryRelExpression { typeCheck($2,$2,"!u");$$ = $2;}
                        | relExpression { $$ = $1;} ;
 
     relExpression : sumExpression GREATER_THAN sumExpression {typeCheck($1,$3,">");$$ = $1;}
@@ -217,8 +217,8 @@
          | unaryExpression { $$ = $1;}
          ;
 
-    unaryExpression : ADD unaryExpression { $$ = $2;}
-                    | SUBTRACT unaryExpression { $$ = $2;}
+    unaryExpression : ADD unaryExpression { typeCheck($2,$2,"+u");$$ = $2;}
+                    | SUBTRACT unaryExpression { typeCheck($2,$2,"-u");$$ = $2;}
                     | factor { $$ = $1;} ;
 
 
