@@ -46,7 +46,6 @@
 
     void gencode();
     
-    int label = 0;
 
 %}
 
@@ -108,7 +107,7 @@
     
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     
-    varDeclInitialize : varDecId | varDecId assign_symbol simpleExpression {gencode();ICGtop=0;typeCheck($1->data_type,$3,"="); is_declaration=1;} ;
+    varDeclInitialize : varDecId | varDecId assign_symbol simpleExpression {typeCheck($1->data_type,$3,"="); is_declaration=1;} ;
     varDecId : identifier {$$=$1;} | identifier '[' INT_CONSTANT  ']' { if($3->value < 1){yyerror("Arrays can't have dimension lesser than 1");} $$=$1; $1->is_array = 1; $1->array_dim = (int)$3->value;};
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");  is_declaration = 1; }
@@ -213,15 +212,15 @@
                   | sumExpression EQUAL  sumExpression {typeCheck($1,$3,"==");$$ = $1; {push("==");}}
                   | sumExpression { $$ = $1;}
                   ;
-    sumExpression : sumExpression ADD  term {typeCheck($1,$3,"+");$$ = $1;{push("+");}gencode();}
-                  | sumExpression SUBTRACT term {typeCheck($1,$3,"-");$$ = $1;{push("-");} gencode(); }
+    sumExpression : sumExpression ADD  term {typeCheck($1,$3,"+");$$ = $1;{push("+");}}
+                  | sumExpression SUBTRACT term {typeCheck($1,$3,"-");$$ = $1;{push("-");} }
                   | term { $$ = $1;}
                   ;
 
    
 
-    term : term MULTIPLY  unaryExpression {typeCheck($1,$3,"*");$$ = $1; {push("*");}gencode();}
-         | term DIVIDE  unaryExpression {typeCheck($1,$3,"/");$$ = $1; {push("/");}gencode();}
+    term : term MULTIPLY  unaryExpression {typeCheck($1,$3,"*");$$ = $1; {push("*");}}
+         | term DIVIDE  unaryExpression {typeCheck($1,$3,"/");$$ = $1; {push("/");}}
          | unaryExpression { $$ = $1;}
          ;
 
@@ -383,8 +382,6 @@ int checkScope(char *val)
 #include "lex.yy.c"
 int main(int argc , char *argv[]){
 
-    system("clear");
-
     SymbolTable = CreateTable();
     ConstantTable = CreateTable();
     nested_homekeeping();
@@ -422,37 +419,30 @@ void push(char *text)
 
 void gencode()
 {
-    //Code For Debugging
     
-    // int i;
-    // printf("\nSTACK\n");
-    // for(i=0;i<ICGtop;i++)
-    // {
-    //     printf("%s\n",ICGstack[i]);
-    // }
-    // printf("----------------------\n");
+    int i;
+    printf("\nSTACK\n");
+    for(i=0;i<ICGtop;i++)
+    {
+        printf("%s\n",ICGstack[i]);
+    }
+    printf("----------------------\n");
 
     char *op1 = ICGstack[--ICGtop]; 
     char *op2 = ICGstack[--ICGtop];
     char *op3 = ICGstack[--ICGtop];
-    
-    if( strcmp(op2,"=")== 0)
-    {
-        printf("%s = %s\n",op3,op1);
-    }
-    else
-    {
-        char temp[3] = "t0\0";
-        temp[1] = (char)(label + '0');
-        temp[2] = '\0';
-        label++;
-
-        printf("%s = %s %s %s\n",temp,op3,op1,op2);
-
-        push(temp);
-    }
+    ICGtop++;
 
     
+
+    char temp[3] = "t0\0";
+    temp[1] = (char)(label + '0');
+    temp[2] = '\0';
+    label++;
+
+    printf("%s = %s %s %s\n",temp,op3,op2,op1);
+
+    push(temp);
 
 }
 

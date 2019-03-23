@@ -42,11 +42,12 @@
     char ICGstack[200][20];
     int ICGtop = 0;
 
+    int label = 0;
+
     void push(char *text);
 
     void gencode();
     
-    int label = 0;
 
 %}
 
@@ -108,7 +109,7 @@
     
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     
-    varDeclInitialize : varDecId | varDecId assign_symbol simpleExpression {gencode();ICGtop=0;typeCheck($1->data_type,$3,"="); is_declaration=1;} ;
+    varDeclInitialize : varDecId | varDecId assign_symbol simpleExpression {ICGtop = 0;typeCheck($1->data_type,$3,"="); is_declaration=1;} ;
     varDecId : identifier {$$=$1;} | identifier '[' INT_CONSTANT  ']' { if($3->value < 1){yyerror("Arrays can't have dimension lesser than 1");} $$=$1; $1->is_array = 1; $1->array_dim = (int)$3->value;};
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");  is_declaration = 1; }
@@ -196,37 +197,37 @@
                | simpleExpression { $$ = $1;} 
                ;
 
-    simpleExpression : simpleExpression LG_OR  andExpression {typeCheck($1,$3,"||"); $$ = $1;{push("||");}} 
+    simpleExpression : simpleExpression LG_OR {push("||");} andExpression {typeCheck($1,$4,"||"); $$ = $1;} 
                      | andExpression { $$ = $1;};
 
-    andExpression : andExpression LG_AND  unaryRelExpression { typeCheck($1,$3,"&&");$$ = $1;{push("&&");}} 
+    andExpression : andExpression LG_AND {push("&&");} unaryRelExpression { typeCheck($1,$4,"&&");$$ = $1;} 
                   | unaryRelExpression { $$ = $1;} ;
 
-    unaryRelExpression : NOT unaryRelExpression { typeCheck($2,$2,"!u");$$ = $2;{push("!");} }
+    unaryRelExpression : NOT {push("!");} unaryRelExpression { typeCheck($3,$3,"!u");$$ = $3;}
                        | relExpression { $$ = $1;} ;
 
-    relExpression : sumExpression GREATER_THAN  sumExpression {typeCheck($1,$3,">");$$ = $1;{push(">");}}
-                  | sumExpression LESSER_THAN  sumExpression {typeCheck($1,$3,"<");$$ = $1;{push("<");}} 
-                  | sumExpression LESS_EQ  sumExpression {typeCheck($1,$3,"<=");$$ = $1;{push("<=");}}
-                  | sumExpression GREATER_EQ  sumExpression {typeCheck($1,$3,">=");$$ = $1;{push(">=");}}
-                  | sumExpression NOT_EQ  sumExpression {typeCheck($1,$3,"!=");{push("!=");}}
-                  | sumExpression EQUAL  sumExpression {typeCheck($1,$3,"==");$$ = $1; {push("==");}}
+    relExpression : sumExpression GREATER_THAN {push(">");} sumExpression {typeCheck($1,$4,">");$$ = $1;}
+                  | sumExpression LESSER_THAN {push("<");} sumExpression {typeCheck($1,$4,"<");$$ = $1;} 
+                  | sumExpression LESS_EQ {push("<=");} sumExpression {typeCheck($1,$4,"<=");$$ = $1;}
+                  | sumExpression GREATER_EQ {push(">=");} sumExpression {typeCheck($1,$4,">=");$$ = $1;}
+                  | sumExpression NOT_EQ {push("!=");} sumExpression {typeCheck($1,$4,"!=");$$ = $1;}
+                  | sumExpression EQUAL {push("==");} sumExpression {typeCheck($1,$4,"==");$$ = $1;}
                   | sumExpression { $$ = $1;}
                   ;
-    sumExpression : sumExpression ADD  term {typeCheck($1,$3,"+");$$ = $1;{push("+");}gencode();}
-                  | sumExpression SUBTRACT term {typeCheck($1,$3,"-");$$ = $1;{push("-");} gencode(); }
+    sumExpression : sumExpression ADD {push("+");} term {typeCheck($1,$4,"+");$$ = $1;gencode();}
+                  | sumExpression SUBTRACT {push("-");} term {typeCheck($1,$4,"-");$$ = $1;gencode();}
                   | term { $$ = $1;}
                   ;
 
    
 
-    term : term MULTIPLY  unaryExpression {typeCheck($1,$3,"*");$$ = $1; {push("*");}gencode();}
-         | term DIVIDE  unaryExpression {typeCheck($1,$3,"/");$$ = $1; {push("/");}gencode();}
+    term : term MULTIPLY {push("*");} unaryExpression {typeCheck($1,$4,"*");$$ = $1;gencode();}
+         | term DIVIDE {push("/");} unaryExpression {typeCheck($1,$4,"/");$$ = $1;gencode();}
          | unaryExpression { $$ = $1;}
          ;
 
-    unaryExpression : ADD  unaryExpression { typeCheck($2,$2,"+u");$$ = $2; {push("+");}}
-                    | SUBTRACT  unaryExpression { typeCheck($2,$2,"-u");$$ = $2; {push("-");}}
+    unaryExpression : ADD {push("+");} unaryExpression { typeCheck($3,$3,"+u");$$ = $3;}
+                    | SUBTRACT {push("-");} unaryExpression { typeCheck($3,$3,"-u");$$ = $3;}
                     | factor { $$ = $1;} ;
 
 
@@ -383,8 +384,6 @@ int checkScope(char *val)
 #include "lex.yy.c"
 int main(int argc , char *argv[]){
 
-    system("clear");
-
     SymbolTable = CreateTable();
     ConstantTable = CreateTable();
     nested_homekeeping();
@@ -422,37 +421,30 @@ void push(char *text)
 
 void gencode()
 {
-    //Code For Debugging
     
-    // int i;
-    // printf("\nSTACK\n");
-    // for(i=0;i<ICGtop;i++)
-    // {
-    //     printf("%s\n",ICGstack[i]);
-    // }
-    // printf("----------------------\n");
+    int i;
+    printf("\nSTACK\n");
+    for(i=0;i<ICGtop;i++)
+    {
+        printf("%s\n",ICGstack[i]);
+    }
+    printf("----------------------\n");
 
     char *op1 = ICGstack[--ICGtop]; 
     char *op2 = ICGstack[--ICGtop];
     char *op3 = ICGstack[--ICGtop];
-    
-    if( strcmp(op2,"=")== 0)
-    {
-        printf("%s = %s\n",op3,op1);
-    }
-    else
-    {
-        char temp[3] = "t0\0";
-        temp[1] = (char)(label + '0');
-        temp[2] = '\0';
-        label++;
-
-        printf("%s = %s %s %s\n",temp,op3,op1,op2);
-
-        push(temp);
-    }
+    ICGtop++;
 
     
+
+    char temp[3] = "t0\0";
+    temp[1] = (char)(label + '0');
+    temp[2] = '\0';
+    label++;
+
+    printf("%s = %s %s %s\n",temp,op3,op2,op1);
+
+    push(temp);
 
 }
 
