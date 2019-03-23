@@ -42,11 +42,18 @@
     char ICGstack[200][20];
     int ICGtop = 0;
 
+    int Labelstack[10];
+    int Labeltop = 0;
+
+
     void push(char *text);
 
     void gencode();
+    void gencode_unary();
+    void gencode_if();
     
     int label = 0;
+    int line_instruction = 0;
 
 %}
 
@@ -108,7 +115,7 @@
     
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     
-    varDeclInitialize : varDecId | varDecId assign_symbol simpleExpression {gencode();ICGtop=0;typeCheck($1->data_type,$3,"="); is_declaration=1;} ;
+    varDeclInitialize : varDecId | varDecId assign_symbol simpleExpression {gencode();typeCheck($1->data_type,$3,"="); is_declaration=1;} ;
     varDecId : identifier {$$=$1;} | identifier '[' INT_CONSTANT  ']' { if($3->value < 1){yyerror("Arrays can't have dimension lesser than 1");} $$=$1; $1->is_array = 1; $1->array_dim = (int)$3->value;};
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");  is_declaration = 1; }
@@ -165,10 +172,11 @@
     statementList : statementList statement
                   |  ;
     // Expressions
-    expressionStmt : expression ';' | ';' ;
-    selectionStmt : IF '(' simpleExpression ')' statement %prec IFX
-                  | IF '(' simpleExpression ')' statement ELSE statement
+    expressionStmt : expression ';' {ICGtop = 0;} | ';' {ICGtop=0;} ;
+    selectionStmt : IF '(' simpleExpression ')' {gencode_if();} compoundStmt else 
                   ;
+    
+    else : ELSE statement  | ;
 
     iterationStmt : WHILE '(' simpleExpression ')' {is_loop = 1;} statement {is_loop = 0;}
                   | DO {is_loop = 1;}statement WHILE '(' expression ')' ';' {is_loop = 0;}
@@ -186,31 +194,31 @@
                                    } ;
     breakStmt : BREAK ';' {if(!is_loop) {yyerror("Illegal use of break");}};
 
-    expression : mutable ASSIGN expression {typeCheck($1,$3,"=");$$ = $1;}
-               | mutable ADD_ASSIGN expression {typeCheck($1,$3,"+=");$$ = $1;}
-               | mutable SUB_ASSIGN expression {typeCheck($1,$3,"-=");$$ = $1;}
-               | mutable MUL_ASSIGN expression {typeCheck($1,$3,"*=");$$ = $1;}
-               | mutable DIV_ASSIGN expression {typeCheck($1,$3,"/=");$$ = $1;}
+    expression : mutable ASSIGN {push("=");}  expression {typeCheck($1,$4,"=");$$ = $1;gencode();}
+               | mutable ADD_ASSIGN {push("+=");} expression {typeCheck($1,$4,"+=");$$ = $1;gencode();}
+               | mutable SUB_ASSIGN {push("-=");} expression {typeCheck($1,$4,"-=");$$ = $1;gencode();}
+               | mutable MUL_ASSIGN {push("*=");} expression {typeCheck($1,$4,"*=");$$ = $1;gencode();}
+               | mutable DIV_ASSIGN {push("/=");} expression {typeCheck($1,$4,"/=");$$ = $1;gencode();}
                | mutable INCREMENT {typeCheck($1,$1,"++"); $$ = $1;}
                | mutable DECREMENT {typeCheck($1,$1,"--"); $$ = $1;}
                | simpleExpression { $$ = $1;} 
                ;
 
-    simpleExpression : simpleExpression LG_OR  andExpression {typeCheck($1,$3,"||"); $$ = $1;{push("||");}} 
+    simpleExpression : simpleExpression LG_OR  andExpression {typeCheck($1,$3,"||"); $$ = $1;{push("||");}gencode();} 
                      | andExpression { $$ = $1;};
 
-    andExpression : andExpression LG_AND  unaryRelExpression { typeCheck($1,$3,"&&");$$ = $1;{push("&&");}} 
+    andExpression : andExpression LG_AND  unaryRelExpression { typeCheck($1,$3,"&&");$$ = $1;{push("&&");}gencode();} 
                   | unaryRelExpression { $$ = $1;} ;
 
     unaryRelExpression : NOT unaryRelExpression { typeCheck($2,$2,"!u");$$ = $2;{push("!");} }
                        | relExpression { $$ = $1;} ;
 
-    relExpression : sumExpression GREATER_THAN  sumExpression {typeCheck($1,$3,">");$$ = $1;{push(">");}}
-                  | sumExpression LESSER_THAN  sumExpression {typeCheck($1,$3,"<");$$ = $1;{push("<");}} 
-                  | sumExpression LESS_EQ  sumExpression {typeCheck($1,$3,"<=");$$ = $1;{push("<=");}}
-                  | sumExpression GREATER_EQ  sumExpression {typeCheck($1,$3,">=");$$ = $1;{push(">=");}}
-                  | sumExpression NOT_EQ  sumExpression {typeCheck($1,$3,"!=");{push("!=");}}
-                  | sumExpression EQUAL  sumExpression {typeCheck($1,$3,"==");$$ = $1; {push("==");}}
+    relExpression : sumExpression GREATER_THAN  sumExpression {typeCheck($1,$3,">");$$ = $1;{push(">");}gencode();}
+                  | sumExpression LESSER_THAN  sumExpression {typeCheck($1,$3,"<");$$ = $1;{push("<");}gencode();} 
+                  | sumExpression LESS_EQ  sumExpression {typeCheck($1,$3,"<=");$$ = $1;{push("<=");}gencode();}
+                  | sumExpression GREATER_EQ  sumExpression {typeCheck($1,$3,">=");$$ = $1;{push(">=");}gencode();}
+                  | sumExpression NOT_EQ  sumExpression {typeCheck($1,$3,"!=");{push("!=");} gencode();}
+                  | sumExpression EQUAL  sumExpression {typeCheck($1,$3,"==");$$ = $1; {push("==");} gencode();}
                   | sumExpression { $$ = $1;}
                   ;
     sumExpression : sumExpression ADD  term {typeCheck($1,$3,"+");$$ = $1;{push("+");}gencode();}
@@ -225,8 +233,8 @@
          | unaryExpression { $$ = $1;}
          ;
 
-    unaryExpression : ADD  unaryExpression { typeCheck($2,$2,"+u");$$ = $2; {push("+");}}
-                    | SUBTRACT  unaryExpression { typeCheck($2,$2,"-u");$$ = $2; {push("-");}}
+    unaryExpression : ADD   factor { typeCheck($2,$2,"+u");$$ = $2; {push("+");}gencode_unary();}
+                    | SUBTRACT  factor { typeCheck($2,$2,"-u");$$ = $2; {push("-");}gencode_unary();}
                     | factor { $$ = $1;} ;
 
 
@@ -440,19 +448,62 @@ void gencode()
     {
         printf("%s = %s\n",op3,op1);
     }
+    else if(strcmp(op2,"+=") == 0)
+    {
+        printf("%s = %s + %s",op3,op3,op1);   
+    }
+    else if(strcmp(op2,"-=") == 0)
+    {
+        printf("%s = %s - %s",op3,op3,op1);   
+    }
+    else if(strcmp(op2,"*=") == 0)
+    {
+        printf("%s = %s * %s",op3,op3,op1);   
+    }
+    else if(strcmp(op2,"/=") == 0)
+    {
+        printf("%s = %s / %s",op3,op3,op1);
+    }
     else
     {
         char temp[3] = "t0\0";
-        temp[1] = (char)(label + '0');
+        temp[1] = (char)(Registerlabel + '0');
         temp[2] = '\0';
-        label++;
+        Registerlabel++;
 
         printf("%s = %s %s %s\n",temp,op3,op1,op2);
 
         push(temp);
-    }
-
-    
-
+    } 
+    line_instruction++;  
 }
 
+void gencode_unary()
+{
+    line_instruction++;
+    char *op1 = ICGstack[--ICGtop]; 
+    char *op2 = ICGstack[--ICGtop];
+
+    char temp[3] = "t0\0";
+    temp[1] = (char)(Registerlabel + '0');
+    temp[2] = '\0';
+    Registerlabel++;
+
+    printf("%s = %s %s\n",temp,op1,op2);
+
+    push(temp);
+    line_instruction++;  
+}
+
+void gencode_if()
+{
+    char temp[3] = "t0\0";
+    temp[1] = (char)(Registerlabel + '0');
+    temp[2] = '\0';
+    Registerlabel++;
+    printf("%s = not %s\n",temp,ICGstack[ICGtop--]);
+    printf("if %s goto L%d\n",temp,1);
+
+    push(temp);
+
+}
