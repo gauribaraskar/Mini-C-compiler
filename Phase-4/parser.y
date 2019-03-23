@@ -43,17 +43,23 @@
     int ICGtop = 0;
 
     int Labelstack[10];
-    int Labeltop = 0;
+    int Labeltop = 1;
 
 
     void push(char *text);
 
     void gencode();
     void gencode_unary();
-    void gencode_if();
+    void gencode_if_statement();
+    void gencode_if_if();
+    void gencode_if_else();
     
-    int label = 0;
+    int Registerlabel = 0;
     int line_instruction = 0;
+
+    int Declarationlabel = 0;
+
+    FILE *output;
 
 %}
 
@@ -173,10 +179,10 @@
                   |  ;
     // Expressions
     expressionStmt : expression ';' {ICGtop = 0;} | ';' {ICGtop=0;} ;
-    selectionStmt : IF '(' simpleExpression ')' {gencode_if();} compoundStmt else 
+    selectionStmt : IF '(' simpleExpression ')' {gencode_if_statement();} compoundStmt  else 
                   ;
     
-    else : ELSE statement  | ;
+    else : {gencode_if_else();}ELSE statement  | ;
 
     iterationStmt : WHILE '(' simpleExpression ')' {is_loop = 1;} statement {is_loop = 0;}
                   | DO {is_loop = 1;}statement WHILE '(' expression ')' ';' {is_loop = 0;}
@@ -399,6 +405,9 @@ int main(int argc , char *argv[]){
     int i;
     // Open a file for parsing
     yyin = fopen(argv[1], "r");
+
+    output = fopen("ICG.code","w");  
+
     if(!yyparse())
     {
         printf("\nParsing complete.\n");
@@ -409,10 +418,9 @@ int main(int argc , char *argv[]){
         printf("\nParsing failed.\n");
     }
     fclose(yyin);
-    for(i=0;i<ICGtop;i++)
-    {
-        printf("%s\n",ICGstack[i]);
-    }
+    fclose(output);
+    system("clear");
+    system("cat ICG.code");
     return 0;
 }
 
@@ -446,23 +454,23 @@ void gencode()
     
     if( strcmp(op2,"=")== 0)
     {
-        printf("%s = %s\n",op3,op1);
+        fprintf(output,"%s = %s\n",op3,op1);
     }
     else if(strcmp(op2,"+=") == 0)
     {
-        printf("%s = %s + %s",op3,op3,op1);   
+        fprintf(output,"%s = %s + %s",op3,op3,op1);   
     }
     else if(strcmp(op2,"-=") == 0)
     {
-        printf("%s = %s - %s",op3,op3,op1);   
+        fprintf(output,"%s = %s - %s",op3,op3,op1);   
     }
     else if(strcmp(op2,"*=") == 0)
     {
-        printf("%s = %s * %s",op3,op3,op1);   
+        fprintf(output,"%s = %s * %s",op3,op3,op1);   
     }
     else if(strcmp(op2,"/=") == 0)
     {
-        printf("%s = %s / %s",op3,op3,op1);
+        fprintf(output,"%s = %s / %s",op3,op3,op1);
     }
     else
     {
@@ -471,7 +479,7 @@ void gencode()
         temp[2] = '\0';
         Registerlabel++;
 
-        printf("%s = %s %s %s\n",temp,op3,op1,op2);
+        fprintf(output,"%s = %s %s %s\n",temp,op3,op1,op2);
 
         push(temp);
     } 
@@ -489,21 +497,36 @@ void gencode_unary()
     temp[2] = '\0';
     Registerlabel++;
 
-    printf("%s = %s %s\n",temp,op1,op2);
+    fprintf(output,"%s = %s %s\n",temp,op1,op2);
 
     push(temp);
     line_instruction++;  
 }
 
-void gencode_if()
+void gencode_if_statement()
 {
+    Labelstack[Labeltop++] = ++Declarationlabel;
     char temp[3] = "t0\0";
     temp[1] = (char)(Registerlabel + '0');
     temp[2] = '\0';
     Registerlabel++;
-    printf("%s = not %s\n",temp,ICGstack[ICGtop--]);
-    printf("if %s goto L%d\n",temp,1);
+    fprintf(output,"%s = not %s\n",temp,ICGstack[--ICGtop]);
+    fprintf(output,"if %s goto L%d\n",temp,Declarationlabel);
 
     push(temp);
+    gencode_if_if();
 
+}
+
+void gencode_if_if()
+{
+    ++Declarationlabel;
+    fprintf(output,"goto L%d\n",Declarationlabel);
+    fprintf(output,"L%d :\n",Labelstack[--Labeltop]);
+    Labelstack[Labeltop++] = Declarationlabel;
+}
+
+void gencode_if_else()
+{
+    fprintf(output,"L%d :\n",Labelstack[--Labeltop]);
 }
