@@ -57,6 +57,7 @@
     void gencode_while_block();
     void gencode_for_modif();
     void gencode_for_eval();
+    void gencode_for();
     
     int Registerlabel = 0;
     int line_instruction = 0;
@@ -64,6 +65,8 @@
     int Declarationlabel = 0;
 
     FILE *output;
+
+    int is_for = 0;
 
 %}
 
@@ -190,7 +193,7 @@
 
     iterationStmt : WHILE '(' simpleExpression ')' {gencode_while();} {is_loop = 1;} statement { gencode_while_block(); is_loop = 0;}
                   | DO {is_loop = 1;}statement WHILE '(' expression ')' ';' {is_loop = 0;}
-                  | FOR '(' optExpression ';' optExpression {gencode_for_eval();} ';' optExpression {gencode_for_modif();} ')'{is_loop = 1;} statement {is_loop = 0;};
+                  | FOR '(' optExpression ';' optExpression {gencode_for_eval();} ';' {is_for = 1;} optExpression {is_for = 0;}  ')'{is_loop = 1;} statement {is_loop = 0;gencode_for_modif();};
     // Optional expressions in case of for
     optExpression : expression | ;
 
@@ -442,16 +445,14 @@ void push(char *text)
 
 void gencode()
 {
-    //Code For Debugging
-    
-    // int i;
-    // printf("\nSTACK\n");
-    // for(i=0;i<ICGtop;i++)
-    // {
-    //     printf("%s\n",ICGstack[i]);
-    // }
-    // printf("----------------------\n");
 
+    if(is_for == 1)
+    {
+        gencode_for();
+    }
+    else
+    {
+        
     char *op1 = ICGstack[--ICGtop]; 
     char *op2 = ICGstack[--ICGtop];
     char *op3 = ICGstack[--ICGtop];
@@ -487,7 +488,51 @@ void gencode()
 
         push(temp);
     } 
+    }
     line_instruction++;  
+}
+
+void gencode_for()
+{
+    char *op1 = ICGstack[--ICGtop]; 
+    char *op2 = ICGstack[--ICGtop];
+    char *op3 = ICGstack[--ICGtop];
+    
+    FILE *output1 = fopen("modtemp.code","a");
+
+    if( strcmp(op2,"=")== 0)
+    {
+        fprintf(output1,"%s = %s\n",op3,op1);
+    }
+    else if(strcmp(op2,"+=") == 0)
+    {
+        fprintf(output1,"%s = %s + %s",op3,op3,op1);   
+    }
+    else if(strcmp(op2,"-=") == 0)
+    {
+        fprintf(output1,"%s = %s - %s",op3,op3,op1);   
+    }
+    else if(strcmp(op2,"*=") == 0)
+    {
+        fprintf(output1,"%s = %s * %s",op3,op3,op1);   
+    }
+    else if(strcmp(op2,"/=") == 0)
+    {
+        fprintf(output1,"%s = %s / %s",op3,op3,op1);
+    }
+    else
+    {
+        char temp[3] = "t0\0";
+        temp[1] = (char)(Registerlabel + '0');
+        temp[2] = '\0';
+        Registerlabel++;
+
+        fprintf(output1,"%s = %s %s %s\n",temp,op3,op1,op2);
+
+        push(temp);
+    } 
+    line_instruction++;  
+    fclose(output1);
 }
 
 void gencode_unary()
@@ -566,5 +611,24 @@ void gencode_for_eval()
 
 void gencode_for_modif()
 {
-    fprintf(output,"OOPS\n");
+    
+    FILE *output1 = fopen("modtemp.code","r");
+
+    char c = fgetc(output1);
+    while(c != EOF)
+    {
+        fprintf(output,"%c",c);
+        c = fgetc(output1);
+    }
+
+    fclose(output1);
+
+    system("rm modtemp.code");
+
+    int l_otherwise = Labelstack[--Labeltop];
+    int l_for = Labelstack[--Labeltop];
+
+    fprintf(output,"goto L%d\n",l_for);
+    fprintf(output,"L%d :\n",l_otherwise);
+    
 }

@@ -2,11 +2,11 @@
 
 int main()
 {
-int i=9;
-while(i < 6)
+int i,k;
+for(i=0;i < 6;i=i+1)
 {
-i = i - 1;
+k = k * 2;
 }
-return i + 1;
+return k + 1;
 }
 
