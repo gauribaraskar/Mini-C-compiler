@@ -2537,14 +2537,8 @@ void gencode_unary()
 void gencode_if_statement()
 {
     Labelstack[Labeltop++] = ++Declarationlabel;
-    char temp[3] = "t0\0";
-    temp[1] = (char)(Registerlabel + '0');
-    temp[2] = '\0';
-    Registerlabel++;
-    fprintf(output,"%s = not %s\n",temp,ICGstack[--ICGtop]);
-    fprintf(output,"if %s goto L%d\n",temp,Declarationlabel);
+    fprintf(output,"if %s goto L%d\n",ICGstack[--ICGtop],Declarationlabel);
 
-    push(temp);
     gencode_if_if();
 
 }
