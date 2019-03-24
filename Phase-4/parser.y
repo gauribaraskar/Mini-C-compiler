@@ -58,6 +58,8 @@
     void gencode_for_modif();
     void gencode_for_eval();
     void gencode_for();
+    void gencode_function(char *lexeme);
+    void gencode_return();
     
     int Registerlabel = 0;
     int line_instruction = 0;
@@ -156,6 +158,7 @@
 						                        int flag = set_is_function(SymbolTable,$2->lexeme);
                                                 if(flag == 0){return -1;}
                                                 p=1;
+                                                gencode_function($2->lexeme);
                                             }  
                      compoundStmt           { is_function = 0;
                                               if(!return_exists && strcmp(func_type,"VOID") != 0)
@@ -204,6 +207,8 @@
                                       return_exists = 1;
                                       if(strcmp(curr_data_type,$2)!=0)
                                         yyerror("return type does not match function type");
+                                      else
+                                        gencode_return();
                                    } ;
     breakStmt : BREAK ';' {if(!is_loop) {yyerror("Illegal use of break");}};
 
@@ -425,8 +430,9 @@ int main(int argc , char *argv[]){
         printf("\nParsing failed.\n");
     }
     fclose(yyin);
+    fprintf(output,"exit\n");
     fclose(output);
-    system("clear");
+    // system("clear");
     system("cat ICG.code");
     return 0;
 }
@@ -463,19 +469,19 @@ void gencode()
     }
     else if(strcmp(op2,"+=") == 0)
     {
-        fprintf(output,"%s = %s + %s",op3,op3,op1);   
+        fprintf(output,"%s = %s + %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"-=") == 0)
     {
-        fprintf(output,"%s = %s - %s",op3,op3,op1);   
+        fprintf(output,"%s = %s - %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"*=") == 0)
     {
-        fprintf(output,"%s = %s * %s",op3,op3,op1);   
+        fprintf(output,"%s = %s * %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"/=") == 0)
     {
-        fprintf(output,"%s = %s / %s",op3,op3,op1);
+        fprintf(output,"%s = %s / %s\n",op3,op3,op1);
     }
     else
     {
@@ -506,19 +512,19 @@ void gencode_for()
     }
     else if(strcmp(op2,"+=") == 0)
     {
-        fprintf(output1,"%s = %s + %s",op3,op3,op1);   
+        fprintf(output1,"%s = %s + %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"-=") == 0)
     {
-        fprintf(output1,"%s = %s - %s",op3,op3,op1);   
+        fprintf(output1,"%s = %s - %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"*=") == 0)
     {
-        fprintf(output1,"%s = %s * %s",op3,op3,op1);   
+        fprintf(output1,"%s = %s * %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"/=") == 0)
     {
-        fprintf(output1,"%s = %s / %s",op3,op3,op1);
+        fprintf(output1,"%s = %s / %s\n",op3,op3,op1);
     }
     else
     {
@@ -631,4 +637,14 @@ void gencode_for_modif()
     fprintf(output,"goto L%d\n",l_for);
     fprintf(output,"L%d :\n",l_otherwise);
     
+}
+
+void gencode_function(char *lexeme)
+{
+    fprintf(output,"%s :\n",lexeme);
+}
+
+void gencode_return()
+{
+    fprintf(output,"RETURN %s\n",ICGstack[--ICGtop]);
 }

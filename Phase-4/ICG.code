@@ -1,13 +1,9 @@
-i = 0
-t0 = i < 6
-L1 :
-if t0 goto L2
-goto L3
-L2 :
-t2 = k * 2
-k = t2
-t1 = i + 1
-i = t1
-goto L1
-L3 :
-t3 = k + 1
+a :
+i = i + 1
+t0 = i * 2
+RETURN t0
+main :
+i = 5
+t1 = i * 2
+RETURN t1
+exit
