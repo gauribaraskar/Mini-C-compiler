@@ -2,11 +2,11 @@
 
 int main()
 {
-int i=1;
+int i=9;
+while(i < 6)
 {
-int i=3;
-i = i + 1;
+i = i - 1;
 }
-i =  i + 1;
+return i + 1;
 }
 

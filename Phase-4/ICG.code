@@ -1,10 +1,11 @@
-i = 7
-t0 = i <= 6
-if t0 goto L1
-goto L2
+i = 0
+t0 = i < 7
 L1 :
+if t0 goto L2
+goto L3
+L2 :
 t1 = i + 1
 i = t1
-L2 :
-t2 = i - 1
+OOPS
+t2 = i * 2
 i = t2

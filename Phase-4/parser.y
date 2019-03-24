@@ -2,8 +2,8 @@
 %{
     // Header files
     #include<stdio.h>
-	  #include<stdlib.h>
-	  #include "tables.h"
+	#include<stdlib.h>
+	#include "tables.h"
     #include<limits.h>
     #include<ctype.h>
     #include<string.h>
@@ -53,6 +53,10 @@
     void gencode_if_statement();
     void gencode_if_if();
     void gencode_if_else();
+    void gencode_while();
+    void gencode_while_block();
+    void gencode_for_modif();
+    void gencode_for_eval();
     
     int Registerlabel = 0;
     int line_instruction = 0;
@@ -130,7 +134,7 @@
 		          | FLOAT {curr_data_type = strdup("FLOAT");  is_declaration = 1;}
                   ;
 
-    assign_symbol : ASSIGN {is_declaration = 0;push("=");}
+    assign_symbol : ASSIGN {is_declaration = 0; push("=");}
     
     pointer : MULTIPLY pointer | MULTIPLY;
 
@@ -184,9 +188,9 @@
     
     else : {gencode_if_else();}ELSE statement  | ;
 
-    iterationStmt : WHILE '(' simpleExpression ')' {is_loop = 1;} statement {is_loop = 0;}
+    iterationStmt : WHILE '(' simpleExpression ')' {gencode_while();} {is_loop = 1;} statement { gencode_while_block(); is_loop = 0;}
                   | DO {is_loop = 1;}statement WHILE '(' expression ')' ';' {is_loop = 0;}
-                  | FOR '(' optExpression ';' optExpression ';' optExpression ')'{is_loop = 1;} statement {is_loop = 0;};
+                  | FOR '(' optExpression ';' optExpression {gencode_for_eval();} ';' optExpression {gencode_for_modif();} ')'{is_loop = 1;} statement {is_loop = 0;};
     // Optional expressions in case of for
     optExpression : expression | ;
 
@@ -523,4 +527,44 @@ void gencode_if_if()
 void gencode_if_else()
 {
     fprintf(output,"L%d :\n",Labelstack[--Labeltop]);
+}
+
+void gencode_while()
+{
+    
+    fprintf(output,"L%d :\n",++Declarationlabel);
+    Labelstack[Labeltop++] = Declarationlabel; 
+    Labelstack[Labeltop++] = ++Declarationlabel;
+    fprintf(output,"if %s goto L%d\n",ICGstack[--ICGtop],Declarationlabel);
+
+    ++Declarationlabel;
+    fprintf(output,"goto L%d\n",Declarationlabel);
+    fprintf(output,"L%d :\n",Labelstack[--Labeltop]);
+    Labelstack[Labeltop++] = Declarationlabel;
+}
+
+void gencode_while_block()
+{
+    int l_otherwise = Labelstack[--Labeltop];
+    int l_while = Labelstack[--Labeltop];
+    fprintf(output,"goto L%d\n",l_while);
+    fprintf(output,"L%d :\n",l_otherwise);
+}
+
+void gencode_for_eval()
+{
+    fprintf(output,"L%d :\n",++Declarationlabel);
+    Labelstack[Labeltop++] = Declarationlabel; 
+    Labelstack[Labeltop++] = ++Declarationlabel;
+    fprintf(output,"if %s goto L%d\n",ICGstack[--ICGtop],Declarationlabel);
+
+    ++Declarationlabel;
+    fprintf(output,"goto L%d\n",Declarationlabel);
+    fprintf(output,"L%d :\n",Labelstack[--Labeltop]);
+    Labelstack[Labeltop++] = Declarationlabel;
+}
+
+void gencode_for_modif()
+{
+    fprintf(output,"OOPS\n");
 }
