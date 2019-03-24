@@ -39,7 +39,7 @@
     int stack[100] = {0};
     int top = 0;
 
-    char ICGstack[200][20];
+    char ICGstack[100][20];
     int ICGtop = 0;
 
     int Labelstack[10];
@@ -60,6 +60,7 @@
     void gencode_for();
     void gencode_function(char *lexeme);
     void gencode_return();
+    void gencode_param();
     
     int Registerlabel = 0;
     int line_instruction = 0;
@@ -169,9 +170,9 @@
 					     };
 
      // Rules for parameter list
-    params : {is_param = 1; }paramList | ;
+    params : paramList | ;
     paramList : paramList ',' paramTypeList | paramTypeList;
-    paramTypeList : typeSpecifier
+    paramTypeList : {is_param = 1; } typeSpecifier
 
                       paramId   {
                                               param_list[p_idx] = (char *)malloc(sizeof(curr_data_type));
@@ -268,12 +269,15 @@
                                     }
     args : argList | ;
   
-    argList : argList ',' arg
+    argList : argList ',' arg 
 	    | arg ;
 
     arg : expression     {
                             arg_list[a_idx] = (char *)malloc(sizeof($1));
                             strcpy(arg_list[a_idx++],$1);
+
+                            gencode_param();
+                            
                         }
           ;
 
@@ -365,7 +369,6 @@ int checkScope(char *val)
             break;
         }
     }
-    
     entry *res = ScopeSearch(SymbolTable,extract,curr_nest_level);
     // First check if variable exists then check for nesting level
     if (res == NULL)
@@ -389,7 +392,6 @@ int checkScope(char *val)
             endLine = Nester[level]->line_end;
         }
 
-        
 
         if((yylineno <= endLine && yylineno >= startLine))
         {
@@ -452,6 +454,14 @@ void push(char *text)
 void gencode()
 {
 
+    // int i;
+
+    // for(i=0;i<ICGtop;i++)
+    // {
+    //     printf("%s\n",ICGstack[i]);
+    // }
+    // printf("-----------\n");
+
     if(is_for == 1)
     {
         gencode_for();
@@ -495,7 +505,7 @@ void gencode()
         push(temp);
     } 
     }
-    line_instruction++;  
+    line_instruction++;
 }
 
 void gencode_for()
@@ -647,4 +657,9 @@ void gencode_function(char *lexeme)
 void gencode_return()
 {
     fprintf(output,"RETURN %s\n",ICGstack[--ICGtop]);
+}
+
+void gencode_param()
+{
+    fprintf(output,"Param X\n");
 }

@@ -58,6 +58,7 @@ void nested_homekeeping()
   temp->nesting_level = 1;
   temp->line_start = 0;
   temp->line_end = 999999;
+  Nester[1] = temp;
 }
 
 void insertNestStart(int nesting_level,int line_start)
@@ -180,6 +181,7 @@ entry* ScopeSearch(entry** TablePointer, char *lexeme,int currScope)
   int temp = hash(lexeme);
   entry *head = NULL;
   head = TablePointer[temp];
+
 
   while(head != NULL)
   {
