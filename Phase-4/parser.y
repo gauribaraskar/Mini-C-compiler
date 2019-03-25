@@ -72,6 +72,8 @@
 
     int is_for = 0;
 
+    int loop_constants[2];
+
 %}
 
 // Data types of tokens
@@ -203,7 +205,7 @@
     // Optional expressions in case of for
     optExpression : expression | ;
 
-    jumpStmt : GOTO identifier ';' | CONTINUE ';' {if(!is_loop) {yyerror("Illegal use of continue");}};
+    jumpStmt : GOTO identifier ';' | CONTINUE ';' {if(!is_loop) {yyerror("Illegal use of continue");} fprintf(output,"goto L%d\n",loop_constants[1]); };
     returnStmt : RETURN ';'  { if(is_function) { if(strcmp(func_type,"VOID")!=0) yyerror("return type (VOID) does not match function type");}}
 
                | RETURN expression {
@@ -213,7 +215,7 @@
                                       else
                                         gencode_return();
                                    } ;
-    breakStmt : BREAK ';' {if(!is_loop) {yyerror("Illegal use of break");}};
+    breakStmt : BREAK ';' {if(!is_loop) {yyerror("Illegal use of break");} fprintf(output,"goto L%d\n",loop_constants[0]); };
 
     expression : mutable ASSIGN {push("=");}  expression {typeCheck($1,$4,"=");$$ = $1;gencode();}
                | mutable ADD_ASSIGN {push("+=");} expression {typeCheck($1,$4,"+=");$$ = $1;gencode();}
@@ -608,12 +610,14 @@ void gencode_while()
 {
     
     fprintf(output,"L%d :\n",++Declarationlabel);
+    loop_constants[0] = Declarationlabel;
     Labelstack[Labeltop++] = Declarationlabel; 
     Labelstack[Labeltop++] = ++Declarationlabel;
     fprintf(output,"if %s goto L%d\n",ICGstack[--ICGtop],Declarationlabel);
 
     ++Declarationlabel;
     fprintf(output,"goto L%d\n",Declarationlabel);
+    loop_constants[1]= Declarationlabel;
     fprintf(output,"L%d :\n",Labelstack[--Labeltop]);
     Labelstack[Labeltop++] = Declarationlabel;
 }
@@ -629,12 +633,14 @@ void gencode_while_block()
 void gencode_for_eval()
 {
     fprintf(output,"L%d :\n",++Declarationlabel);
+    loop_constants[0] = Declarationlabel;
     Labelstack[Labeltop++] = Declarationlabel; 
     Labelstack[Labeltop++] = ++Declarationlabel;
     fprintf(output,"if %s goto L%d\n",ICGstack[--ICGtop],Declarationlabel);
 
     ++Declarationlabel;
     fprintf(output,"goto L%d\n",Declarationlabel);
+    loop_constants[1] = Declarationlabel;
     fprintf(output,"L%d :\n",Labelstack[--Labeltop]);
     Labelstack[Labeltop++] = Declarationlabel;
 }
