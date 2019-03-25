@@ -442,7 +442,10 @@ int main(int argc , char *argv[]){
     fprintf(output,"exit\n");
     fclose(output);
     // system("clear");
+    printf("_________________________________________\n\n");
+    printf("\tIntermediate Three Address Code\n\n");
     system("cat ICG.code");
+    printf("_________________________________________\n");
     return 0;
 }
 
@@ -460,14 +463,6 @@ void push(char *text)
 
 void gencode()
 {
-
-    // int i;
-
-    // for(i=0;i<ICGtop;i++)
-    // {
-    //     printf("%s\n",ICGstack[i]);
-    // }
-    // printf("-----------\n");
 
     if(is_for == 1)
     {
