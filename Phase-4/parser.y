@@ -14,7 +14,7 @@
     
     int yyerror(char *msg);
     int checkScope(char *value);
-    int typeCheck(char*,char*,char*);
+    int typeCheck(entry*,entry*,char*);
     int checkFunc(char*);
     char* curr_data_type;
     int yylex(void);
@@ -67,6 +67,7 @@
     int line_instruction = 0;
 
     int Declarationlabel = 0;
+    int valAssign;
 
     FILE *output;
 
@@ -102,7 +103,7 @@
 
 
  %type <tbEntry> identifier varDecId
- %type <str> mutable call factor expression simpleExpression andExpression sumExpression unaryExpression unaryRelExpression term immutable relExpression const_type
+ %type <tbEntry> mutable call factor expression simpleExpression andExpression sumExpression unaryExpression unaryRelExpression term immutable relExpression const_type
 
 
 // Start Symbol of the grammar
@@ -134,7 +135,7 @@
     
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     
-    varDeclInitialize : varDecId | varDecId assign_symbol simpleExpression {gencode();typeCheck($1->data_type,$3,"="); is_declaration=1;} ;
+    varDeclInitialize : varDecId | varDecId assign_symbol simpleExpression {gencode(); $1->value = valAssign; typeCheck($1,$3,"="); is_declaration=1;} ;
     varDecId : identifier {$$=$1;} | identifier '[' INT_CONSTANT  ']' { if($3->value < 1){yyerror("Arrays can't have dimension lesser than 1");} $$=$1; $1->is_array = 1; $1->array_dim = (int)$3->value;};
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");  is_declaration = 1; }
@@ -210,18 +211,18 @@
 
                | RETURN expression {
                                       return_exists = 1;
-                                      if(strcmp(curr_data_type,$2)!=0)
+                                      if(strcmp(curr_data_type,$2->data_type)!=0)
                                         yyerror("return type does not match function type");
                                       else
                                         gencode_return();
                                    } ;
     breakStmt : BREAK ';' {if(!is_loop) {yyerror("Illegal use of break");} fprintf(output,"goto L%d\n",loop_constants[0]); };
 
-    expression : mutable ASSIGN {push("=");}  expression {typeCheck($1,$4,"=");$$ = $1;gencode();}
-               | mutable ADD_ASSIGN {push("+=");} expression {typeCheck($1,$4,"+=");$$ = $1;gencode();}
-               | mutable SUB_ASSIGN {push("-=");} expression {typeCheck($1,$4,"-=");$$ = $1;gencode();}
-               | mutable MUL_ASSIGN {push("*=");} expression {typeCheck($1,$4,"*=");$$ = $1;gencode();}
-               | mutable DIV_ASSIGN {push("/=");} expression {typeCheck($1,$4,"/=");$$ = $1;gencode();}
+    expression : mutable ASSIGN {push("=");}  expression {typeCheck($1,$4,"=");$$ = $1;gencode(); $1->value = valAssign;}
+               | mutable ADD_ASSIGN {push("+=");} expression {typeCheck($1,$4,"+=");$$ = $1;gencode();$1->value = valAssign;}
+               | mutable SUB_ASSIGN {push("-=");} expression {typeCheck($1,$4,"-=");$$ = $1;gencode();$1->value = valAssign;}
+               | mutable MUL_ASSIGN {push("*=");} expression {typeCheck($1,$4,"*=");$$ = $1;gencode(); $1->value = valAssign;}
+               | mutable DIV_ASSIGN {push("/=");} expression {typeCheck($1,$4,"/=");$$ = $1;gencode(); $1->value = valAssign;}
                | mutable INCREMENT {typeCheck($1,$1,"++"); $$ = $1;}
                | mutable DECREMENT {typeCheck($1,$1,"--"); $$ = $1;}
                | simpleExpression { $$ = $1;} 
@@ -262,12 +263,12 @@
 
 
     factor : immutable {$$ = $1;} | mutable {$$ = $1;};
-    mutable : identifier {if(checkScope(yylval.str) == 0){ return -1;}; $$ = $1->data_type;}| identifier '[' INT_CONSTANT ']' {if($3->value < 0 || $3->value >= $1->array_dim ){yyerror("Exceeds Array Dimensions\n"); } $$ = $1->data_type;}
+    mutable : identifier {if(checkScope(yylval.str) == 0){ return -1;}; $$ = $1;}| identifier '[' simpleExpression ']' {if($3->value < 0 || $3->value >= $1->array_dim ){yyerror("Exceeds Array Dimensions\n"); } $$ = $1;}
     immutable : '(' expression ')' { $$ = $2;}| call {$$=$1;} | const_type {$$=$1;} ;
     call : identifier  '(' args ')' { 
                                       if(checkFunc($1->lexeme) == 0)
                                         {return -1;};
-                                      $$ = $1->data_type;
+                                      $$ = $1;
                                       check_parameter_list($1,arg_list,a_idx);
                                       a_idx = 0;
                                       fprintf(output,"refparam result\n");
@@ -281,17 +282,17 @@
 
     arg : expression     {
                             arg_list[a_idx] = (char *)malloc(sizeof($1));
-                            strcpy(arg_list[a_idx++],$1);
+                            strcpy(arg_list[a_idx++],$1->data_type);
 
                             gencode_param();
                             
                         }
           ;
 
-    const_type : DEC_CONSTANT { $$ = $1->data_type;push($1->lexeme);}
-               | INT_CONSTANT { $$ = $1->data_type;push($1->lexeme);}
-               | HEX_CONSTANT { $$ = $1->data_type;push($1->lexeme);}
-               | STRING       { $$ = $1->data_type;push($1->lexeme);}  
+    const_type : DEC_CONSTANT { $$ = $1;push($1->lexeme);}
+               | INT_CONSTANT { $$ = $1;push($1->lexeme);}
+               | HEX_CONSTANT { $$ = $1;push($1->lexeme);}
+               | STRING       { $$ = $1;push($1->lexeme);}  
                ;
     identifier : IDENTIFIER { 
 					if(is_declaration){
@@ -339,9 +340,9 @@ int checkFunc(char* lexeme)
     }
 }
 
-int typeCheck(char *a,char *b,char *c){
+int typeCheck(entry *a,entry *b,char *c){
 	
-	if(strcmp(a,b)!=0){
+	if(strcmp(a->data_type,b->data_type)!=0){
 		yyerror("Type Mismatch");
 		exit(0);
 	}
@@ -490,7 +491,8 @@ void gencode()
     }
     else if(strcmp(op2,"+=") == 0)
     {
-        fprintf(output,"%s = %s + %s\n",op3,op3,op1);   
+        fprintf(output,"%s = %s + %s\n",op3,op3,op1);
+           
     }
     else if(strcmp(op2,"-=") == 0)
     {
@@ -512,6 +514,14 @@ void gencode()
         Registerlabel++;
 
         fprintf(output,"%s = %s %s %s\n",temp,op3,op1,op2);
+        if(strcmp(op1,"+") == 0)
+            valAssign = atoi(op3) + atoi(op2);
+        else if(strcmp(op1,"-") == 0)
+            valAssign = atoi(op3) - atoi(op2);
+        else if(strcmp(op1,"*") == 0)
+            valAssign = atoi(op3) * atoi(op2);
+        else if(strcmp(op1,"/") == 0)
+            valAssign = atoi(op3) / atoi(op2);
 
         push(temp);
     } 
