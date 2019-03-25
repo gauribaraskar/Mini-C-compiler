@@ -1,6 +1,0 @@
-t0 = a + 1
-b = t0
-c :
-t1 = z + x
-z = t1
-exit

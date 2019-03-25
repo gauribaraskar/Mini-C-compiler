@@ -45,6 +45,7 @@
     int Labelstack[10];
     int Labeltop = 1;
 
+    int is_call = 0;
 
     void push(char *text);
 
@@ -167,6 +168,7 @@
                                                 yyerror("This Function must have a return type");
                                                 
                                               }
+                                              fprintf(output,"func end\n");
 					     };
 
      // Rules for parameter list
@@ -260,14 +262,17 @@
     factor : immutable {$$ = $1;} | mutable {$$ = $1;};
     mutable : identifier {if(checkScope(yylval.str) == 0){ return -1;}; $$ = $1->data_type;}| identifier '[' INT_CONSTANT ']' {if($3->value < 0 || $3->value >= $1->array_dim ){yyerror("Exceeds Array Dimensions\n"); } $$ = $1->data_type;}
     immutable : '(' expression ')' { $$ = $2;}| call {$$=$1;} | const_type {$$=$1;} ;
-    call : identifier '(' args ')' { 
+    call : identifier  '(' args ')' { 
                                       if(checkFunc($1->lexeme) == 0)
                                         {return -1;};
                                       $$ = $1->data_type;
                                       check_parameter_list($1,arg_list,a_idx);
                                       a_idx = 0;
+                                      fprintf(output,"refparam result\n");
+                                      {fprintf(output,"call %s,%d\n",$1->lexeme,$1->num_params);}
+                                      is_call = 1;
                                     }
-    args : argList | ;
+    args : argList  | ;
   
     argList : argList ',' arg 
 	    | arg ;
@@ -475,7 +480,16 @@ void gencode()
     
     if( strcmp(op2,"=")== 0)
     {
-        fprintf(output,"%s = %s\n",op3,op1);
+        if(is_call == 0)
+        {
+            fprintf(output,"%s = %s\n",op3,op1);
+            is_call = 0;
+        }
+        else
+        {
+           fprintf(output,"%s = result\n",op3);
+           --ICGtop;
+        }
     }
     else if(strcmp(op2,"+=") == 0)
     {
@@ -651,15 +665,15 @@ void gencode_for_modif()
 
 void gencode_function(char *lexeme)
 {
-    fprintf(output,"%s :\n",lexeme);
+    fprintf(output,"func begin %s\n",lexeme);
 }
 
 void gencode_return()
 {
-    fprintf(output,"RETURN %s\n",ICGstack[--ICGtop]);
+    fprintf(output,"return %s\n",ICGstack[--ICGtop]);
 }
 
 void gencode_param()
 {
-    fprintf(output,"Param X\n");
+    fprintf(output,"Param %s\n",ICGstack[--ICGtop]);
 }
