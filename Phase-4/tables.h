@@ -158,6 +158,7 @@ entry* Search(entry** TablePointer, char *lexeme)
 
 entry* InsertSearch(entry** TablePointer, char *lexeme,int currScope)
 {
+  
   int temp = hash(lexeme);
   entry *head = NULL;
   head = TablePointer[temp];

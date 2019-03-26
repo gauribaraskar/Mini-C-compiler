@@ -1,5 +1,16 @@
-t0 = 3 * 5
-a = t0
-t1 = a + 7
-b = t1
+func begin main
+i = 0
+a = 0
+i = 0
+t0 = i < 10
+L1 :
+if t0 goto L2
+goto L3
+L2 :
+t1 = 4 + 7
+a = t1
+i = i + 2
+goto L1
+L3 :
+func end
 exit

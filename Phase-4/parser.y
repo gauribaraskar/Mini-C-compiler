@@ -42,6 +42,9 @@
     char ICGstack[100][20];
     int ICGtop = 0;
 
+    double ICGvaluestack[100];
+    int ICGvaluetop = 0;
+
     int Labelstack[10];
     int Labeltop = 1;
 
@@ -67,13 +70,14 @@
     int line_instruction = 0;
 
     int Declarationlabel = 0;
-    int valAssign;
+    double valAssign;
 
     FILE *output;
 
     int is_for = 0;
 
     int loop_constants[2];
+    int temporary = 0;
 
 %}
 
@@ -450,6 +454,7 @@ int main(int argc , char *argv[]){
     return 0;
 }
 
+
 int yyerror(char *msg)
 {
   // Function to display error messages with line no and token
@@ -462,9 +467,13 @@ void push(char *text)
     strcpy(ICGstack[ICGtop++],text);
 }
 
+void pushvalue(double text)
+{
+    ICGvaluestack[ICGvaluetop++] = text;
+}
+
 void gencode()
 {
-
     if(is_for == 1)
     {
         gencode_for();
@@ -481,7 +490,16 @@ void gencode()
         if(is_call == 0)
         {
             fprintf(output,"%s = %s\n",op3,op1);
+            if(isalpha(op1[0])){
+              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = ICGvaluestack[--ICGvaluetop];
+              else
+                valAssign = InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+            }
+            else
+              valAssign = atof(op1);
             is_call = 0;
+
         }
         else
         {
@@ -491,41 +509,104 @@ void gencode()
     }
     else if(strcmp(op2,"+=") == 0)
     {
+    	if(isalpha(op1[0])){
+              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value + ICGvaluestack[--ICGvaluetop];
+              else
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value + InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+            }
+            else
+        {
+        	valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value + atof(op1);
+        }
         fprintf(output,"%s = %s + %s\n",op3,op3,op1);
            
     }
     else if(strcmp(op2,"-=") == 0)
     {
+    	if(isalpha(op1[0])){
+              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value - ICGvaluestack[--ICGvaluetop];
+              else
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value - InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+            }
+            else
+        {
+        	valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value - atof(op1);
+        }
         fprintf(output,"%s = %s - %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"*=") == 0)
     {
+    	if(isalpha(op1[0])){
+              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value * ICGvaluestack[--ICGvaluetop];
+              else
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value * InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+            }
+            else
+        {
+        	valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value * atof(op1);
+        }
         fprintf(output,"%s = %s * %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"/=") == 0)
     {
+    	if(isalpha(op1[0])){
+              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value / ICGvaluestack[--ICGvaluetop];
+              else
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value / InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+            }
+        else
+        {
+        	valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value / atof(op1);
+        }
         fprintf(output,"%s = %s / %s\n",op3,op3,op1);
     }
     else
     {
+
         char temp[3] = "t0\0";
         temp[1] = (char)(Registerlabel + '0');
         temp[2] = '\0';
         Registerlabel++;
+        double var3,var2;
 
+        if(isalpha(op3[0])){
+              if(InsertSearch(SymbolTable,op3,curr_nest_level)==NULL)
+                var3 = ICGvaluestack[--ICGvaluetop];
+              else
+                var3 = InsertSearch(SymbolTable,op3,curr_nest_level)->value;
+        }
+        else
+          var3 = atof(op3);
+
+        if(isalpha(op2[0])){
+              if(InsertSearch(SymbolTable,op2,curr_nest_level)==NULL)
+                var2 = ICGvaluestack[--ICGvaluetop];
+              else
+                var2 = InsertSearch(SymbolTable,op2,curr_nest_level)->value;
+        }
+        else
+          var2 = atof(op2);
+        
         fprintf(output,"%s = %s %s %s\n",temp,op3,op1,op2);
         if(strcmp(op1,"+") == 0)
-            valAssign = atoi(op3) + atoi(op2);
+            valAssign = var3 + var2;
         else if(strcmp(op1,"-") == 0)
-            valAssign = atoi(op3) - atoi(op2);
+            valAssign = var3 - var2;
         else if(strcmp(op1,"*") == 0)
-            valAssign = atoi(op3) * atoi(op2);
+            valAssign = var3 * var2;
         else if(strcmp(op1,"/") == 0)
-            valAssign = atoi(op3) / atoi(op2);
+            valAssign = var3 / var2;
 
         push(temp);
+        pushvalue(valAssign);
+         
     } 
     }
+
     line_instruction++;
 }
 
@@ -543,18 +624,58 @@ void gencode_for()
     }
     else if(strcmp(op2,"+=") == 0)
     {
+    	if(isalpha(op1[0])){
+              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value + ICGvaluestack[--ICGvaluetop];
+              else
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value + InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+            }
+        else
+        {
+        	valAssign =  atof(op1);
+        }
         fprintf(output1,"%s = %s + %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"-=") == 0)
     {
+    	if(isalpha(op1[0])){
+              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value - ICGvaluestack[--ICGvaluetop];
+              else
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value - InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+            }
+        else
+        {
+        	valAssign = atof(op1);
+        }
         fprintf(output1,"%s = %s - %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"*=") == 0)
     {
+    	if(isalpha(op1[0])){
+              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value * ICGvaluestack[--ICGvaluetop];
+              else
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value * InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+            }
+        else
+        {
+        	valAssign = atof(op1);
+        }
         fprintf(output1,"%s = %s * %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"/=") == 0)
     {
+    	if(isalpha(op1[0])){
+              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value / ICGvaluestack[--ICGvaluetop];
+              else
+                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value / InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+            }
+        else
+        {
+        	valAssign = atof(op1);
+        }
         fprintf(output1,"%s = %s / %s\n",op3,op3,op1);
     }
     else
@@ -564,9 +685,39 @@ void gencode_for()
         temp[2] = '\0';
         Registerlabel++;
 
+        double var3,var2;
+
+        if(isalpha(op3[0])){
+              if(InsertSearch(SymbolTable,op3,curr_nest_level)==NULL)
+                var3 = ICGvaluestack[--ICGvaluetop];
+              else
+                var3 = InsertSearch(SymbolTable,op3,curr_nest_level)->value;
+        }
+        else
+          var3 = atof(op3);
+
+        if(isalpha(op2[0])){
+              if(InsertSearch(SymbolTable,op2,curr_nest_level)==NULL)
+                var2 = ICGvaluestack[--ICGvaluetop];
+              else
+                var2 = InsertSearch(SymbolTable,op2,curr_nest_level)->value;
+        }
+        else
+          var2 = atof(op2);
+
         fprintf(output1,"%s = %s %s %s\n",temp,op3,op1,op2);
+        if(strcmp(op1,"+") == 0)
+            valAssign = var3 + var2;
+        else if(strcmp(op1,"-") == 0)
+            valAssign = var3 - var2;
+        else if(strcmp(op1,"*") == 0)
+            valAssign = var3 * var2;
+        else if(strcmp(op1,"/") == 0)
+         
 
         push(temp);
+        pushvalue(valAssign);
+         
     } 
     line_instruction++;  
     fclose(output1);
