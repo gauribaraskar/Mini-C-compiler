@@ -425,7 +425,7 @@ int checkScope(char *val)
 #include "lex.yy.c"
 int main(int argc , char *argv[]){
 
-    //system("clear");
+    system("clear");
 
     SymbolTable = CreateTable();
     ConstantTable = CreateTable();
@@ -441,6 +441,14 @@ int main(int argc , char *argv[]){
         printf("\nParsing complete.\n");
         disp();
         fprintf(output,"exit\n");
+        fclose(output);
+        printf("\n\n_________________________________________________\n\n");
+        printf("\t Intermediate Code Generation\n\n");
+        printf("_________________________________________________\n\n");
+        system("cat ICG.code");
+        printf("\n_________________________________________________\n");
+        fclose(yyin);
+        return 1;
         
     }
     else
@@ -474,13 +482,7 @@ void pushvalue(double text)
 
 void gencode()
 {
-    printf("\nStack\n");
-    int i = 0;
-    for(i=0;i<ICGtop;i++)
-    {
-        printf("%s\n",ICGstack[i]);
-    }
-    printf("\n______________\n");
+    
    
     if(is_for == 1)
     {
@@ -621,13 +623,6 @@ void gencode()
 void gencode_for()
 {
 
-    printf("\nStack\n");
-    int i = 0;
-    for(i=0;i<ICGtop;i++)
-    {
-        printf("%s\n",ICGstack[i]);
-    }
-    printf("\n______________\n");
 
     char *op1 = ICGstack[--ICGtop]; 
     char *op2 = ICGstack[--ICGtop];
@@ -861,14 +856,6 @@ void gencode_param()
 }
 void gencode_array()
 {
-
-    printf("\nStack\n");
-    int i = 0;
-    for(i=0;i<ICGtop;i++)
-    {
-        printf("%s\n",ICGstack[i]);
-    }
-    printf("\n______________\n");
     
     char temp[3] = "t0\0";
         temp[1] = (char)(Registerlabel + '0');

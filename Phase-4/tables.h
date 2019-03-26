@@ -33,6 +33,7 @@ struct table_entry{
     int array_dim;
     char* parameter_list[10]; 
     int num_params;
+    int *arr_vals;
     struct table_entry *next;
 };
 
