@@ -227,7 +227,7 @@
     void gencode_function(char *lexeme);
     void gencode_return();
     void gencode_param();
-    void gencode_array();
+    void gencode_array(char *data_type);
     
     int Registerlabel = 0;
     int line_instruction = 0;
@@ -2092,7 +2092,7 @@ yyreduce:
 
   case 109:
 #line 272 "parser.y"
-    {if((yyvsp[(4) - (6)].tbEntry)->value < 0 || (yyvsp[(4) - (6)].tbEntry)->value >= (yyvsp[(1) - (6)].tbEntry)->array_dim ){yyerror("Exceeds Array Dimensions\n"); } (yyval.tbEntry) = (yyvsp[(1) - (6)].tbEntry); gencode_array();}
+    {if((yyvsp[(4) - (6)].tbEntry)->value < 0 || (yyvsp[(4) - (6)].tbEntry)->value >= (yyvsp[(1) - (6)].tbEntry)->array_dim ){yyerror("Exceeds Array Dimensions\n"); } (yyval.tbEntry) = (yyvsp[(1) - (6)].tbEntry); gencode_array((yyvsp[(1) - (6)].tbEntry)->data_type);}
     break;
 
   case 110:
@@ -2436,8 +2436,15 @@ void disp()
 {
     printf("\n\tSymbol table");
     Display(SymbolTable);
-    printf("\n\tConstant table");
-    DisplayConstant(ConstantTable);
+    // printf("\n\tConstant table");
+    //DisplayConstant(ConstantTable);
+
+    printf("\n\n_________________________________________________\n\n");
+    printf("\t Intermediate Code Generation\n\n");
+    printf("_________________________________________________\n\n");
+    system("cat ICG.code");
+    printf("\n_________________________________________________\n");
+
 }
 
 int checkScope(char *val)
@@ -2515,15 +2522,10 @@ int main(int argc , char *argv[]){
     if(!yyparse())
     {
         printf("\nParsing complete.\n");
-        disp();
         fprintf(output,"exit\n");
         fclose(output);
-        printf("\n\n_________________________________________________\n\n");
-        printf("\t Intermediate Code Generation\n\n");
-        printf("_________________________________________________\n\n");
-        system("cat ICG.code");
-        printf("\n_________________________________________________\n");
         fclose(yyin);
+        disp();
         return 1;
         
     }
@@ -2930,13 +2932,20 @@ void gencode_param()
 {
     fprintf(output,"Param %s\n",ICGstack[--ICGtop]);
 }
-void gencode_array()
+void gencode_array(char *data_type)
 {
     
     char temp[3] = "t0\0";
         temp[1] = (char)(Registerlabel + '0');
         temp[2] = '\0';
         Registerlabel++;
+    
+    char temp1[3] = "t0\0";
+        temp1[1] = (char)(Registerlabel + '0');
+        temp1[2] = '\0';
+        Registerlabel++;
+
+    
 
     char *op1 = ICGstack[--ICGtop];
     char *op2 = ICGstack[--ICGtop];
@@ -2944,14 +2953,14 @@ void gencode_array()
     
     
     strcat(op2,"[");
-    strcat(op2,op1);
+    if(strcmp(data_type,"INT") == 0 || strcmp(data_type,"FLOAT")==0)
+        fprintf(output,"%s = 4 * %s\n",temp,op1);
+    strcat(op2,temp);
     strcat(op2,"]");
 
-    printf("%s\n%s\n",op1,op2);
+    fprintf(output,"%s = %s\n",temp1,op2);
 
-    fprintf(output,"%s = %s\n",temp,op2);
-
-    push(temp);
+    push(temp1);
 
     //fprintf(output,"ARRAY %s\n",ICGstack[--ICGtop]);
 }

@@ -1,4 +1,5 @@
 func begin main
-a = 5
+i = 6
+return i
 func end
 exit
