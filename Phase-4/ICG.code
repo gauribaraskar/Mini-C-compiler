@@ -1,16 +1,18 @@
 func begin main
-i = 0
-a = 0
+sum = 0
 i = 0
 t0 = i < 10
 L1 :
 if t0 goto L2
 goto L3
 L2 :
-t1 = 4 + 7
-a = t1
-i = i + 2
+t2 = a[i]
+t3 = sum + t2
+sum = t3
+t1 = i - 1
+i = t1
 goto L1
 L3 :
+return 0
 func end
 exit

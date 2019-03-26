@@ -65,6 +65,7 @@
     void gencode_function(char *lexeme);
     void gencode_return();
     void gencode_param();
+    void gencode_array();
     
     int Registerlabel = 0;
     int line_instruction = 0;
@@ -78,6 +79,7 @@
 
     int loop_constants[2];
     int temporary = 0;
+    int is_array = 0;
 
 %}
 
@@ -267,7 +269,7 @@
 
 
     factor : immutable {$$ = $1;} | mutable {$$ = $1;};
-    mutable : identifier {if(checkScope(yylval.str) == 0){ return -1;}; $$ = $1;}| identifier '[' simpleExpression ']' {if($3->value < 0 || $3->value >= $1->array_dim ){yyerror("Exceeds Array Dimensions\n"); } $$ = $1;}
+    mutable : identifier {if(checkScope(yylval.str) == 0){ return -1;}; $$ = $1;}| identifier '[' {is_array=1;}simpleExpression {is_array=0;} ']' {if($4->value < 0 || $4->value >= $1->array_dim ){yyerror("Exceeds Array Dimensions\n"); } $$ = $1; gencode_array();}
     immutable : '(' expression ')' { $$ = $2;}| call {$$=$1;} | const_type {$$=$1;} ;
     call : identifier  '(' args ')' { 
                                       if(checkFunc($1->lexeme) == 0)
@@ -423,12 +425,12 @@ int checkScope(char *val)
 #include "lex.yy.c"
 int main(int argc , char *argv[]){
 
-    system("clear");
+    //system("clear");
 
     SymbolTable = CreateTable();
     ConstantTable = CreateTable();
     nested_homekeeping();
-    int i;
+    
     // Open a file for parsing
     yyin = fopen(argv[1], "r");
 
@@ -438,19 +440,17 @@ int main(int argc , char *argv[]){
     {
         printf("\nParsing complete.\n");
         disp();
+        fprintf(output,"exit\n");
+        
     }
     else
     {
         printf("\nParsing failed.\n");
     }
     fclose(yyin);
-    fprintf(output,"exit\n");
     fclose(output);
     // system("clear");
-    printf("_________________________________________\n\n");
-    printf("\tIntermediate Three Address Code\n\n");
-    system("cat ICG.code");
-    printf("_________________________________________\n");
+    
     return 0;
 }
 
@@ -474,6 +474,14 @@ void pushvalue(double text)
 
 void gencode()
 {
+    printf("\nStack\n");
+    int i = 0;
+    for(i=0;i<ICGtop;i++)
+    {
+        printf("%s\n",ICGstack[i]);
+    }
+    printf("\n______________\n");
+   
     if(is_for == 1)
     {
         gencode_for();
@@ -491,10 +499,10 @@ void gencode()
         {
             fprintf(output,"%s = %s\n",op3,op1);
             if(isalpha(op1[0])){
-              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
+              if(ScopeSearch(SymbolTable,op1,curr_nest_level)==NULL)
                 valAssign = ICGvaluestack[--ICGvaluetop];
               else
-                valAssign = InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+                valAssign = ScopeSearch(SymbolTable,op1,curr_nest_level)->value;
             }
             else
               valAssign = atof(op1);
@@ -510,14 +518,14 @@ void gencode()
     else if(strcmp(op2,"+=") == 0)
     {
     	if(isalpha(op1[0])){
-              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value + ICGvaluestack[--ICGvaluetop];
+              if(ScopeSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value + ICGvaluestack[--ICGvaluetop];
               else
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value + InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value + ScopeSearch(SymbolTable,op1,curr_nest_level)->value;
             }
             else
         {
-        	valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value + atof(op1);
+        	valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value + atof(op1);
         }
         fprintf(output,"%s = %s + %s\n",op3,op3,op1);
            
@@ -525,42 +533,42 @@ void gencode()
     else if(strcmp(op2,"-=") == 0)
     {
     	if(isalpha(op1[0])){
-              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value - ICGvaluestack[--ICGvaluetop];
+              if(ScopeSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value - ICGvaluestack[--ICGvaluetop];
               else
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value - InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value - ScopeSearch(SymbolTable,op1,curr_nest_level)->value;
             }
             else
         {
-        	valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value - atof(op1);
+        	valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value - atof(op1);
         }
         fprintf(output,"%s = %s - %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"*=") == 0)
     {
     	if(isalpha(op1[0])){
-              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value * ICGvaluestack[--ICGvaluetop];
+              if(ScopeSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value * ICGvaluestack[--ICGvaluetop];
               else
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value * InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value * ScopeSearch(SymbolTable,op1,curr_nest_level)->value;
             }
             else
         {
-        	valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value * atof(op1);
+        	valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value * atof(op1);
         }
         fprintf(output,"%s = %s * %s\n",op3,op3,op1);   
     }
     else if(strcmp(op2,"/=") == 0)
     {
     	if(isalpha(op1[0])){
-              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value / ICGvaluestack[--ICGvaluetop];
+              if(ScopeSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value / ICGvaluestack[--ICGvaluetop];
               else
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value / InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value / ScopeSearch(SymbolTable,op1,curr_nest_level)->value;
             }
         else
         {
-        	valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value / atof(op1);
+        	valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value / atof(op1);
         }
         fprintf(output,"%s = %s / %s\n",op3,op3,op1);
     }
@@ -574,19 +582,19 @@ void gencode()
         double var3,var2;
 
         if(isalpha(op3[0])){
-              if(InsertSearch(SymbolTable,op3,curr_nest_level)==NULL)
+              if(ScopeSearch(SymbolTable,op3,curr_nest_level)==NULL)
                 var3 = ICGvaluestack[--ICGvaluetop];
               else
-                var3 = InsertSearch(SymbolTable,op3,curr_nest_level)->value;
+                var3 = ScopeSearch(SymbolTable,op3,curr_nest_level)->value;
         }
         else
           var3 = atof(op3);
 
         if(isalpha(op2[0])){
-              if(InsertSearch(SymbolTable,op2,curr_nest_level)==NULL)
+              if(ScopeSearch(SymbolTable,op2,curr_nest_level)==NULL)
                 var2 = ICGvaluestack[--ICGvaluetop];
               else
-                var2 = InsertSearch(SymbolTable,op2,curr_nest_level)->value;
+                var2 = ScopeSearch(SymbolTable,op2,curr_nest_level)->value;
         }
         else
           var2 = atof(op2);
@@ -612,6 +620,15 @@ void gencode()
 
 void gencode_for()
 {
+
+    printf("\nStack\n");
+    int i = 0;
+    for(i=0;i<ICGtop;i++)
+    {
+        printf("%s\n",ICGstack[i]);
+    }
+    printf("\n______________\n");
+
     char *op1 = ICGstack[--ICGtop]; 
     char *op2 = ICGstack[--ICGtop];
     char *op3 = ICGstack[--ICGtop];
@@ -625,10 +642,10 @@ void gencode_for()
     else if(strcmp(op2,"+=") == 0)
     {
     	if(isalpha(op1[0])){
-              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value + ICGvaluestack[--ICGvaluetop];
+              if(ScopeSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value + ICGvaluestack[--ICGvaluetop];
               else
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value + InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value + ScopeSearch(SymbolTable,op1,curr_nest_level)->value;
             }
         else
         {
@@ -639,10 +656,10 @@ void gencode_for()
     else if(strcmp(op2,"-=") == 0)
     {
     	if(isalpha(op1[0])){
-              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value - ICGvaluestack[--ICGvaluetop];
+              if(ScopeSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value - ICGvaluestack[--ICGvaluetop];
               else
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value - InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value - ScopeSearch(SymbolTable,op1,curr_nest_level)->value;
             }
         else
         {
@@ -653,10 +670,10 @@ void gencode_for()
     else if(strcmp(op2,"*=") == 0)
     {
     	if(isalpha(op1[0])){
-              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value * ICGvaluestack[--ICGvaluetop];
+              if(ScopeSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value * ICGvaluestack[--ICGvaluetop];
               else
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value * InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value * ScopeSearch(SymbolTable,op1,curr_nest_level)->value;
             }
         else
         {
@@ -667,10 +684,10 @@ void gencode_for()
     else if(strcmp(op2,"/=") == 0)
     {
     	if(isalpha(op1[0])){
-              if(InsertSearch(SymbolTable,op1,curr_nest_level)==NULL)
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value / ICGvaluestack[--ICGvaluetop];
+              if(ScopeSearch(SymbolTable,op1,curr_nest_level)==NULL)
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value / ICGvaluestack[--ICGvaluetop];
               else
-                valAssign = InsertSearch(SymbolTable,op3,curr_nest_level)->value / InsertSearch(SymbolTable,op1,curr_nest_level)->value;
+                valAssign = ScopeSearch(SymbolTable,op3,curr_nest_level)->value / ScopeSearch(SymbolTable,op1,curr_nest_level)->value;
             }
         else
         {
@@ -680,6 +697,7 @@ void gencode_for()
     }
     else
     {
+
         char temp[3] = "t0\0";
         temp[1] = (char)(Registerlabel + '0');
         temp[2] = '\0';
@@ -688,23 +706,25 @@ void gencode_for()
         double var3,var2;
 
         if(isalpha(op3[0])){
-              if(InsertSearch(SymbolTable,op3,curr_nest_level)==NULL)
+              if(ScopeSearch(SymbolTable,op3,curr_nest_level)==NULL)
                 var3 = ICGvaluestack[--ICGvaluetop];
               else
-                var3 = InsertSearch(SymbolTable,op3,curr_nest_level)->value;
+                var3 = ScopeSearch(SymbolTable,op3,curr_nest_level)->value;
         }
         else
           var3 = atof(op3);
 
         if(isalpha(op2[0])){
-              if(InsertSearch(SymbolTable,op2,curr_nest_level)==NULL)
+              if(ScopeSearch(SymbolTable,op2,curr_nest_level)==NULL)
                 var2 = ICGvaluestack[--ICGvaluetop];
               else
-                var2 = InsertSearch(SymbolTable,op2,curr_nest_level)->value;
+                var2 = ScopeSearch(SymbolTable,op2,curr_nest_level)->value;
         }
         else
           var2 = atof(op2);
 
+        if(strcmp(op1,"=") != 0)
+        {
         fprintf(output1,"%s = %s %s %s\n",temp,op3,op1,op2);
         if(strcmp(op1,"+") == 0)
             valAssign = var3 + var2;
@@ -713,8 +733,8 @@ void gencode_for()
         else if(strcmp(op1,"*") == 0)
             valAssign = var3 * var2;
         else if(strcmp(op1,"/") == 0)
-         
-
+            valAssign = var3/var2;
+        }
         push(temp);
         pushvalue(valAssign);
          
@@ -838,4 +858,37 @@ void gencode_return()
 void gencode_param()
 {
     fprintf(output,"Param %s\n",ICGstack[--ICGtop]);
+}
+void gencode_array()
+{
+
+    printf("\nStack\n");
+    int i = 0;
+    for(i=0;i<ICGtop;i++)
+    {
+        printf("%s\n",ICGstack[i]);
+    }
+    printf("\n______________\n");
+    
+    char temp[3] = "t0\0";
+        temp[1] = (char)(Registerlabel + '0');
+        temp[2] = '\0';
+        Registerlabel++;
+
+    char *op1 = ICGstack[--ICGtop];
+    char *op2 = ICGstack[--ICGtop];
+
+    
+    
+    strcat(op2,"[");
+    strcat(op2,op1);
+    strcat(op2,"]");
+
+    printf("%s\n%s\n",op1,op2);
+
+    fprintf(output,"%s = %s\n",temp,op2);
+
+    push(temp);
+
+    //fprintf(output,"ARRAY %s\n",ICGstack[--ICGtop]);
 }
