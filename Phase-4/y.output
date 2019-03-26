@@ -1,4 +1,4 @@
-Terminals unused in grammar
+Terminals which are not used
 
    MOD_ASSIGN
    MOD
@@ -45,21 +45,21 @@ Grammar
    19 pointer: MULTIPLY pointer
    20        | MULTIPLY
 
-   21 $@1: %empty
+   21 @1: /* empty */
 
-   22 $@2: %empty
+   22 @2: /* empty */
 
-   23 funDeclaration: typeSpecifier identifier $@1 '(' params ')' $@2 compoundStmt
+   23 funDeclaration: typeSpecifier identifier @1 '(' params ')' @2 compoundStmt
 
    24 params: paramList
-   25       | %empty
+   25       | /* empty */
 
    26 paramList: paramList ',' paramTypeList
    27          | paramTypeList
 
-   28 $@3: %empty
+   28 @3: /* empty */
 
-   29 paramTypeList: $@3 typeSpecifier paramId
+   29 paramTypeList: @3 typeSpecifier paramId
 
    30 paramId: identifier
    31        | identifier '[' ']'
@@ -73,190 +73,197 @@ Grammar
    38          | breakStmt
    39          | varDeclaration
 
-   40 $@4: %empty
+   40 @4: /* empty */
 
-   41 compoundStmt: $@4 '{' statementList '}'
+   41 compoundStmt: @4 '{' statementList '}'
 
    42 statementList: statementList statement
-   43              | %empty
+   43              | /* empty */
 
    44 expressionStmt: expression ';'
    45               | ';'
 
-   46 $@5: %empty
+   46 @5: /* empty */
 
-   47 selectionStmt: IF '(' simpleExpression ')' $@5 compoundStmt else
+   47 selectionStmt: IF '(' simpleExpression ')' @5 compoundStmt else
 
-   48 $@6: %empty
+   48 @6: /* empty */
 
-   49 else: $@6 ELSE statement
-   50     | %empty
+   49 else: @6 ELSE statement
+   50     | /* empty */
 
-   51 $@7: %empty
+   51 @7: /* empty */
 
-   52 $@8: %empty
+   52 @8: /* empty */
 
-   53 iterationStmt: WHILE '(' simpleExpression ')' $@7 $@8 statement
+   53 iterationStmt: WHILE '(' simpleExpression ')' @7 @8 statement
 
-   54 $@9: %empty
+   54 @9: /* empty */
 
-   55 iterationStmt: DO $@9 statement WHILE '(' expression ')' ';'
+   55 @10: /* empty */
 
-   56 $@10: %empty
+   56 iterationStmt: DO @9 @10 statement WHILE '(' expression ')' ';'
 
-   57 $@11: %empty
+   57 @11: /* empty */
 
-   58 $@12: %empty
+   58 @12: /* empty */
 
-   59 $@13: %empty
+   59 @13: /* empty */
 
-   60 iterationStmt: FOR '(' optExpression ';' optExpression $@10 ';' $@11 optExpression $@12 ')' $@13 statement
+   60 @14: /* empty */
 
-   61 optExpression: expression
-   62              | %empty
+   61 iterationStmt: FOR '(' optExpression ';' optExpression @11 ';' @12 optExpression @13 ')' @14 statement
 
-   63 jumpStmt: GOTO identifier ';'
-   64         | CONTINUE ';'
+   62 optExpression: expression
+   63              | /* empty */
 
-   65 returnStmt: RETURN ';'
-   66           | RETURN expression
+   64 jumpStmt: GOTO identifier ';'
+   65         | CONTINUE ';'
 
-   67 breakStmt: BREAK ';'
+   66 returnStmt: RETURN ';'
+   67           | RETURN expression
 
-   68 $@14: %empty
+   68 breakStmt: BREAK ';'
 
-   69 expression: mutable ASSIGN $@14 expression
+   69 @15: /* empty */
 
-   70 $@15: %empty
+   70 expression: mutable ASSIGN @15 expression
 
-   71 expression: mutable ADD_ASSIGN $@15 expression
+   71 @16: /* empty */
 
-   72 $@16: %empty
+   72 expression: mutable ADD_ASSIGN @16 expression
 
-   73 expression: mutable SUB_ASSIGN $@16 expression
+   73 @17: /* empty */
 
-   74 $@17: %empty
+   74 expression: mutable SUB_ASSIGN @17 expression
 
-   75 expression: mutable MUL_ASSIGN $@17 expression
+   75 @18: /* empty */
 
-   76 $@18: %empty
+   76 expression: mutable MUL_ASSIGN @18 expression
 
-   77 expression: mutable DIV_ASSIGN $@18 expression
-   78           | mutable INCREMENT
-   79           | mutable DECREMENT
-   80           | simpleExpression
+   77 @19: /* empty */
 
-   81 simpleExpression: simpleExpression LG_OR andExpression
-   82                 | andExpression
+   78 expression: mutable DIV_ASSIGN @19 expression
+   79           | mutable INCREMENT
+   80           | mutable DECREMENT
+   81           | simpleExpression
 
-   83 andExpression: andExpression LG_AND unaryRelExpression
-   84              | unaryRelExpression
+   82 simpleExpression: simpleExpression LG_OR andExpression
+   83                 | andExpression
 
-   85 unaryRelExpression: NOT unaryRelExpression
-   86                   | relExpression
+   84 andExpression: andExpression LG_AND unaryRelExpression
+   85              | unaryRelExpression
 
-   87 relExpression: sumExpression GREATER_THAN sumExpression
-   88              | sumExpression LESSER_THAN sumExpression
-   89              | sumExpression LESS_EQ sumExpression
-   90              | sumExpression GREATER_EQ sumExpression
-   91              | sumExpression NOT_EQ sumExpression
-   92              | sumExpression EQUAL sumExpression
-   93              | sumExpression
+   86 unaryRelExpression: NOT unaryRelExpression
+   87                   | relExpression
 
-   94 sumExpression: sumExpression ADD term
-   95              | sumExpression SUBTRACT term
-   96              | term
+   88 relExpression: sumExpression GREATER_THAN sumExpression
+   89              | sumExpression LESSER_THAN sumExpression
+   90              | sumExpression LESS_EQ sumExpression
+   91              | sumExpression GREATER_EQ sumExpression
+   92              | sumExpression NOT_EQ sumExpression
+   93              | sumExpression EQUAL sumExpression
+   94              | sumExpression
 
-   97 term: term MULTIPLY unaryExpression
-   98     | term DIVIDE unaryExpression
-   99     | unaryExpression
+   95 sumExpression: sumExpression ADD term
+   96              | sumExpression SUBTRACT term
+   97              | term
 
-  100 unaryExpression: ADD factor
-  101                | SUBTRACT factor
-  102                | factor
+   98 term: term MULTIPLY unaryExpression
+   99     | term DIVIDE unaryExpression
+  100     | unaryExpression
 
-  103 factor: immutable
-  104       | mutable
+  101 unaryExpression: ADD factor
+  102                | SUBTRACT factor
+  103                | factor
 
-  105 mutable: identifier
-  106        | identifier '[' simpleExpression ']'
+  104 factor: immutable
+  105       | mutable
 
-  107 immutable: '(' expression ')'
-  108          | call
-  109          | const_type
+  106 mutable: identifier
 
-  110 call: identifier '(' args ')'
+  107 @20: /* empty */
 
-  111 args: argList
-  112     | %empty
+  108 @21: /* empty */
 
-  113 argList: argList ',' arg
-  114        | arg
+  109 mutable: identifier '[' @20 simpleExpression @21 ']'
 
-  115 arg: expression
+  110 immutable: '(' expression ')'
+  111          | call
+  112          | const_type
 
-  116 const_type: DEC_CONSTANT
-  117           | INT_CONSTANT
-  118           | HEX_CONSTANT
-  119           | STRING
+  113 call: identifier '(' args ')'
 
-  120 identifier: IDENTIFIER
+  114 args: argList
+  115     | /* empty */
+
+  116 argList: argList ',' arg
+  117        | arg
+
+  118 arg: expression
+
+  119 const_type: DEC_CONSTANT
+  120           | INT_CONSTANT
+  121           | HEX_CONSTANT
+  122           | STRING
+
+  123 identifier: IDENTIFIER
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'(' (40) 23 47 53 55 60 107 110
-')' (41) 23 47 53 55 60 107 110
-',' (44) 7 26 113
-';' (59) 6 44 45 55 60 63 64 65 67
-'[' (91) 12 31 106
-']' (93) 12 31 106
+'(' (40) 23 47 53 56 61 110 113
+')' (41) 23 47 53 56 61 110 113
+',' (44) 7 26 116
+';' (59) 6 44 45 56 61 64 65 66 68
+'[' (91) 12 31 109
+']' (93) 12 31 109
 '{' (123) 41
 '}' (125) 41
 error (256)
-ADD (258) 94 100
-SUBTRACT (259) 95 101
-MULTIPLY (260) 19 20 97
-DIVIDE (261) 98
-ASSIGN (262) 18 69
-ADD_ASSIGN (263) 71
-SUB_ASSIGN (264) 73
-MUL_ASSIGN (265) 75
-DIV_ASSIGN (266) 77
+ADD (258) 95 101
+SUBTRACT (259) 96 102
+MULTIPLY (260) 19 20 98
+DIVIDE (261) 99
+ASSIGN (262) 18 70
+ADD_ASSIGN (263) 72
+SUB_ASSIGN (264) 74
+MUL_ASSIGN (265) 76
+DIV_ASSIGN (266) 78
 MOD_ASSIGN (267)
 MOD (268)
-GREATER_THAN (269) 87
-LESSER_THAN (270) 88
-LESS_EQ (271) 89
-GREATER_EQ (272) 90
-NOT_EQ (273) 91
-EQUAL (274) 92
+GREATER_THAN (269) 88
+LESSER_THAN (270) 89
+LESS_EQ (271) 90
+GREATER_EQ (272) 91
+NOT_EQ (273) 92
+EQUAL (274) 93
 VOID (275) 15
 IF (276) 47
 ELSE (277) 49
-FOR (278) 60
-DO (279) 55
-WHILE (280) 53 55
-GOTO (281) 63
-BREAK (282) 67
-CONTINUE (283) 64
-RETURN (284) 65 66
+FOR (278) 61
+DO (279) 56
+WHILE (280) 53 56
+GOTO (281) 64
+BREAK (282) 68
+CONTINUE (283) 65
+RETURN (284) 66 67
 INT (285) 14
 SHORT (286)
 LONG (287)
 CHAR (288) 16
 FLOAT (289) 17
-LG_OR (290) 81
-LG_AND (291) 83
-NOT (292) 85
-DECREMENT (293) 79
-INCREMENT (294) 78
-HEX_CONSTANT (295) 118
-DEC_CONSTANT (296) 116
-INT_CONSTANT (297) 12 117
-STRING (298) 119
-IDENTIFIER (299) 120
+LG_OR (290) 82
+LG_AND (291) 84
+NOT (292) 86
+DECREMENT (293) 80
+INCREMENT (294) 79
+HEX_CONSTANT (295) 121
+DEC_CONSTANT (296) 119
+INT_CONSTANT (297) 12 120
+STRING (298) 122
+IDENTIFIER (299) 123
 IFX (300)
 
 
@@ -286,9 +293,9 @@ pointer (64)
     on left: 19 20, on right: 13 19
 funDeclaration (65)
     on left: 23, on right: 5
-$@1 (66)
+@1 (66)
     on left: 21, on right: 23
-$@2 (67)
+@2 (67)
     on left: 22, on right: 23
 params (68)
     on left: 24 25, on right: 23
@@ -296,15 +303,15 @@ paramList (69)
     on left: 26 27, on right: 24 26
 paramTypeList (70)
     on left: 29, on right: 26 27
-$@3 (71)
+@3 (71)
     on left: 28, on right: 29
 paramId (72)
     on left: 30 31, on right: 29
 statement (73)
-    on left: 32 33 34 35 36 37 38 39, on right: 42 49 53 55 60
+    on left: 32 33 34 35 36 37 38 39, on right: 42 49 53 56 61
 compoundStmt (74)
     on left: 41, on right: 23 33 47
-$@4 (75)
+@4 (75)
     on left: 40, on right: 41
 statementList (76)
     on left: 42 43, on right: 41 42
@@ -312,84 +319,90 @@ expressionStmt (77)
     on left: 44 45, on right: 32
 selectionStmt (78)
     on left: 47, on right: 34
-$@5 (79)
+@5 (79)
     on left: 46, on right: 47
 else (80)
     on left: 49 50, on right: 47
-$@6 (81)
+@6 (81)
     on left: 48, on right: 49
 iterationStmt (82)
-    on left: 53 55 60, on right: 35
-$@7 (83)
+    on left: 53 56 61, on right: 35
+@7 (83)
     on left: 51, on right: 53
-$@8 (84)
+@8 (84)
     on left: 52, on right: 53
-$@9 (85)
-    on left: 54, on right: 55
-$@10 (86)
-    on left: 56, on right: 60
-$@11 (87)
-    on left: 57, on right: 60
-$@12 (88)
-    on left: 58, on right: 60
-$@13 (89)
-    on left: 59, on right: 60
-optExpression (90)
-    on left: 61 62, on right: 60
-jumpStmt (91)
-    on left: 63 64, on right: 36
-returnStmt (92)
-    on left: 65 66, on right: 37
-breakStmt (93)
-    on left: 67, on right: 38
-expression (94)
-    on left: 69 71 73 75 77 78 79 80, on right: 44 55 61 66 69 71 73
-    75 77 107 115
-$@14 (95)
-    on left: 68, on right: 69
-$@15 (96)
-    on left: 70, on right: 71
-$@16 (97)
-    on left: 72, on right: 73
-$@17 (98)
-    on left: 74, on right: 75
-$@18 (99)
-    on left: 76, on right: 77
-simpleExpression (100)
-    on left: 81 82, on right: 10 47 53 80 81 106
-andExpression (101)
-    on left: 83 84, on right: 81 82 83
-unaryRelExpression (102)
-    on left: 85 86, on right: 83 84 85
-relExpression (103)
-    on left: 87 88 89 90 91 92 93, on right: 86
-sumExpression (104)
-    on left: 94 95 96, on right: 87 88 89 90 91 92 93 94 95
-term (105)
-    on left: 97 98 99, on right: 94 95 96 97 98
-unaryExpression (106)
-    on left: 100 101 102, on right: 97 98 99
-factor (107)
-    on left: 103 104, on right: 100 101 102
-mutable (108)
-    on left: 105 106, on right: 69 71 73 75 77 78 79 104
-immutable (109)
-    on left: 107 108 109, on right: 103
-call (110)
-    on left: 110, on right: 108
-args (111)
-    on left: 111 112, on right: 110
-argList (112)
-    on left: 113 114, on right: 111 113
-arg (113)
-    on left: 115, on right: 113 114
-const_type (114)
-    on left: 116 117 118 119, on right: 109
-identifier (115)
-    on left: 120, on right: 11 12 23 30 31 63 105 106 110
+@9 (85)
+    on left: 54, on right: 56
+@10 (86)
+    on left: 55, on right: 56
+@11 (87)
+    on left: 57, on right: 61
+@12 (88)
+    on left: 58, on right: 61
+@13 (89)
+    on left: 59, on right: 61
+@14 (90)
+    on left: 60, on right: 61
+optExpression (91)
+    on left: 62 63, on right: 61
+jumpStmt (92)
+    on left: 64 65, on right: 36
+returnStmt (93)
+    on left: 66 67, on right: 37
+breakStmt (94)
+    on left: 68, on right: 38
+expression (95)
+    on left: 70 72 74 76 78 79 80 81, on right: 44 56 62 67 70 72 74
+    76 78 110 118
+@15 (96)
+    on left: 69, on right: 70
+@16 (97)
+    on left: 71, on right: 72
+@17 (98)
+    on left: 73, on right: 74
+@18 (99)
+    on left: 75, on right: 76
+@19 (100)
+    on left: 77, on right: 78
+simpleExpression (101)
+    on left: 82 83, on right: 10 47 53 81 82 109
+andExpression (102)
+    on left: 84 85, on right: 82 83 84
+unaryRelExpression (103)
+    on left: 86 87, on right: 84 85 86
+relExpression (104)
+    on left: 88 89 90 91 92 93 94, on right: 87
+sumExpression (105)
+    on left: 95 96 97, on right: 88 89 90 91 92 93 94 95 96
+term (106)
+    on left: 98 99 100, on right: 95 96 97 98 99
+unaryExpression (107)
+    on left: 101 102 103, on right: 98 99 100
+factor (108)
+    on left: 104 105, on right: 101 102 103
+mutable (109)
+    on left: 106 109, on right: 70 72 74 76 78 79 80 105
+@20 (110)
+    on left: 107, on right: 109
+@21 (111)
+    on left: 108, on right: 109
+immutable (112)
+    on left: 110 111 112, on right: 104
+call (113)
+    on left: 113, on right: 111
+args (114)
+    on left: 114 115, on right: 113
+argList (115)
+    on left: 116 117, on right: 114 116
+arg (116)
+    on left: 118, on right: 116 117
+const_type (117)
+    on left: 119 120 121 122, on right: 112
+identifier (118)
+    on left: 123, on right: 11 12 23 30 31 64 106 109 113
 
 
-State 0
+state 0
 
     0 $accept: . program $end
 
@@ -406,42 +419,42 @@ State 0
     funDeclaration   go to state 10
 
 
-State 1
+state 1
 
    15 typeSpecifier: VOID .
 
     $default  reduce using rule 15 (typeSpecifier)
 
 
-State 2
+state 2
 
    14 typeSpecifier: INT .
 
     $default  reduce using rule 14 (typeSpecifier)
 
 
-State 3
+state 3
 
    16 typeSpecifier: CHAR .
 
     $default  reduce using rule 16 (typeSpecifier)
 
 
-State 4
+state 4
 
    17 typeSpecifier: FLOAT .
 
     $default  reduce using rule 17 (typeSpecifier)
 
 
-State 5
+state 5
 
     0 $accept: program . $end
 
     $end  shift, and go to state 11
 
 
-State 6
+state 6
 
     1 program: declarationList .
     2 declarationList: declarationList . declaration
@@ -459,25 +472,25 @@ State 6
     funDeclaration  go to state 10
 
 
-State 7
+state 7
 
     3 declarationList: declaration .
 
     $default  reduce using rule 3 (declarationList)
 
 
-State 8
+state 8
 
     4 declaration: varDeclaration .
 
     $default  reduce using rule 4 (declaration)
 
 
-State 9
+state 9
 
     6 varDeclaration: typeSpecifier . varDeclList ';'
    13 typeSpecifier: typeSpecifier . pointer
-   23 funDeclaration: typeSpecifier . identifier $@1 '(' params ')' $@2 compoundStmt
+   23 funDeclaration: typeSpecifier . identifier @1 '(' params ')' @2 compoundStmt
 
     MULTIPLY    shift, and go to state 13
     IDENTIFIER  shift, and go to state 14
@@ -489,28 +502,28 @@ State 9
     identifier         go to state 19
 
 
-State 10
+state 10
 
     5 declaration: funDeclaration .
 
     $default  reduce using rule 5 (declaration)
 
 
-State 11
+state 11
 
     0 $accept: program $end .
 
     $default  accept
 
 
-State 12
+state 12
 
     2 declarationList: declarationList declaration .
 
     $default  reduce using rule 2 (declarationList)
 
 
-State 13
+state 13
 
    19 pointer: MULTIPLY . pointer
    20        | MULTIPLY .
@@ -520,14 +533,14 @@ State 13
     pointer  go to state 20
 
 
-State 14
+state 14
 
-  120 identifier: IDENTIFIER .
+  123 identifier: IDENTIFIER .
 
-    $default  reduce using rule 120 (identifier)
+    $default  reduce using rule 123 (identifier)
 
 
-State 15
+state 15
 
     6 varDeclaration: typeSpecifier varDeclList . ';'
     7 varDeclList: varDeclList . ',' varDeclInitialize
@@ -536,14 +549,14 @@ State 15
     ';'  shift, and go to state 22
 
 
-State 16
+state 16
 
     8 varDeclList: varDeclInitialize .
 
     $default  reduce using rule 8 (varDeclList)
 
 
-State 17
+state 17
 
     9 varDeclInitialize: varDecId .
    10                  | varDecId . assign_symbol simpleExpression
@@ -555,35 +568,35 @@ State 17
     assign_symbol  go to state 24
 
 
-State 18
+state 18
 
    13 typeSpecifier: typeSpecifier pointer .
 
     $default  reduce using rule 13 (typeSpecifier)
 
 
-State 19
+state 19
 
    11 varDecId: identifier .
    12         | identifier . '[' INT_CONSTANT ']'
-   23 funDeclaration: typeSpecifier identifier . $@1 '(' params ')' $@2 compoundStmt
+   23 funDeclaration: typeSpecifier identifier . @1 '(' params ')' @2 compoundStmt
 
     '['  shift, and go to state 25
 
-    '('       reduce using rule 21 ($@1)
+    '('       reduce using rule 21 (@1)
     $default  reduce using rule 11 (varDecId)
 
-    $@1  go to state 26
+    @1  go to state 26
 
 
-State 20
+state 20
 
    19 pointer: MULTIPLY pointer .
 
     $default  reduce using rule 19 (pointer)
 
 
-State 21
+state 21
 
     7 varDeclList: varDeclList ',' . varDeclInitialize
 
@@ -594,21 +607,21 @@ State 21
     identifier         go to state 28
 
 
-State 22
+state 22
 
     6 varDeclaration: typeSpecifier varDeclList ';' .
 
     $default  reduce using rule 6 (varDeclaration)
 
 
-State 23
+state 23
 
    18 assign_symbol: ASSIGN .
 
     $default  reduce using rule 18 (assign_symbol)
 
 
-State 24
+state 24
 
    10 varDeclInitialize: varDecId assign_symbol . simpleExpression
 
@@ -637,28 +650,28 @@ State 24
     identifier          go to state 49
 
 
-State 25
+state 25
 
    12 varDecId: identifier '[' . INT_CONSTANT ']'
 
     INT_CONSTANT  shift, and go to state 50
 
 
-State 26
+state 26
 
-   23 funDeclaration: typeSpecifier identifier $@1 . '(' params ')' $@2 compoundStmt
+   23 funDeclaration: typeSpecifier identifier @1 . '(' params ')' @2 compoundStmt
 
     '('  shift, and go to state 51
 
 
-State 27
+state 27
 
     7 varDeclList: varDeclList ',' varDeclInitialize .
 
     $default  reduce using rule 7 (varDeclList)
 
 
-State 28
+state 28
 
    11 varDecId: identifier .
    12         | identifier . '[' INT_CONSTANT ']'
@@ -668,9 +681,9 @@ State 28
     $default  reduce using rule 11 (varDecId)
 
 
-State 29
+state 29
 
-  100 unaryExpression: ADD . factor
+  101 unaryExpression: ADD . factor
 
     HEX_CONSTANT  shift, and go to state 32
     DEC_CONSTANT  shift, and go to state 33
@@ -687,9 +700,9 @@ State 29
     identifier  go to state 49
 
 
-State 30
+state 30
 
-  101 unaryExpression: SUBTRACT . factor
+  102 unaryExpression: SUBTRACT . factor
 
     HEX_CONSTANT  shift, and go to state 32
     DEC_CONSTANT  shift, and go to state 33
@@ -706,9 +719,9 @@ State 30
     identifier  go to state 49
 
 
-State 31
+state 31
 
-   85 unaryRelExpression: NOT . unaryRelExpression
+   86 unaryRelExpression: NOT . unaryRelExpression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -733,37 +746,37 @@ State 31
     identifier          go to state 49
 
 
-State 32
+state 32
 
-  118 const_type: HEX_CONSTANT .
+  121 const_type: HEX_CONSTANT .
 
-    $default  reduce using rule 118 (const_type)
-
-
-State 33
-
-  116 const_type: DEC_CONSTANT .
-
-    $default  reduce using rule 116 (const_type)
+    $default  reduce using rule 121 (const_type)
 
 
-State 34
+state 33
 
-  117 const_type: INT_CONSTANT .
-
-    $default  reduce using rule 117 (const_type)
-
-
-State 35
-
-  119 const_type: STRING .
+  119 const_type: DEC_CONSTANT .
 
     $default  reduce using rule 119 (const_type)
 
 
-State 36
+state 34
 
-  107 immutable: '(' . expression ')'
+  120 const_type: INT_CONSTANT .
+
+    $default  reduce using rule 120 (const_type)
+
+
+state 35
+
+  122 const_type: STRING .
+
+    $default  reduce using rule 122 (const_type)
+
+
+state 36
+
+  110 immutable: '(' . expression ')'
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -791,51 +804,51 @@ State 36
     identifier          go to state 49
 
 
-State 37
+state 37
 
    10 varDeclInitialize: varDecId assign_symbol simpleExpression .
-   81 simpleExpression: simpleExpression . LG_OR andExpression
+   82 simpleExpression: simpleExpression . LG_OR andExpression
 
     LG_OR  shift, and go to state 58
 
     $default  reduce using rule 10 (varDeclInitialize)
 
 
-State 38
+state 38
 
-   82 simpleExpression: andExpression .
-   83 andExpression: andExpression . LG_AND unaryRelExpression
+   83 simpleExpression: andExpression .
+   84 andExpression: andExpression . LG_AND unaryRelExpression
 
     LG_AND  shift, and go to state 59
 
-    $default  reduce using rule 82 (simpleExpression)
+    $default  reduce using rule 83 (simpleExpression)
 
 
-State 39
+state 39
 
-   84 andExpression: unaryRelExpression .
+   85 andExpression: unaryRelExpression .
 
-    $default  reduce using rule 84 (andExpression)
-
-
-State 40
-
-   86 unaryRelExpression: relExpression .
-
-    $default  reduce using rule 86 (unaryRelExpression)
+    $default  reduce using rule 85 (andExpression)
 
 
-State 41
+state 40
 
-   87 relExpression: sumExpression . GREATER_THAN sumExpression
-   88              | sumExpression . LESSER_THAN sumExpression
-   89              | sumExpression . LESS_EQ sumExpression
-   90              | sumExpression . GREATER_EQ sumExpression
-   91              | sumExpression . NOT_EQ sumExpression
-   92              | sumExpression . EQUAL sumExpression
-   93              | sumExpression .
-   94 sumExpression: sumExpression . ADD term
-   95              | sumExpression . SUBTRACT term
+   87 unaryRelExpression: relExpression .
+
+    $default  reduce using rule 87 (unaryRelExpression)
+
+
+state 41
+
+   88 relExpression: sumExpression . GREATER_THAN sumExpression
+   89              | sumExpression . LESSER_THAN sumExpression
+   90              | sumExpression . LESS_EQ sumExpression
+   91              | sumExpression . GREATER_EQ sumExpression
+   92              | sumExpression . NOT_EQ sumExpression
+   93              | sumExpression . EQUAL sumExpression
+   94              | sumExpression .
+   95 sumExpression: sumExpression . ADD term
+   96              | sumExpression . SUBTRACT term
 
     ADD           shift, and go to state 60
     SUBTRACT      shift, and go to state 61
@@ -846,146 +859,146 @@ State 41
     NOT_EQ        shift, and go to state 66
     EQUAL         shift, and go to state 67
 
-    ADD       [reduce using rule 93 (relExpression)]
-    SUBTRACT  [reduce using rule 93 (relExpression)]
-    $default  reduce using rule 93 (relExpression)
+    ADD       [reduce using rule 94 (relExpression)]
+    SUBTRACT  [reduce using rule 94 (relExpression)]
+    $default  reduce using rule 94 (relExpression)
 
 
-State 42
+state 42
 
-   96 sumExpression: term .
-   97 term: term . MULTIPLY unaryExpression
-   98     | term . DIVIDE unaryExpression
+   97 sumExpression: term .
+   98 term: term . MULTIPLY unaryExpression
+   99     | term . DIVIDE unaryExpression
 
     MULTIPLY  shift, and go to state 68
     DIVIDE    shift, and go to state 69
 
-    $default  reduce using rule 96 (sumExpression)
+    $default  reduce using rule 97 (sumExpression)
 
 
-State 43
+state 43
 
-   99 term: unaryExpression .
+  100 term: unaryExpression .
 
-    $default  reduce using rule 99 (term)
-
-
-State 44
-
-  102 unaryExpression: factor .
-
-    $default  reduce using rule 102 (unaryExpression)
+    $default  reduce using rule 100 (term)
 
 
-State 45
+state 44
 
-  104 factor: mutable .
+  103 unaryExpression: factor .
+
+    $default  reduce using rule 103 (unaryExpression)
+
+
+state 45
+
+  105 factor: mutable .
+
+    $default  reduce using rule 105 (factor)
+
+
+state 46
+
+  104 factor: immutable .
 
     $default  reduce using rule 104 (factor)
 
 
-State 46
+state 47
 
-  103 factor: immutable .
+  111 immutable: call .
 
-    $default  reduce using rule 103 (factor)
-
-
-State 47
-
-  108 immutable: call .
-
-    $default  reduce using rule 108 (immutable)
+    $default  reduce using rule 111 (immutable)
 
 
-State 48
+state 48
 
-  109 immutable: const_type .
+  112 immutable: const_type .
 
-    $default  reduce using rule 109 (immutable)
+    $default  reduce using rule 112 (immutable)
 
 
-State 49
+state 49
 
-  105 mutable: identifier .
-  106        | identifier . '[' simpleExpression ']'
-  110 call: identifier . '(' args ')'
+  106 mutable: identifier .
+  109        | identifier . '[' @20 simpleExpression @21 ']'
+  113 call: identifier . '(' args ')'
 
     '['  shift, and go to state 70
     '('  shift, and go to state 71
 
-    '('       [reduce using rule 105 (mutable)]
-    $default  reduce using rule 105 (mutable)
+    '('       [reduce using rule 106 (mutable)]
+    $default  reduce using rule 106 (mutable)
 
 
-State 50
+state 50
 
    12 varDecId: identifier '[' INT_CONSTANT . ']'
 
     ']'  shift, and go to state 72
 
 
-State 51
+state 51
 
-   23 funDeclaration: typeSpecifier identifier $@1 '(' . params ')' $@2 compoundStmt
+   23 funDeclaration: typeSpecifier identifier @1 '(' . params ')' @2 compoundStmt
 
     ')'       reduce using rule 25 (params)
-    $default  reduce using rule 28 ($@3)
+    $default  reduce using rule 28 (@3)
 
     params         go to state 73
     paramList      go to state 74
     paramTypeList  go to state 75
-    $@3            go to state 76
+    @3             go to state 76
 
 
-State 52
+state 52
 
-  100 unaryExpression: ADD factor .
-
-    $default  reduce using rule 100 (unaryExpression)
-
-
-State 53
-
-  101 unaryExpression: SUBTRACT factor .
+  101 unaryExpression: ADD factor .
 
     $default  reduce using rule 101 (unaryExpression)
 
 
-State 54
+state 53
 
-   85 unaryRelExpression: NOT unaryRelExpression .
+  102 unaryExpression: SUBTRACT factor .
 
-    $default  reduce using rule 85 (unaryRelExpression)
+    $default  reduce using rule 102 (unaryExpression)
 
 
-State 55
+state 54
 
-  107 immutable: '(' expression . ')'
+   86 unaryRelExpression: NOT unaryRelExpression .
+
+    $default  reduce using rule 86 (unaryRelExpression)
+
+
+state 55
+
+  110 immutable: '(' expression . ')'
 
     ')'  shift, and go to state 77
 
 
-State 56
+state 56
 
-   80 expression: simpleExpression .
-   81 simpleExpression: simpleExpression . LG_OR andExpression
+   81 expression: simpleExpression .
+   82 simpleExpression: simpleExpression . LG_OR andExpression
 
     LG_OR  shift, and go to state 58
 
-    $default  reduce using rule 80 (expression)
+    $default  reduce using rule 81 (expression)
 
 
-State 57
+state 57
 
-   69 expression: mutable . ASSIGN $@14 expression
-   71           | mutable . ADD_ASSIGN $@15 expression
-   73           | mutable . SUB_ASSIGN $@16 expression
-   75           | mutable . MUL_ASSIGN $@17 expression
-   77           | mutable . DIV_ASSIGN $@18 expression
-   78           | mutable . INCREMENT
-   79           | mutable . DECREMENT
-  104 factor: mutable .
+   70 expression: mutable . ASSIGN @15 expression
+   72           | mutable . ADD_ASSIGN @16 expression
+   74           | mutable . SUB_ASSIGN @17 expression
+   76           | mutable . MUL_ASSIGN @18 expression
+   78           | mutable . DIV_ASSIGN @19 expression
+   79           | mutable . INCREMENT
+   80           | mutable . DECREMENT
+  105 factor: mutable .
 
     ASSIGN      shift, and go to state 78
     ADD_ASSIGN  shift, and go to state 79
@@ -995,12 +1008,12 @@ State 57
     DECREMENT   shift, and go to state 83
     INCREMENT   shift, and go to state 84
 
-    $default  reduce using rule 104 (factor)
+    $default  reduce using rule 105 (factor)
 
 
-State 58
+state 58
 
-   81 simpleExpression: simpleExpression LG_OR . andExpression
+   82 simpleExpression: simpleExpression LG_OR . andExpression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1026,9 +1039,9 @@ State 58
     identifier          go to state 49
 
 
-State 59
+state 59
 
-   83 andExpression: andExpression LG_AND . unaryRelExpression
+   84 andExpression: andExpression LG_AND . unaryRelExpression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1053,9 +1066,9 @@ State 59
     identifier          go to state 49
 
 
-State 60
+state 60
 
-   94 sumExpression: sumExpression ADD . term
+   95 sumExpression: sumExpression ADD . term
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1076,9 +1089,9 @@ State 60
     identifier       go to state 49
 
 
-State 61
+state 61
 
-   95 sumExpression: sumExpression SUBTRACT . term
+   96 sumExpression: sumExpression SUBTRACT . term
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1099,9 +1112,9 @@ State 61
     identifier       go to state 49
 
 
-State 62
+state 62
 
-   87 relExpression: sumExpression GREATER_THAN . sumExpression
+   88 relExpression: sumExpression GREATER_THAN . sumExpression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1123,9 +1136,9 @@ State 62
     identifier       go to state 49
 
 
-State 63
+state 63
 
-   88 relExpression: sumExpression LESSER_THAN . sumExpression
+   89 relExpression: sumExpression LESSER_THAN . sumExpression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1147,9 +1160,9 @@ State 63
     identifier       go to state 49
 
 
-State 64
+state 64
 
-   89 relExpression: sumExpression LESS_EQ . sumExpression
+   90 relExpression: sumExpression LESS_EQ . sumExpression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1171,9 +1184,9 @@ State 64
     identifier       go to state 49
 
 
-State 65
+state 65
 
-   90 relExpression: sumExpression GREATER_EQ . sumExpression
+   91 relExpression: sumExpression GREATER_EQ . sumExpression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1195,9 +1208,9 @@ State 65
     identifier       go to state 49
 
 
-State 66
+state 66
 
-   91 relExpression: sumExpression NOT_EQ . sumExpression
+   92 relExpression: sumExpression NOT_EQ . sumExpression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1219,9 +1232,9 @@ State 66
     identifier       go to state 49
 
 
-State 67
+state 67
 
-   92 relExpression: sumExpression EQUAL . sumExpression
+   93 relExpression: sumExpression EQUAL . sumExpression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1243,9 +1256,9 @@ State 67
     identifier       go to state 49
 
 
-State 68
+state 68
 
-   97 term: term MULTIPLY . unaryExpression
+   98 term: term MULTIPLY . unaryExpression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1265,9 +1278,9 @@ State 68
     identifier       go to state 49
 
 
-State 69
+state 69
 
-   98 term: term DIVIDE . unaryExpression
+   99 term: term DIVIDE . unaryExpression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1287,38 +1300,18 @@ State 69
     identifier       go to state 49
 
 
-State 70
+state 70
 
-  106 mutable: identifier '[' . simpleExpression ']'
+  109 mutable: identifier '[' . @20 simpleExpression @21 ']'
 
-    ADD           shift, and go to state 29
-    SUBTRACT      shift, and go to state 30
-    NOT           shift, and go to state 31
-    HEX_CONSTANT  shift, and go to state 32
-    DEC_CONSTANT  shift, and go to state 33
-    INT_CONSTANT  shift, and go to state 34
-    STRING        shift, and go to state 35
-    IDENTIFIER    shift, and go to state 14
-    '('           shift, and go to state 36
+    $default  reduce using rule 107 (@20)
 
-    simpleExpression    go to state 97
-    andExpression       go to state 38
-    unaryRelExpression  go to state 39
-    relExpression       go to state 40
-    sumExpression       go to state 41
-    term                go to state 42
-    unaryExpression     go to state 43
-    factor              go to state 44
-    mutable             go to state 45
-    immutable           go to state 46
-    call                go to state 47
-    const_type          go to state 48
-    identifier          go to state 49
+    @20  go to state 97
 
 
-State 71
+state 71
 
-  110 call: identifier '(' . args ')'
+  113 call: identifier '(' . args ')'
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1330,7 +1323,7 @@ State 71
     IDENTIFIER    shift, and go to state 14
     '('           shift, and go to state 36
 
-    $default  reduce using rule 112 (args)
+    $default  reduce using rule 115 (args)
 
     expression          go to state 98
     simpleExpression    go to state 56
@@ -1351,21 +1344,21 @@ State 71
     identifier          go to state 49
 
 
-State 72
+state 72
 
    12 varDecId: identifier '[' INT_CONSTANT ']' .
 
     $default  reduce using rule 12 (varDecId)
 
 
-State 73
+state 73
 
-   23 funDeclaration: typeSpecifier identifier $@1 '(' params . ')' $@2 compoundStmt
+   23 funDeclaration: typeSpecifier identifier @1 '(' params . ')' @2 compoundStmt
 
     ')'  shift, and go to state 102
 
 
-State 74
+state 74
 
    24 params: paramList .
    26 paramList: paramList . ',' paramTypeList
@@ -1375,16 +1368,16 @@ State 74
     $default  reduce using rule 24 (params)
 
 
-State 75
+state 75
 
    27 paramList: paramTypeList .
 
     $default  reduce using rule 27 (paramList)
 
 
-State 76
+state 76
 
-   29 paramTypeList: $@3 . typeSpecifier paramId
+   29 paramTypeList: @3 . typeSpecifier paramId
 
     VOID   shift, and go to state 1
     INT    shift, and go to state 2
@@ -1394,106 +1387,94 @@ State 76
     typeSpecifier  go to state 104
 
 
-State 77
+state 77
 
-  107 immutable: '(' expression ')' .
+  110 immutable: '(' expression ')' .
 
-    $default  reduce using rule 107 (immutable)
-
-
-State 78
-
-   69 expression: mutable ASSIGN . $@14 expression
-
-    $default  reduce using rule 68 ($@14)
-
-    $@14  go to state 105
+    $default  reduce using rule 110 (immutable)
 
 
-State 79
+state 78
 
-   71 expression: mutable ADD_ASSIGN . $@15 expression
+   70 expression: mutable ASSIGN . @15 expression
 
-    $default  reduce using rule 70 ($@15)
+    $default  reduce using rule 69 (@15)
 
-    $@15  go to state 106
-
-
-State 80
-
-   73 expression: mutable SUB_ASSIGN . $@16 expression
-
-    $default  reduce using rule 72 ($@16)
-
-    $@16  go to state 107
+    @15  go to state 105
 
 
-State 81
+state 79
 
-   75 expression: mutable MUL_ASSIGN . $@17 expression
+   72 expression: mutable ADD_ASSIGN . @16 expression
 
-    $default  reduce using rule 74 ($@17)
+    $default  reduce using rule 71 (@16)
 
-    $@17  go to state 108
-
-
-State 82
-
-   77 expression: mutable DIV_ASSIGN . $@18 expression
-
-    $default  reduce using rule 76 ($@18)
-
-    $@18  go to state 109
+    @16  go to state 106
 
 
-State 83
+state 80
 
-   79 expression: mutable DECREMENT .
+   74 expression: mutable SUB_ASSIGN . @17 expression
+
+    $default  reduce using rule 73 (@17)
+
+    @17  go to state 107
+
+
+state 81
+
+   76 expression: mutable MUL_ASSIGN . @18 expression
+
+    $default  reduce using rule 75 (@18)
+
+    @18  go to state 108
+
+
+state 82
+
+   78 expression: mutable DIV_ASSIGN . @19 expression
+
+    $default  reduce using rule 77 (@19)
+
+    @19  go to state 109
+
+
+state 83
+
+   80 expression: mutable DECREMENT .
+
+    $default  reduce using rule 80 (expression)
+
+
+state 84
+
+   79 expression: mutable INCREMENT .
 
     $default  reduce using rule 79 (expression)
 
 
-State 84
+state 85
 
-   78 expression: mutable INCREMENT .
-
-    $default  reduce using rule 78 (expression)
-
-
-State 85
-
-   81 simpleExpression: simpleExpression LG_OR andExpression .
-   83 andExpression: andExpression . LG_AND unaryRelExpression
+   82 simpleExpression: simpleExpression LG_OR andExpression .
+   84 andExpression: andExpression . LG_AND unaryRelExpression
 
     LG_AND  shift, and go to state 59
 
-    $default  reduce using rule 81 (simpleExpression)
+    $default  reduce using rule 82 (simpleExpression)
 
 
-State 86
+state 86
 
-   83 andExpression: andExpression LG_AND unaryRelExpression .
+   84 andExpression: andExpression LG_AND unaryRelExpression .
 
-    $default  reduce using rule 83 (andExpression)
-
-
-State 87
-
-   94 sumExpression: sumExpression ADD term .
-   97 term: term . MULTIPLY unaryExpression
-   98     | term . DIVIDE unaryExpression
-
-    MULTIPLY  shift, and go to state 68
-    DIVIDE    shift, and go to state 69
-
-    $default  reduce using rule 94 (sumExpression)
+    $default  reduce using rule 84 (andExpression)
 
 
-State 88
+state 87
 
-   95 sumExpression: sumExpression SUBTRACT term .
-   97 term: term . MULTIPLY unaryExpression
-   98     | term . DIVIDE unaryExpression
+   95 sumExpression: sumExpression ADD term .
+   98 term: term . MULTIPLY unaryExpression
+   99     | term . DIVIDE unaryExpression
 
     MULTIPLY  shift, and go to state 68
     DIVIDE    shift, and go to state 69
@@ -1501,23 +1482,23 @@ State 88
     $default  reduce using rule 95 (sumExpression)
 
 
-State 89
+state 88
 
-   87 relExpression: sumExpression GREATER_THAN sumExpression .
-   94 sumExpression: sumExpression . ADD term
-   95              | sumExpression . SUBTRACT term
+   96 sumExpression: sumExpression SUBTRACT term .
+   98 term: term . MULTIPLY unaryExpression
+   99     | term . DIVIDE unaryExpression
 
-    ADD       shift, and go to state 60
-    SUBTRACT  shift, and go to state 61
+    MULTIPLY  shift, and go to state 68
+    DIVIDE    shift, and go to state 69
 
-    $default  reduce using rule 87 (relExpression)
+    $default  reduce using rule 96 (sumExpression)
 
 
-State 90
+state 89
 
-   88 relExpression: sumExpression LESSER_THAN sumExpression .
-   94 sumExpression: sumExpression . ADD term
-   95              | sumExpression . SUBTRACT term
+   88 relExpression: sumExpression GREATER_THAN sumExpression .
+   95 sumExpression: sumExpression . ADD term
+   96              | sumExpression . SUBTRACT term
 
     ADD       shift, and go to state 60
     SUBTRACT  shift, and go to state 61
@@ -1525,11 +1506,11 @@ State 90
     $default  reduce using rule 88 (relExpression)
 
 
-State 91
+state 90
 
-   89 relExpression: sumExpression LESS_EQ sumExpression .
-   94 sumExpression: sumExpression . ADD term
-   95              | sumExpression . SUBTRACT term
+   89 relExpression: sumExpression LESSER_THAN sumExpression .
+   95 sumExpression: sumExpression . ADD term
+   96              | sumExpression . SUBTRACT term
 
     ADD       shift, and go to state 60
     SUBTRACT  shift, and go to state 61
@@ -1537,11 +1518,11 @@ State 91
     $default  reduce using rule 89 (relExpression)
 
 
-State 92
+state 91
 
-   90 relExpression: sumExpression GREATER_EQ sumExpression .
-   94 sumExpression: sumExpression . ADD term
-   95              | sumExpression . SUBTRACT term
+   90 relExpression: sumExpression LESS_EQ sumExpression .
+   95 sumExpression: sumExpression . ADD term
+   96              | sumExpression . SUBTRACT term
 
     ADD       shift, and go to state 60
     SUBTRACT  shift, and go to state 61
@@ -1549,11 +1530,11 @@ State 92
     $default  reduce using rule 90 (relExpression)
 
 
-State 93
+state 92
 
-   91 relExpression: sumExpression NOT_EQ sumExpression .
-   94 sumExpression: sumExpression . ADD term
-   95              | sumExpression . SUBTRACT term
+   91 relExpression: sumExpression GREATER_EQ sumExpression .
+   95 sumExpression: sumExpression . ADD term
+   96              | sumExpression . SUBTRACT term
 
     ADD       shift, and go to state 60
     SUBTRACT  shift, and go to state 61
@@ -1561,11 +1542,11 @@ State 93
     $default  reduce using rule 91 (relExpression)
 
 
-State 94
+state 93
 
-   92 relExpression: sumExpression EQUAL sumExpression .
-   94 sumExpression: sumExpression . ADD term
-   95              | sumExpression . SUBTRACT term
+   92 relExpression: sumExpression NOT_EQ sumExpression .
+   95 sumExpression: sumExpression . ADD term
+   96              | sumExpression . SUBTRACT term
 
     ADD       shift, and go to state 60
     SUBTRACT  shift, and go to state 61
@@ -1573,83 +1554,115 @@ State 94
     $default  reduce using rule 92 (relExpression)
 
 
-State 95
+state 94
 
-   97 term: term MULTIPLY unaryExpression .
+   93 relExpression: sumExpression EQUAL sumExpression .
+   95 sumExpression: sumExpression . ADD term
+   96              | sumExpression . SUBTRACT term
 
-    $default  reduce using rule 97 (term)
+    ADD       shift, and go to state 60
+    SUBTRACT  shift, and go to state 61
+
+    $default  reduce using rule 93 (relExpression)
 
 
-State 96
+state 95
 
-   98 term: term DIVIDE unaryExpression .
+   98 term: term MULTIPLY unaryExpression .
 
     $default  reduce using rule 98 (term)
 
 
-State 97
+state 96
 
-   81 simpleExpression: simpleExpression . LG_OR andExpression
-  106 mutable: identifier '[' simpleExpression . ']'
+   99 term: term DIVIDE unaryExpression .
 
-    LG_OR  shift, and go to state 58
-    ']'    shift, and go to state 110
+    $default  reduce using rule 99 (term)
 
 
-State 98
+state 97
 
-  115 arg: expression .
+  109 mutable: identifier '[' @20 . simpleExpression @21 ']'
 
-    $default  reduce using rule 115 (arg)
+    ADD           shift, and go to state 29
+    SUBTRACT      shift, and go to state 30
+    NOT           shift, and go to state 31
+    HEX_CONSTANT  shift, and go to state 32
+    DEC_CONSTANT  shift, and go to state 33
+    INT_CONSTANT  shift, and go to state 34
+    STRING        shift, and go to state 35
+    IDENTIFIER    shift, and go to state 14
+    '('           shift, and go to state 36
+
+    simpleExpression    go to state 110
+    andExpression       go to state 38
+    unaryRelExpression  go to state 39
+    relExpression       go to state 40
+    sumExpression       go to state 41
+    term                go to state 42
+    unaryExpression     go to state 43
+    factor              go to state 44
+    mutable             go to state 45
+    immutable           go to state 46
+    call                go to state 47
+    const_type          go to state 48
+    identifier          go to state 49
 
 
-State 99
+state 98
 
-  110 call: identifier '(' args . ')'
+  118 arg: expression .
+
+    $default  reduce using rule 118 (arg)
+
+
+state 99
+
+  113 call: identifier '(' args . ')'
 
     ')'  shift, and go to state 111
 
 
-State 100
+state 100
 
-  111 args: argList .
-  113 argList: argList . ',' arg
+  114 args: argList .
+  116 argList: argList . ',' arg
 
     ','  shift, and go to state 112
 
-    $default  reduce using rule 111 (args)
+    $default  reduce using rule 114 (args)
 
 
-State 101
+state 101
 
-  114 argList: arg .
+  117 argList: arg .
 
-    $default  reduce using rule 114 (argList)
-
-
-State 102
-
-   23 funDeclaration: typeSpecifier identifier $@1 '(' params ')' . $@2 compoundStmt
-
-    $default  reduce using rule 22 ($@2)
-
-    $@2  go to state 113
+    $default  reduce using rule 117 (argList)
 
 
-State 103
+state 102
+
+   23 funDeclaration: typeSpecifier identifier @1 '(' params ')' . @2 compoundStmt
+
+    $default  reduce using rule 22 (@2)
+
+    @2  go to state 113
+
+
+state 103
 
    26 paramList: paramList ',' . paramTypeList
 
-    $default  reduce using rule 28 ($@3)
+    $default  reduce using rule 28 (@3)
 
     paramTypeList  go to state 114
-    $@3            go to state 76
+    @3             go to state 76
 
 
-State 104
+state 104
 
    13 typeSpecifier: typeSpecifier . pointer
-   29 paramTypeList: $@3 typeSpecifier . paramId
+   29 paramTypeList: @3 typeSpecifier . paramId
 
     MULTIPLY    shift, and go to state 13
     IDENTIFIER  shift, and go to state 14
@@ -1659,9 +1672,9 @@ State 104
     identifier  go to state 116
 
 
-State 105
+state 105
 
-   69 expression: mutable ASSIGN $@14 . expression
+   70 expression: mutable ASSIGN @15 . expression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1689,9 +1702,9 @@ State 105
     identifier          go to state 49
 
 
-State 106
+state 106
 
-   71 expression: mutable ADD_ASSIGN $@15 . expression
+   72 expression: mutable ADD_ASSIGN @16 . expression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1719,9 +1732,9 @@ State 106
     identifier          go to state 49
 
 
-State 107
+state 107
 
-   73 expression: mutable SUB_ASSIGN $@16 . expression
+   74 expression: mutable SUB_ASSIGN @17 . expression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1749,9 +1762,9 @@ State 107
     identifier          go to state 49
 
 
-State 108
+state 108
 
-   75 expression: mutable MUL_ASSIGN $@17 . expression
+   76 expression: mutable MUL_ASSIGN @18 . expression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1779,9 +1792,9 @@ State 108
     identifier          go to state 49
 
 
-State 109
+state 109
 
-   77 expression: mutable DIV_ASSIGN $@18 . expression
+   78 expression: mutable DIV_ASSIGN @19 . expression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1809,23 +1822,28 @@ State 109
     identifier          go to state 49
 
 
-State 110
+state 110
 
-  106 mutable: identifier '[' simpleExpression ']' .
+   82 simpleExpression: simpleExpression . LG_OR andExpression
+  109 mutable: identifier '[' @20 simpleExpression . @21 ']'
 
-    $default  reduce using rule 106 (mutable)
+    LG_OR  shift, and go to state 58
 
+    $default  reduce using rule 108 (@21)
 
-State 111
-
-  110 call: identifier '(' args ')' .
-
-    $default  reduce using rule 110 (call)
+    @21  go to state 122
 
 
-State 112
+state 111
 
-  113 argList: argList ',' . arg
+  113 call: identifier '(' args ')' .
+
+    $default  reduce using rule 113 (call)
+
+
+state 112
+
+  116 argList: argList ',' . arg
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -1849,140 +1867,154 @@ State 112
     mutable             go to state 57
     immutable           go to state 46
     call                go to state 47
-    arg                 go to state 122
+    arg                 go to state 123
     const_type          go to state 48
     identifier          go to state 49
 
 
-State 113
+state 113
 
-   23 funDeclaration: typeSpecifier identifier $@1 '(' params ')' $@2 . compoundStmt
+   23 funDeclaration: typeSpecifier identifier @1 '(' params ')' @2 . compoundStmt
 
-    $default  reduce using rule 40 ($@4)
+    $default  reduce using rule 40 (@4)
 
-    compoundStmt  go to state 123
-    $@4           go to state 124
+    compoundStmt  go to state 124
+    @4            go to state 125
 
 
-State 114
+state 114
 
    26 paramList: paramList ',' paramTypeList .
 
     $default  reduce using rule 26 (paramList)
 
 
-State 115
+state 115
 
-   29 paramTypeList: $@3 typeSpecifier paramId .
+   29 paramTypeList: @3 typeSpecifier paramId .
 
     $default  reduce using rule 29 (paramTypeList)
 
 
-State 116
+state 116
 
    30 paramId: identifier .
    31        | identifier . '[' ']'
 
-    '['  shift, and go to state 125
+    '['  shift, and go to state 126
 
     $default  reduce using rule 30 (paramId)
 
 
-State 117
+state 117
 
-   69 expression: mutable ASSIGN $@14 expression .
+   70 expression: mutable ASSIGN @15 expression .
 
-    $default  reduce using rule 69 (expression)
-
-
-State 118
-
-   71 expression: mutable ADD_ASSIGN $@15 expression .
-
-    $default  reduce using rule 71 (expression)
+    $default  reduce using rule 70 (expression)
 
 
-State 119
+state 118
 
-   73 expression: mutable SUB_ASSIGN $@16 expression .
+   72 expression: mutable ADD_ASSIGN @16 expression .
 
-    $default  reduce using rule 73 (expression)
-
-
-State 120
-
-   75 expression: mutable MUL_ASSIGN $@17 expression .
-
-    $default  reduce using rule 75 (expression)
+    $default  reduce using rule 72 (expression)
 
 
-State 121
+state 119
 
-   77 expression: mutable DIV_ASSIGN $@18 expression .
+   74 expression: mutable SUB_ASSIGN @17 expression .
 
-    $default  reduce using rule 77 (expression)
-
-
-State 122
-
-  113 argList: argList ',' arg .
-
-    $default  reduce using rule 113 (argList)
+    $default  reduce using rule 74 (expression)
 
 
-State 123
+state 120
 
-   23 funDeclaration: typeSpecifier identifier $@1 '(' params ')' $@2 compoundStmt .
+   76 expression: mutable MUL_ASSIGN @18 expression .
 
-    $default  reduce using rule 23 (funDeclaration)
-
-
-State 124
-
-   41 compoundStmt: $@4 . '{' statementList '}'
-
-    '{'  shift, and go to state 126
+    $default  reduce using rule 76 (expression)
 
 
-State 125
+state 121
 
-   31 paramId: identifier '[' . ']'
+   78 expression: mutable DIV_ASSIGN @19 expression .
+
+    $default  reduce using rule 78 (expression)
+
+
+state 122
+
+  109 mutable: identifier '[' @20 simpleExpression @21 . ']'
 
     ']'  shift, and go to state 127
 
 
-State 126
+state 123
 
-   41 compoundStmt: $@4 '{' . statementList '}'
+  116 argList: argList ',' arg .
+
+    $default  reduce using rule 116 (argList)
+
+
+state 124
+
+   23 funDeclaration: typeSpecifier identifier @1 '(' params ')' @2 compoundStmt .
+
+    $default  reduce using rule 23 (funDeclaration)
+
+
+state 125
+
+   41 compoundStmt: @4 . '{' statementList '}'
+
+    '{'  shift, and go to state 128
+
+
+state 126
+
+   31 paramId: identifier '[' . ']'
+
+    ']'  shift, and go to state 129
+
+
+state 127
+
+  109 mutable: identifier '[' @20 simpleExpression @21 ']' .
+
+    $default  reduce using rule 109 (mutable)
+
+
+state 128
+
+   41 compoundStmt: @4 '{' . statementList '}'
 
     $default  reduce using rule 43 (statementList)
 
-    statementList  go to state 128
+    statementList  go to state 130
 
 
-State 127
+state 129
 
    31 paramId: identifier '[' ']' .
 
     $default  reduce using rule 31 (paramId)
 
 
-State 128
+state 130
 
-   41 compoundStmt: $@4 '{' statementList . '}'
+   41 compoundStmt: @4 '{' statementList . '}'
    42 statementList: statementList . statement
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
     VOID          shift, and go to state 1
-    IF            shift, and go to state 129
-    FOR           shift, and go to state 130
-    DO            shift, and go to state 131
-    WHILE         shift, and go to state 132
-    GOTO          shift, and go to state 133
-    BREAK         shift, and go to state 134
-    CONTINUE      shift, and go to state 135
-    RETURN        shift, and go to state 136
+    IF            shift, and go to state 131
+    FOR           shift, and go to state 132
+    DO            shift, and go to state 133
+    WHILE         shift, and go to state 134
+    GOTO          shift, and go to state 135
+    BREAK         shift, and go to state 136
+    CONTINUE      shift, and go to state 137
+    RETURN        shift, and go to state 138
     INT           shift, and go to state 2
     CHAR          shift, and go to state 3
     FLOAT         shift, and go to state 4
@@ -1992,24 +2024,24 @@ State 128
     INT_CONSTANT  shift, and go to state 34
     STRING        shift, and go to state 35
     IDENTIFIER    shift, and go to state 14
-    ';'           shift, and go to state 137
+    ';'           shift, and go to state 139
     '('           shift, and go to state 36
-    '}'           shift, and go to state 138
+    '}'           shift, and go to state 140
 
-    $default  reduce using rule 40 ($@4)
+    $default  reduce using rule 40 (@4)
 
-    varDeclaration      go to state 139
-    typeSpecifier       go to state 140
-    statement           go to state 141
-    compoundStmt        go to state 142
-    $@4                 go to state 124
-    expressionStmt      go to state 143
-    selectionStmt       go to state 144
-    iterationStmt       go to state 145
-    jumpStmt            go to state 146
-    returnStmt          go to state 147
-    breakStmt           go to state 148
-    expression          go to state 149
+    varDeclaration      go to state 141
+    typeSpecifier       go to state 142
+    statement           go to state 143
+    compoundStmt        go to state 144
+    @4                  go to state 125
+    expressionStmt      go to state 145
+    selectionStmt       go to state 146
+    iterationStmt       go to state 147
+    jumpStmt            go to state 148
+    returnStmt          go to state 149
+    breakStmt           go to state 150
+    expression          go to state 151
     simpleExpression    go to state 56
     andExpression       go to state 38
     unaryRelExpression  go to state 39
@@ -2025,63 +2057,63 @@ State 128
     identifier          go to state 49
 
 
-State 129
+state 131
 
-   47 selectionStmt: IF . '(' simpleExpression ')' $@5 compoundStmt else
+   47 selectionStmt: IF . '(' simpleExpression ')' @5 compoundStmt else
 
-    '('  shift, and go to state 150
-
-
-State 130
-
-   60 iterationStmt: FOR . '(' optExpression ';' optExpression $@10 ';' $@11 optExpression $@12 ')' $@13 statement
-
-    '('  shift, and go to state 151
+    '('  shift, and go to state 152
 
 
-State 131
+state 132
 
-   55 iterationStmt: DO . $@9 statement WHILE '(' expression ')' ';'
-
-    $default  reduce using rule 54 ($@9)
-
-    $@9  go to state 152
-
-
-State 132
-
-   53 iterationStmt: WHILE . '(' simpleExpression ')' $@7 $@8 statement
+   61 iterationStmt: FOR . '(' optExpression ';' optExpression @11 ';' @12 optExpression @13 ')' @14 statement
 
     '('  shift, and go to state 153
 
 
-State 133
+state 133
 
-   63 jumpStmt: GOTO . identifier ';'
+   56 iterationStmt: DO . @9 @10 statement WHILE '(' expression ')' ';'
+
+    $default  reduce using rule 54 (@9)
+
+    @9  go to state 154
+
+
+state 134
+
+   53 iterationStmt: WHILE . '(' simpleExpression ')' @7 @8 statement
+
+    '('  shift, and go to state 155
+
+
+state 135
+
+   64 jumpStmt: GOTO . identifier ';'
 
     IDENTIFIER  shift, and go to state 14
 
-    identifier  go to state 154
+    identifier  go to state 156
 
 
-State 134
+state 136
 
-   67 breakStmt: BREAK . ';'
+   68 breakStmt: BREAK . ';'
 
-    ';'  shift, and go to state 155
-
-
-State 135
-
-   64 jumpStmt: CONTINUE . ';'
-
-    ';'  shift, and go to state 156
+    ';'  shift, and go to state 157
 
 
-State 136
+state 137
 
-   65 returnStmt: RETURN . ';'
-   66           | RETURN . expression
+   65 jumpStmt: CONTINUE . ';'
+
+    ';'  shift, and go to state 158
+
+
+state 138
+
+   66 returnStmt: RETURN . ';'
+   67           | RETURN . expression
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -2091,10 +2123,10 @@ State 136
     INT_CONSTANT  shift, and go to state 34
     STRING        shift, and go to state 35
     IDENTIFIER    shift, and go to state 14
-    ';'           shift, and go to state 157
+    ';'           shift, and go to state 159
     '('           shift, and go to state 36
 
-    expression          go to state 158
+    expression          go to state 160
     simpleExpression    go to state 56
     andExpression       go to state 38
     unaryRelExpression  go to state 39
@@ -2110,28 +2142,28 @@ State 136
     identifier          go to state 49
 
 
-State 137
+state 139
 
    45 expressionStmt: ';' .
 
     $default  reduce using rule 45 (expressionStmt)
 
 
-State 138
+state 140
 
-   41 compoundStmt: $@4 '{' statementList '}' .
+   41 compoundStmt: @4 '{' statementList '}' .
 
     $default  reduce using rule 41 (compoundStmt)
 
 
-State 139
+state 141
 
    39 statement: varDeclaration .
 
     $default  reduce using rule 39 (statement)
 
 
-State 140
+state 142
 
     6 varDeclaration: typeSpecifier . varDeclList ';'
    13 typeSpecifier: typeSpecifier . pointer
@@ -2146,72 +2178,72 @@ State 140
     identifier         go to state 28
 
 
-State 141
+state 143
 
    42 statementList: statementList statement .
 
     $default  reduce using rule 42 (statementList)
 
 
-State 142
+state 144
 
    33 statement: compoundStmt .
 
     $default  reduce using rule 33 (statement)
 
 
-State 143
+state 145
 
    32 statement: expressionStmt .
 
     $default  reduce using rule 32 (statement)
 
 
-State 144
+state 146
 
    34 statement: selectionStmt .
 
     $default  reduce using rule 34 (statement)
 
 
-State 145
+state 147
 
    35 statement: iterationStmt .
 
     $default  reduce using rule 35 (statement)
 
 
-State 146
+state 148
 
    36 statement: jumpStmt .
 
     $default  reduce using rule 36 (statement)
 
 
-State 147
+state 149
 
    37 statement: returnStmt .
 
     $default  reduce using rule 37 (statement)
 
 
-State 148
+state 150
 
    38 statement: breakStmt .
 
     $default  reduce using rule 38 (statement)
 
 
-State 149
+state 151
 
    44 expressionStmt: expression . ';'
 
-    ';'  shift, and go to state 159
+    ';'  shift, and go to state 161
 
 
-State 150
+state 152
 
-   47 selectionStmt: IF '(' . simpleExpression ')' $@5 compoundStmt else
+   47 selectionStmt: IF '(' . simpleExpression ')' @5 compoundStmt else
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -2223,7 +2255,7 @@ State 150
     IDENTIFIER    shift, and go to state 14
     '('           shift, and go to state 36
 
-    simpleExpression    go to state 160
+    simpleExpression    go to state 162
     andExpression       go to state 38
     unaryRelExpression  go to state 39
     relExpression       go to state 40
@@ -2238,9 +2270,9 @@ State 150
     identifier          go to state 49
 
 
-State 151
+state 153
 
-   60 iterationStmt: FOR '(' . optExpression ';' optExpression $@10 ';' $@11 optExpression $@12 ')' $@13 statement
+   61 iterationStmt: FOR '(' . optExpression ';' optExpression @11 ';' @12 optExpression @13 ')' @14 statement
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -2252,10 +2284,10 @@ State 151
     IDENTIFIER    shift, and go to state 14
     '('           shift, and go to state 36
 
-    $default  reduce using rule 62 (optExpression)
+    $default  reduce using rule 63 (optExpression)
 
-    optExpression       go to state 161
-    expression          go to state 162
+    optExpression       go to state 163
+    expression          go to state 164
     simpleExpression    go to state 56
     andExpression       go to state 38
     unaryRelExpression  go to state 39
@@ -2271,65 +2303,18 @@ State 151
     identifier          go to state 49
 
 
-State 152
+state 154
 
-   55 iterationStmt: DO $@9 . statement WHILE '(' expression ')' ';'
+   56 iterationStmt: DO @9 . @10 statement WHILE '(' expression ')' ';'
 
-    ADD           shift, and go to state 29
-    SUBTRACT      shift, and go to state 30
-    VOID          shift, and go to state 1
-    IF            shift, and go to state 129
-    FOR           shift, and go to state 130
-    DO            shift, and go to state 131
-    WHILE         shift, and go to state 132
-    GOTO          shift, and go to state 133
-    BREAK         shift, and go to state 134
-    CONTINUE      shift, and go to state 135
-    RETURN        shift, and go to state 136
-    INT           shift, and go to state 2
-    CHAR          shift, and go to state 3
-    FLOAT         shift, and go to state 4
-    NOT           shift, and go to state 31
-    HEX_CONSTANT  shift, and go to state 32
-    DEC_CONSTANT  shift, and go to state 33
-    INT_CONSTANT  shift, and go to state 34
-    STRING        shift, and go to state 35
-    IDENTIFIER    shift, and go to state 14
-    ';'           shift, and go to state 137
-    '('           shift, and go to state 36
+    $default  reduce using rule 55 (@10)
 
-    $default  reduce using rule 40 ($@4)
-
-    varDeclaration      go to state 139
-    typeSpecifier       go to state 140
-    statement           go to state 163
-    compoundStmt        go to state 142
-    $@4                 go to state 124
-    expressionStmt      go to state 143
-    selectionStmt       go to state 144
-    iterationStmt       go to state 145
-    jumpStmt            go to state 146
-    returnStmt          go to state 147
-    breakStmt           go to state 148
-    expression          go to state 149
-    simpleExpression    go to state 56
-    andExpression       go to state 38
-    unaryRelExpression  go to state 39
-    relExpression       go to state 40
-    sumExpression       go to state 41
-    term                go to state 42
-    unaryExpression     go to state 43
-    factor              go to state 44
-    mutable             go to state 57
-    immutable           go to state 46
-    call                go to state 47
-    const_type          go to state 48
-    identifier          go to state 49
+    @10  go to state 165
 
 
-State 153
+state 155
 
-   53 iterationStmt: WHILE '(' . simpleExpression ')' $@7 $@8 statement
+   53 iterationStmt: WHILE '(' . simpleExpression ')' @7 @8 statement
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -2341,7 +2326,7 @@ State 153
     IDENTIFIER    shift, and go to state 14
     '('           shift, and go to state 36
 
-    simpleExpression    go to state 164
+    simpleExpression    go to state 166
     andExpression       go to state 38
     unaryRelExpression  go to state 39
     relExpression       go to state 40
@@ -2356,250 +2341,86 @@ State 153
     identifier          go to state 49
 
 
-State 154
+state 156
 
-   63 jumpStmt: GOTO identifier . ';'
+   64 jumpStmt: GOTO identifier . ';'
 
-    ';'  shift, and go to state 165
-
-
-State 155
-
-   67 breakStmt: BREAK ';' .
-
-    $default  reduce using rule 67 (breakStmt)
+    ';'  shift, and go to state 167
 
 
-State 156
+state 157
 
-   64 jumpStmt: CONTINUE ';' .
+   68 breakStmt: BREAK ';' .
 
-    $default  reduce using rule 64 (jumpStmt)
-
-
-State 157
-
-   65 returnStmt: RETURN ';' .
-
-    $default  reduce using rule 65 (returnStmt)
+    $default  reduce using rule 68 (breakStmt)
 
 
-State 158
+state 158
 
-   66 returnStmt: RETURN expression .
+   65 jumpStmt: CONTINUE ';' .
+
+    $default  reduce using rule 65 (jumpStmt)
+
+
+state 159
+
+   66 returnStmt: RETURN ';' .
 
     $default  reduce using rule 66 (returnStmt)
 
 
-State 159
+state 160
+
+   67 returnStmt: RETURN expression .
+
+    $default  reduce using rule 67 (returnStmt)
+
+
+state 161
 
    44 expressionStmt: expression ';' .
 
     $default  reduce using rule 44 (expressionStmt)
 
 
-State 160
+state 162
 
-   47 selectionStmt: IF '(' simpleExpression . ')' $@5 compoundStmt else
-   81 simpleExpression: simpleExpression . LG_OR andExpression
-
-    LG_OR  shift, and go to state 58
-    ')'    shift, and go to state 166
-
-
-State 161
-
-   60 iterationStmt: FOR '(' optExpression . ';' optExpression $@10 ';' $@11 optExpression $@12 ')' $@13 statement
-
-    ';'  shift, and go to state 167
-
-
-State 162
-
-   61 optExpression: expression .
-
-    $default  reduce using rule 61 (optExpression)
-
-
-State 163
-
-   55 iterationStmt: DO $@9 statement . WHILE '(' expression ')' ';'
-
-    WHILE  shift, and go to state 168
-
-
-State 164
-
-   53 iterationStmt: WHILE '(' simpleExpression . ')' $@7 $@8 statement
-   81 simpleExpression: simpleExpression . LG_OR andExpression
+   47 selectionStmt: IF '(' simpleExpression . ')' @5 compoundStmt else
+   82 simpleExpression: simpleExpression . LG_OR andExpression
 
     LG_OR  shift, and go to state 58
-    ')'    shift, and go to state 169
+    ')'    shift, and go to state 168
 
 
-State 165
+state 163
 
-   63 jumpStmt: GOTO identifier ';' .
+   61 iterationStmt: FOR '(' optExpression . ';' optExpression @11 ';' @12 optExpression @13 ')' @14 statement
 
-    $default  reduce using rule 63 (jumpStmt)
-
-
-State 166
-
-   47 selectionStmt: IF '(' simpleExpression ')' . $@5 compoundStmt else
-
-    $default  reduce using rule 46 ($@5)
-
-    $@5  go to state 170
+    ';'  shift, and go to state 169
 
 
-State 167
+state 164
 
-   60 iterationStmt: FOR '(' optExpression ';' . optExpression $@10 ';' $@11 optExpression $@12 ')' $@13 statement
-
-    ADD           shift, and go to state 29
-    SUBTRACT      shift, and go to state 30
-    NOT           shift, and go to state 31
-    HEX_CONSTANT  shift, and go to state 32
-    DEC_CONSTANT  shift, and go to state 33
-    INT_CONSTANT  shift, and go to state 34
-    STRING        shift, and go to state 35
-    IDENTIFIER    shift, and go to state 14
-    '('           shift, and go to state 36
+   62 optExpression: expression .
 
     $default  reduce using rule 62 (optExpression)
 
-    optExpression       go to state 171
-    expression          go to state 162
-    simpleExpression    go to state 56
-    andExpression       go to state 38
-    unaryRelExpression  go to state 39
-    relExpression       go to state 40
-    sumExpression       go to state 41
-    term                go to state 42
-    unaryExpression     go to state 43
-    factor              go to state 44
-    mutable             go to state 57
-    immutable           go to state 46
-    call                go to state 47
-    const_type          go to state 48
-    identifier          go to state 49
 
+state 165
 
-State 168
-
-   55 iterationStmt: DO $@9 statement WHILE . '(' expression ')' ';'
-
-    '('  shift, and go to state 172
-
-
-State 169
-
-   53 iterationStmt: WHILE '(' simpleExpression ')' . $@7 $@8 statement
-
-    $default  reduce using rule 51 ($@7)
-
-    $@7  go to state 173
-
-
-State 170
-
-   47 selectionStmt: IF '(' simpleExpression ')' $@5 . compoundStmt else
-
-    $default  reduce using rule 40 ($@4)
-
-    compoundStmt  go to state 174
-    $@4           go to state 124
-
-
-State 171
-
-   60 iterationStmt: FOR '(' optExpression ';' optExpression . $@10 ';' $@11 optExpression $@12 ')' $@13 statement
-
-    $default  reduce using rule 56 ($@10)
-
-    $@10  go to state 175
-
-
-State 172
-
-   55 iterationStmt: DO $@9 statement WHILE '(' . expression ')' ';'
-
-    ADD           shift, and go to state 29
-    SUBTRACT      shift, and go to state 30
-    NOT           shift, and go to state 31
-    HEX_CONSTANT  shift, and go to state 32
-    DEC_CONSTANT  shift, and go to state 33
-    INT_CONSTANT  shift, and go to state 34
-    STRING        shift, and go to state 35
-    IDENTIFIER    shift, and go to state 14
-    '('           shift, and go to state 36
-
-    expression          go to state 176
-    simpleExpression    go to state 56
-    andExpression       go to state 38
-    unaryRelExpression  go to state 39
-    relExpression       go to state 40
-    sumExpression       go to state 41
-    term                go to state 42
-    unaryExpression     go to state 43
-    factor              go to state 44
-    mutable             go to state 57
-    immutable           go to state 46
-    call                go to state 47
-    const_type          go to state 48
-    identifier          go to state 49
-
-
-State 173
-
-   53 iterationStmt: WHILE '(' simpleExpression ')' $@7 . $@8 statement
-
-    $default  reduce using rule 52 ($@8)
-
-    $@8  go to state 177
-
-
-State 174
-
-   47 selectionStmt: IF '(' simpleExpression ')' $@5 compoundStmt . else
-
-    ELSE      reduce using rule 48 ($@6)
-    $default  reduce using rule 50 (else)
-
-    else  go to state 178
-    $@6   go to state 179
-
-
-State 175
-
-   60 iterationStmt: FOR '(' optExpression ';' optExpression $@10 . ';' $@11 optExpression $@12 ')' $@13 statement
-
-    ';'  shift, and go to state 180
-
-
-State 176
-
-   55 iterationStmt: DO $@9 statement WHILE '(' expression . ')' ';'
-
-    ')'  shift, and go to state 181
-
-
-State 177
-
-   53 iterationStmt: WHILE '(' simpleExpression ')' $@7 $@8 . statement
+   56 iterationStmt: DO @9 @10 . statement WHILE '(' expression ')' ';'
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
     VOID          shift, and go to state 1
-    IF            shift, and go to state 129
-    FOR           shift, and go to state 130
-    DO            shift, and go to state 131
-    WHILE         shift, and go to state 132
-    GOTO          shift, and go to state 133
-    BREAK         shift, and go to state 134
-    CONTINUE      shift, and go to state 135
-    RETURN        shift, and go to state 136
+    IF            shift, and go to state 131
+    FOR           shift, and go to state 132
+    DO            shift, and go to state 133
+    WHILE         shift, and go to state 134
+    GOTO          shift, and go to state 135
+    BREAK         shift, and go to state 136
+    CONTINUE      shift, and go to state 137
+    RETURN        shift, and go to state 138
     INT           shift, and go to state 2
     CHAR          shift, and go to state 3
     FLOAT         shift, and go to state 4
@@ -2609,23 +2430,23 @@ State 177
     INT_CONSTANT  shift, and go to state 34
     STRING        shift, and go to state 35
     IDENTIFIER    shift, and go to state 14
-    ';'           shift, and go to state 137
+    ';'           shift, and go to state 139
     '('           shift, and go to state 36
 
-    $default  reduce using rule 40 ($@4)
+    $default  reduce using rule 40 (@4)
 
-    varDeclaration      go to state 139
-    typeSpecifier       go to state 140
-    statement           go to state 182
-    compoundStmt        go to state 142
-    $@4                 go to state 124
-    expressionStmt      go to state 143
-    selectionStmt       go to state 144
-    iterationStmt       go to state 145
-    jumpStmt            go to state 146
-    returnStmt          go to state 147
-    breakStmt           go to state 148
-    expression          go to state 149
+    varDeclaration      go to state 141
+    typeSpecifier       go to state 142
+    statement           go to state 170
+    compoundStmt        go to state 144
+    @4                  go to state 125
+    expressionStmt      go to state 145
+    selectionStmt       go to state 146
+    iterationStmt       go to state 147
+    jumpStmt            go to state 148
+    returnStmt          go to state 149
+    breakStmt           go to state 150
+    expression          go to state 151
     simpleExpression    go to state 56
     andExpression       go to state 38
     unaryRelExpression  go to state 39
@@ -2641,58 +2462,271 @@ State 177
     identifier          go to state 49
 
 
-State 178
+state 166
 
-   47 selectionStmt: IF '(' simpleExpression ')' $@5 compoundStmt else .
+   53 iterationStmt: WHILE '(' simpleExpression . ')' @7 @8 statement
+   82 simpleExpression: simpleExpression . LG_OR andExpression
+
+    LG_OR  shift, and go to state 58
+    ')'    shift, and go to state 171
+
+
+state 167
+
+   64 jumpStmt: GOTO identifier ';' .
+
+    $default  reduce using rule 64 (jumpStmt)
+
+
+state 168
+
+   47 selectionStmt: IF '(' simpleExpression ')' . @5 compoundStmt else
+
+    $default  reduce using rule 46 (@5)
+
+    @5  go to state 172
+
+
+state 169
+
+   61 iterationStmt: FOR '(' optExpression ';' . optExpression @11 ';' @12 optExpression @13 ')' @14 statement
+
+    ADD           shift, and go to state 29
+    SUBTRACT      shift, and go to state 30
+    NOT           shift, and go to state 31
+    HEX_CONSTANT  shift, and go to state 32
+    DEC_CONSTANT  shift, and go to state 33
+    INT_CONSTANT  shift, and go to state 34
+    STRING        shift, and go to state 35
+    IDENTIFIER    shift, and go to state 14
+    '('           shift, and go to state 36
+
+    $default  reduce using rule 63 (optExpression)
+
+    optExpression       go to state 173
+    expression          go to state 164
+    simpleExpression    go to state 56
+    andExpression       go to state 38
+    unaryRelExpression  go to state 39
+    relExpression       go to state 40
+    sumExpression       go to state 41
+    term                go to state 42
+    unaryExpression     go to state 43
+    factor              go to state 44
+    mutable             go to state 57
+    immutable           go to state 46
+    call                go to state 47
+    const_type          go to state 48
+    identifier          go to state 49
+
+
+state 170
+
+   56 iterationStmt: DO @9 @10 statement . WHILE '(' expression ')' ';'
+
+    WHILE  shift, and go to state 174
+
+
+state 171
+
+   53 iterationStmt: WHILE '(' simpleExpression ')' . @7 @8 statement
+
+    $default  reduce using rule 51 (@7)
+
+    @7  go to state 175
+
+
+state 172
+
+   47 selectionStmt: IF '(' simpleExpression ')' @5 . compoundStmt else
+
+    $default  reduce using rule 40 (@4)
+
+    compoundStmt  go to state 176
+    @4            go to state 125
+
+
+state 173
+
+   61 iterationStmt: FOR '(' optExpression ';' optExpression . @11 ';' @12 optExpression @13 ')' @14 statement
+
+    $default  reduce using rule 57 (@11)
+
+    @11  go to state 177
+
+
+state 174
+
+   56 iterationStmt: DO @9 @10 statement WHILE . '(' expression ')' ';'
+
+    '('  shift, and go to state 178
+
+
+state 175
+
+   53 iterationStmt: WHILE '(' simpleExpression ')' @7 . @8 statement
+
+    $default  reduce using rule 52 (@8)
+
+    @8  go to state 179
+
+
+state 176
+
+   47 selectionStmt: IF '(' simpleExpression ')' @5 compoundStmt . else
+
+    ELSE      reduce using rule 48 (@6)
+    $default  reduce using rule 50 (else)
+
+    else  go to state 180
+    @6    go to state 181
+
+
+state 177
+
+   61 iterationStmt: FOR '(' optExpression ';' optExpression @11 . ';' @12 optExpression @13 ')' @14 statement
+
+    ';'  shift, and go to state 182
+
+
+state 178
+
+   56 iterationStmt: DO @9 @10 statement WHILE '(' . expression ')' ';'
+
+    ADD           shift, and go to state 29
+    SUBTRACT      shift, and go to state 30
+    NOT           shift, and go to state 31
+    HEX_CONSTANT  shift, and go to state 32
+    DEC_CONSTANT  shift, and go to state 33
+    INT_CONSTANT  shift, and go to state 34
+    STRING        shift, and go to state 35
+    IDENTIFIER    shift, and go to state 14
+    '('           shift, and go to state 36
+
+    expression          go to state 183
+    simpleExpression    go to state 56
+    andExpression       go to state 38
+    unaryRelExpression  go to state 39
+    relExpression       go to state 40
+    sumExpression       go to state 41
+    term                go to state 42
+    unaryExpression     go to state 43
+    factor              go to state 44
+    mutable             go to state 57
+    immutable           go to state 46
+    call                go to state 47
+    const_type          go to state 48
+    identifier          go to state 49
+
+
+state 179
+
+   53 iterationStmt: WHILE '(' simpleExpression ')' @7 @8 . statement
+
+    ADD           shift, and go to state 29
+    SUBTRACT      shift, and go to state 30
+    VOID          shift, and go to state 1
+    IF            shift, and go to state 131
+    FOR           shift, and go to state 132
+    DO            shift, and go to state 133
+    WHILE         shift, and go to state 134
+    GOTO          shift, and go to state 135
+    BREAK         shift, and go to state 136
+    CONTINUE      shift, and go to state 137
+    RETURN        shift, and go to state 138
+    INT           shift, and go to state 2
+    CHAR          shift, and go to state 3
+    FLOAT         shift, and go to state 4
+    NOT           shift, and go to state 31
+    HEX_CONSTANT  shift, and go to state 32
+    DEC_CONSTANT  shift, and go to state 33
+    INT_CONSTANT  shift, and go to state 34
+    STRING        shift, and go to state 35
+    IDENTIFIER    shift, and go to state 14
+    ';'           shift, and go to state 139
+    '('           shift, and go to state 36
+
+    $default  reduce using rule 40 (@4)
+
+    varDeclaration      go to state 141
+    typeSpecifier       go to state 142
+    statement           go to state 184
+    compoundStmt        go to state 144
+    @4                  go to state 125
+    expressionStmt      go to state 145
+    selectionStmt       go to state 146
+    iterationStmt       go to state 147
+    jumpStmt            go to state 148
+    returnStmt          go to state 149
+    breakStmt           go to state 150
+    expression          go to state 151
+    simpleExpression    go to state 56
+    andExpression       go to state 38
+    unaryRelExpression  go to state 39
+    relExpression       go to state 40
+    sumExpression       go to state 41
+    term                go to state 42
+    unaryExpression     go to state 43
+    factor              go to state 44
+    mutable             go to state 57
+    immutable           go to state 46
+    call                go to state 47
+    const_type          go to state 48
+    identifier          go to state 49
+
+
+state 180
+
+   47 selectionStmt: IF '(' simpleExpression ')' @5 compoundStmt else .
 
     $default  reduce using rule 47 (selectionStmt)
 
 
-State 179
+state 181
 
-   49 else: $@6 . ELSE statement
+   49 else: @6 . ELSE statement
 
-    ELSE  shift, and go to state 183
-
-
-State 180
-
-   60 iterationStmt: FOR '(' optExpression ';' optExpression $@10 ';' . $@11 optExpression $@12 ')' $@13 statement
-
-    $default  reduce using rule 57 ($@11)
-
-    $@11  go to state 184
+    ELSE  shift, and go to state 185
 
 
-State 181
+state 182
 
-   55 iterationStmt: DO $@9 statement WHILE '(' expression ')' . ';'
+   61 iterationStmt: FOR '(' optExpression ';' optExpression @11 ';' . @12 optExpression @13 ')' @14 statement
 
-    ';'  shift, and go to state 185
+    $default  reduce using rule 58 (@12)
+
+    @12  go to state 186
 
 
-State 182
+state 183
 
-   53 iterationStmt: WHILE '(' simpleExpression ')' $@7 $@8 statement .
+   56 iterationStmt: DO @9 @10 statement WHILE '(' expression . ')' ';'
+
+    ')'  shift, and go to state 187
+
+
+state 184
+
+   53 iterationStmt: WHILE '(' simpleExpression ')' @7 @8 statement .
 
     $default  reduce using rule 53 (iterationStmt)
 
 
-State 183
+state 185
 
-   49 else: $@6 ELSE . statement
+   49 else: @6 ELSE . statement
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
     VOID          shift, and go to state 1
-    IF            shift, and go to state 129
-    FOR           shift, and go to state 130
-    DO            shift, and go to state 131
-    WHILE         shift, and go to state 132
-    GOTO          shift, and go to state 133
-    BREAK         shift, and go to state 134
-    CONTINUE      shift, and go to state 135
-    RETURN        shift, and go to state 136
+    IF            shift, and go to state 131
+    FOR           shift, and go to state 132
+    DO            shift, and go to state 133
+    WHILE         shift, and go to state 134
+    GOTO          shift, and go to state 135
+    BREAK         shift, and go to state 136
+    CONTINUE      shift, and go to state 137
+    RETURN        shift, and go to state 138
     INT           shift, and go to state 2
     CHAR          shift, and go to state 3
     FLOAT         shift, and go to state 4
@@ -2702,23 +2736,23 @@ State 183
     INT_CONSTANT  shift, and go to state 34
     STRING        shift, and go to state 35
     IDENTIFIER    shift, and go to state 14
-    ';'           shift, and go to state 137
+    ';'           shift, and go to state 139
     '('           shift, and go to state 36
 
-    $default  reduce using rule 40 ($@4)
+    $default  reduce using rule 40 (@4)
 
-    varDeclaration      go to state 139
-    typeSpecifier       go to state 140
-    statement           go to state 186
-    compoundStmt        go to state 142
-    $@4                 go to state 124
-    expressionStmt      go to state 143
-    selectionStmt       go to state 144
-    iterationStmt       go to state 145
-    jumpStmt            go to state 146
-    returnStmt          go to state 147
-    breakStmt           go to state 148
-    expression          go to state 149
+    varDeclaration      go to state 141
+    typeSpecifier       go to state 142
+    statement           go to state 188
+    compoundStmt        go to state 144
+    @4                  go to state 125
+    expressionStmt      go to state 145
+    selectionStmt       go to state 146
+    iterationStmt       go to state 147
+    jumpStmt            go to state 148
+    returnStmt          go to state 149
+    breakStmt           go to state 150
+    expression          go to state 151
     simpleExpression    go to state 56
     andExpression       go to state 38
     unaryRelExpression  go to state 39
@@ -2734,9 +2768,9 @@ State 183
     identifier          go to state 49
 
 
-State 184
+state 186
 
-   60 iterationStmt: FOR '(' optExpression ';' optExpression $@10 ';' $@11 . optExpression $@12 ')' $@13 statement
+   61 iterationStmt: FOR '(' optExpression ';' optExpression @11 ';' @12 . optExpression @13 ')' @14 statement
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
@@ -2748,10 +2782,10 @@ State 184
     IDENTIFIER    shift, and go to state 14
     '('           shift, and go to state 36
 
-    $default  reduce using rule 62 (optExpression)
+    $default  reduce using rule 63 (optExpression)
 
-    optExpression       go to state 187
-    expression          go to state 162
+    optExpression       go to state 189
+    expression          go to state 164
     simpleExpression    go to state 56
     andExpression       go to state 38
     unaryRelExpression  go to state 39
@@ -2767,60 +2801,67 @@ State 184
     identifier          go to state 49
 
 
-State 185
+state 187
 
-   55 iterationStmt: DO $@9 statement WHILE '(' expression ')' ';' .
+   56 iterationStmt: DO @9 @10 statement WHILE '(' expression ')' . ';'
 
-    $default  reduce using rule 55 (iterationStmt)
+    ';'  shift, and go to state 190
 
 
-State 186
+state 188
 
-   49 else: $@6 ELSE statement .
+   49 else: @6 ELSE statement .
 
     $default  reduce using rule 49 (else)
 
 
-State 187
+state 189
 
-   60 iterationStmt: FOR '(' optExpression ';' optExpression $@10 ';' $@11 optExpression . $@12 ')' $@13 statement
+   61 iterationStmt: FOR '(' optExpression ';' optExpression @11 ';' @12 optExpression . @13 ')' @14 statement
 
-    $default  reduce using rule 58 ($@12)
+    $default  reduce using rule 59 (@13)
 
-    $@12  go to state 188
-
-
-State 188
-
-   60 iterationStmt: FOR '(' optExpression ';' optExpression $@10 ';' $@11 optExpression $@12 . ')' $@13 statement
-
-    ')'  shift, and go to state 189
+    @13  go to state 191
 
 
-State 189
+state 190
 
-   60 iterationStmt: FOR '(' optExpression ';' optExpression $@10 ';' $@11 optExpression $@12 ')' . $@13 statement
+   56 iterationStmt: DO @9 @10 statement WHILE '(' expression ')' ';' .
 
-    $default  reduce using rule 59 ($@13)
-
-    $@13  go to state 190
+    $default  reduce using rule 56 (iterationStmt)
 
 
-State 190
+state 191
 
-   60 iterationStmt: FOR '(' optExpression ';' optExpression $@10 ';' $@11 optExpression $@12 ')' $@13 . statement
+   61 iterationStmt: FOR '(' optExpression ';' optExpression @11 ';' @12 optExpression @13 . ')' @14 statement
+
+    ')'  shift, and go to state 192
+
+
+state 192
+
+   61 iterationStmt: FOR '(' optExpression ';' optExpression @11 ';' @12 optExpression @13 ')' . @14 statement
+
+    $default  reduce using rule 60 (@14)
+
+    @14  go to state 193
+
+
+state 193
+
+   61 iterationStmt: FOR '(' optExpression ';' optExpression @11 ';' @12 optExpression @13 ')' @14 . statement
 
     ADD           shift, and go to state 29
     SUBTRACT      shift, and go to state 30
     VOID          shift, and go to state 1
-    IF            shift, and go to state 129
-    FOR           shift, and go to state 130
-    DO            shift, and go to state 131
-    WHILE         shift, and go to state 132
-    GOTO          shift, and go to state 133
-    BREAK         shift, and go to state 134
-    CONTINUE      shift, and go to state 135
-    RETURN        shift, and go to state 136
+    IF            shift, and go to state 131
+    FOR           shift, and go to state 132
+    DO            shift, and go to state 133
+    WHILE         shift, and go to state 134
+    GOTO          shift, and go to state 135
+    BREAK         shift, and go to state 136
+    CONTINUE      shift, and go to state 137
+    RETURN        shift, and go to state 138
     INT           shift, and go to state 2
     CHAR          shift, and go to state 3
     FLOAT         shift, and go to state 4
@@ -2830,23 +2871,23 @@ State 190
     INT_CONSTANT  shift, and go to state 34
     STRING        shift, and go to state 35
     IDENTIFIER    shift, and go to state 14
-    ';'           shift, and go to state 137
+    ';'           shift, and go to state 139
     '('           shift, and go to state 36
 
-    $default  reduce using rule 40 ($@4)
+    $default  reduce using rule 40 (@4)
 
-    varDeclaration      go to state 139
-    typeSpecifier       go to state 140
-    statement           go to state 191
-    compoundStmt        go to state 142
-    $@4                 go to state 124
-    expressionStmt      go to state 143
-    selectionStmt       go to state 144
-    iterationStmt       go to state 145
-    jumpStmt            go to state 146
-    returnStmt          go to state 147
-    breakStmt           go to state 148
-    expression          go to state 149
+    varDeclaration      go to state 141
+    typeSpecifier       go to state 142
+    statement           go to state 194
+    compoundStmt        go to state 144
+    @4                  go to state 125
+    expressionStmt      go to state 145
+    selectionStmt       go to state 146
+    iterationStmt       go to state 147
+    jumpStmt            go to state 148
+    returnStmt          go to state 149
+    breakStmt           go to state 150
+    expression          go to state 151
     simpleExpression    go to state 56
     andExpression       go to state 38
     unaryRelExpression  go to state 39
@@ -2862,8 +2903,8 @@ State 190
     identifier          go to state 49
 
 
-State 191
+state 194
 
-   60 iterationStmt: FOR '(' optExpression ';' optExpression $@10 ';' $@11 optExpression $@12 ')' $@13 statement .
+   61 iterationStmt: FOR '(' optExpression ';' optExpression @11 ';' @12 optExpression @13 ')' @14 statement .
 
-    $default  reduce using rule 60 (iterationStmt)
+    $default  reduce using rule 61 (iterationStmt)
