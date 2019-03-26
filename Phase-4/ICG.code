@@ -1,5 +1,22 @@
 func begin main
 i = 6
-return i
+L1 :
+t0 = i + 1
+i = t0
+j = 0
+t1 = j < 12
+L2 :
+if t1 goto L3
+goto L4
+L3 :
+t2 = i - 1
+i = t2
+j = j + 1
+goto L2
+L4 :
+t3 = i < 10
+if t3 goto L2
+goto L5
+L5 :
 func end
 exit

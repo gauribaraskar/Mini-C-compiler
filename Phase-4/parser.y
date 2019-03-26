@@ -66,6 +66,8 @@
     void gencode_return();
     void gencode_param();
     void gencode_array(char *data_type);
+    void gencode_doWhile_eval();
+    void gencode_doWhile_block();
     
     int Registerlabel = 0;
     int line_instruction = 0;
@@ -142,7 +144,7 @@
     varDeclList : varDeclList ',' varDeclInitialize | varDeclInitialize;
     
     varDeclInitialize : varDecId | varDecId assign_symbol simpleExpression {gencode(); $1->value = valAssign; typeCheck($1,$3,"="); is_declaration=1;} ;
-    varDecId : identifier {$$=$1;} | identifier '[' INT_CONSTANT  ']' { if($3->value < 1){yyerror("Arrays can't have dimension lesser than 1");} $$=$1; $1->is_array = 1; $1->array_dim = (int)$3->value;};
+    varDecId : identifier {$$=$1;} | identifier '[' INT_CONSTANT  ']' { if($3->value < 1){yyerror("Arrays can't have dimension lesser than 1"); return -1;} $$=$1; $1->is_array = 1; $1->array_dim = (int)$3->value;};
     typeSpecifier : typeSpecifier pointer
                   | INT {curr_data_type = strdup("INT");  is_declaration = 1; }
                   | VOID {curr_data_type = strdup("VOID");  is_declaration = 1; }
@@ -174,7 +176,7 @@
                      compoundStmt           { is_function = 0;
                                               if(!return_exists && strcmp(func_type,"VOID") != 0)
                                               {
-                                                yyerror("This Function must have a return type");
+                                                printf("Warning : Function %s must have a return type\n",$2->lexeme);
                                                 
                                               }
                                               fprintf(output,"func end\n");
@@ -207,30 +209,33 @@
     else : {gencode_if_else();}ELSE statement  | ;
 
     iterationStmt : WHILE '(' simpleExpression ')' {gencode_while();} {is_loop = 1;} statement { gencode_while_block(); is_loop = 0;}
-                  | DO {is_loop = 1;}statement WHILE '(' expression ')' ';' {is_loop = 0;}
+                  | DO {is_loop = 1;}  {gencode_doWhile_block();}statement  WHILE '(' expression ')'  ';' {is_loop = 0; {gencode_doWhile_eval();}}
                   | FOR '(' optExpression ';' optExpression {gencode_for_eval();} ';' {is_for = 1;} optExpression {is_for = 0;}  ')'{is_loop = 1;} statement {is_loop = 0;gencode_for_modif();};
     // Optional expressions in case of for
     optExpression : expression | ;
 
-    jumpStmt : GOTO identifier ';' | CONTINUE ';' {if(!is_loop) {yyerror("Illegal use of continue");} fprintf(output,"goto L%d\n",loop_constants[1]); };
-    returnStmt : RETURN ';'  { if(is_function) { if(strcmp(func_type,"VOID")!=0) yyerror("return type (VOID) does not match function type");}}
+    jumpStmt : GOTO identifier ';' | CONTINUE ';' {if(!is_loop) {yyerror("Illegal use of continue"); return -1;} fprintf(output,"goto L%d\n",loop_constants[1]); };
+    returnStmt : RETURN ';'  { if(is_function) { if(strcmp(func_type,"VOID")!=0) yyerror("return type (VOID) does not match function type"); return -1;}}
 
                | RETURN expression {
                                       return_exists = 1;
                                       if(strcmp(curr_data_type,$2->data_type)!=0)
+                                      {
                                         yyerror("return type does not match function type");
+                                        return -1;
+                                      }
                                       else
                                         gencode_return();
                                    } ;
-    breakStmt : BREAK ';' {if(!is_loop) {yyerror("Illegal use of break");} fprintf(output,"goto L%d\n",loop_constants[0]); };
+    breakStmt : BREAK ';' {if(!is_loop) {yyerror("Illegal use of break"); return -1;} fprintf(output,"goto L%d\n",loop_constants[0]); };
 
     expression : mutable ASSIGN {push("=");}  expression {typeCheck($1,$4,"=");$$ = $1;gencode(); $1->value = valAssign;}
                | mutable ADD_ASSIGN {push("+=");} expression {typeCheck($1,$4,"+=");$$ = $1;gencode();$1->value = valAssign;}
                | mutable SUB_ASSIGN {push("-=");} expression {typeCheck($1,$4,"-=");$$ = $1;gencode();$1->value = valAssign;}
                | mutable MUL_ASSIGN {push("*=");} expression {typeCheck($1,$4,"*=");$$ = $1;gencode(); $1->value = valAssign;}
                | mutable DIV_ASSIGN {push("/=");} expression {typeCheck($1,$4,"/=");$$ = $1;gencode(); $1->value = valAssign;}
-               | mutable INCREMENT {typeCheck($1,$1,"++"); $$ = $1;}
-               | mutable DECREMENT {typeCheck($1,$1,"--"); $$ = $1;}
+               | mutable INCREMENT {typeCheck($1,$1,"++"); $$ = $1; $1->value = $1->value + 1; fprintf(output,"%s = %s + 1\n",$1->lexeme,$1->lexeme);}
+               | mutable DECREMENT {typeCheck($1,$1,"--"); $$ = $1; $1->value = $1->value - 1; fprintf(output,"%s = %s - 1\n",$1->lexeme,$1->lexeme);}
                | simpleExpression { $$ = $1;} 
                ;
 
@@ -269,7 +274,7 @@
 
 
     factor : immutable {$$ = $1;} | mutable {$$ = $1;};
-    mutable : identifier {if(checkScope(yylval.str) == 0){ return -1;}; $$ = $1;}| identifier '[' {is_array=1;}simpleExpression {is_array=0;} ']' {if($4->value < 0 || $4->value >= $1->array_dim ){yyerror("Exceeds Array Dimensions\n"); } $$ = $1; gencode_array($1->data_type);}
+    mutable : identifier {if(checkScope(yylval.str) == 0){ return -1;}; $$ = $1;}| identifier '[' {is_array=1;}simpleExpression {is_array=0;} ']' {if($4->value < 0 || $4->value >= $1->array_dim ){yyerror("Exceeds Array Dimensions\n"); return -1; } $$ = $1; gencode_array($1->data_type);}
     immutable : '(' expression ')' { $$ = $2;}| call {$$=$1;} | const_type {$$=$1;} ;
     call : identifier  '(' args ')' { 
                                       if(checkFunc($1->lexeme) == 0)
@@ -395,6 +400,7 @@ int checkScope(char *val)
     if (res == NULL)
     {
         yyerror("Variable Not Declared\n");
+        exit(0);        
         return 0;
     }
     else
@@ -423,6 +429,7 @@ int checkScope(char *val)
         {
             
             yyerror("Variable Out Of Scope\n");
+            exit(0);
             return 0; 
         }
     }
@@ -887,4 +894,18 @@ void gencode_array(char *data_type)
     push(temp1);
 
     //fprintf(output,"ARRAY %s\n",ICGstack[--ICGtop]);
+}
+
+void gencode_doWhile_block()
+{
+    fprintf(output,"L%d :\n",++Declarationlabel);
+    loop_constants[0] = Declarationlabel;
+    loop_constants[1] = Declarationlabel + 1;
+}
+
+void gencode_doWhile_eval()
+{
+    fprintf(output,"if %s goto L%d\n",ICGstack[--ICGtop],loop_constants[0]);
+    fprintf(output,"goto L%d\n",++Declarationlabel);
+    fprintf(output,"L%d :\n",Declarationlabel); 
 }
