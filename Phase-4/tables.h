@@ -401,14 +401,14 @@ void Display(entry** TablePointer)
 
   printf("-----------------------------------------\n");
 
-  printf("\n\t(lexeme, \t    value, Data type, Line Number, isArray, ArrayDimensions, isFunction, Nesting Level, num_params\n");
+  printf("\n\t(lexeme, \tData type, \tLine Number, \tisArray, \tArrayDimensions, \tisFunction, \tNesting Level, \tnum_params\n");
 
   for(i=0;i<SIZE;i++)
   {
     temp = TablePointer[i];
     while(temp != NULL)
     {
-      printf("\t(%6s, %-5f, %9s, %11d, %7d, %15d, %10d, %13d, %10d)\n",temp->lexeme,temp->value,temp->data_type,temp->line_number,temp->is_array,temp->array_dim,temp->is_function,temp->nesting_level, temp->num_params);
+      printf("\t(%s, \t\t%s, \t\t%d, \t\t%d, \t\t%d, \t\t\t%d, \t\t%d, \t\t%d\t)\n",temp->lexeme,temp->data_type,temp->line_number,temp->is_array,temp->array_dim,temp->is_function,temp->nesting_level, temp->num_params);
       int j;
       if(temp->num_params > 0)
       {

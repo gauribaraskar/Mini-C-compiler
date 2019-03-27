@@ -1,15 +1,12 @@
 func begin main
-a = 10
-t0 = a < 20
-L1 :
-if t0 goto L2
-goto L3
-L2 :
-k = 1
-t1 = a + 1
-a = t1
-goto L1
-L3 :
+temp = 5
+t0 = 4 * 3
+t1 = arr[t0]
+t1 = 2
+t2 = temp - 3
+t3 = 4 * t2
+t4 = arr[t3]
+k = t4
 return 0
 func end
 exit
