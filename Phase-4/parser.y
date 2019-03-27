@@ -219,7 +219,7 @@
 
                | RETURN expression {
                                       return_exists = 1;
-                                      if(strcmp(curr_data_type,$2->data_type)!=0)
+                                      if(strcmp(func_type,$2->data_type)!=0)
                                       {
                                         yyerror("return type does not match function type");
                                         return -1;
