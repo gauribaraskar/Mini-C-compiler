@@ -198,7 +198,7 @@
     statement : expressionStmt  | compoundStmt  | selectionStmt | iterationStmt | jumpStmt | returnStmt | breakStmt | varDeclaration ;
 
     // compound statements produces a list of statements with its local declarations
-    compoundStmt : {curr_nest_level++; stack[top] = curr_nest_level; top+=1; insertNestStart(curr_nest_level,yylineno);} '{' statementList '}' {curr_nest_level++; insertNestEnd(stack[top-1],yylineno);top-=1;};
+    compoundStmt : {curr_nest_level++; stack[top] = curr_nest_level; top+=1; insertNestStart(curr_nest_level,yylineno);} '{' statementList '}' {curr_nest_level--; insertNestEnd(stack[top-1],yylineno);top-=1;};
     statementList : statementList statement
                   |  ;
     // Expressions
@@ -217,7 +217,7 @@
     jumpStmt : GOTO identifier ';' | CONTINUE ';' {if(!is_loop) {yyerror("Illegal use of continue"); return -1;} fprintf(output,"goto L%d\n",loop_constants[1]); };
     returnStmt : RETURN ';'  { if(is_function) { if(strcmp(func_type,"VOID")!=0) yyerror("return type (VOID) does not match function type"); return -1;}}
 
-               | RETURN expression {
+               | RETURN expression ';'{
                                       return_exists = 1;
                                       if(strcmp(func_type,$2->data_type)!=0)
                                       {
